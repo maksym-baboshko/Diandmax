@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { rsvpSchema } from "@/widgets/rsvp/schema";
+import { rsvpSchema } from "@/widgets/rsvp/model";
+import { getRsvpEmailConfig, sendRsvpNotification } from "@/widgets/rsvp/server";
+
+export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
@@ -13,13 +16,35 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log("RSVP submission:", result.data);
+    if (result.data.website) {
+      return NextResponse.json({ success: true });
+    }
 
-    return NextResponse.json({ success: true });
+    const emailConfig = getRsvpEmailConfig();
+
+    if (!emailConfig) {
+      console.error("RSVP API is missing required Resend configuration.");
+      return NextResponse.json(
+        { error: "RSVP is not configured", code: "RSVP_NOT_CONFIGURED" },
+        { status: 503 }
+      );
+    }
+
+    const emailId = await sendRsvpNotification(result.data, emailConfig);
+
+    return NextResponse.json({ success: true, id: emailId });
   } catch (error) {
     console.error("RSVP API error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal Server Error";
+
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      {
+        error:
+          process.env.NODE_ENV === "development"
+            ? errorMessage
+            : "Internal Server Error",
+      },
       { status: 500 }
     );
   }

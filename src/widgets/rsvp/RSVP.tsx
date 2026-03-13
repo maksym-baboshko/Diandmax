@@ -9,7 +9,7 @@ import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { SectionWrapper, SectionHeading, AnimatedReveal, Input, Textarea } from "@/shared/ui";
 import { cn, useLiteMotion } from "@/shared/lib";
 
-import { rsvpSchema, type RSVPFormData } from "./schema";
+import { rsvpSchema, type RSVPFormData } from "@/widgets/rsvp/model";
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -203,22 +203,100 @@ export function RSVP() {
   const [submitted, setSubmitted] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [submittedName, setSubmittedName] = useState("");
+  const [submittedAttending, setSubmittedAttending] = useState<RSVPFormData["attending"] | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<RSVPFormData>({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<RSVPFormData>({
     resolver: zodResolver(rsvpSchema),
-    defaultValues: { guests: 1 },
+    defaultValues: { guestNames: [""], guests: 1, website: "" },
   });
 
   const attending = watch("attending");
   const guests = watch("guests") ?? 1;
+  const watchedGuestNames = watch("guestNames");
+  const visibleGuestFieldsCount = attending === "yes" ? guests : 1;
 
-  const onSubmit = (data: RSVPFormData) => {
-    const trimmedName = data.name.trim();
-    const displayName = trimmedName.split(/\s+/)[0] ?? "";
+  useEffect(() => {
+    const currentGuestNames = watchedGuestNames?.length
+      ? watchedGuestNames
+      : [""];
 
-    setSubmittedName(displayName);
-    setShowConfetti(true);
-    setSubmitted(true);
+    if (currentGuestNames.length === visibleGuestFieldsCount) {
+      return;
+    }
+
+    if (currentGuestNames.length < visibleGuestFieldsCount) {
+      setValue(
+        "guestNames",
+        [
+          ...currentGuestNames,
+          ...Array.from(
+            { length: visibleGuestFieldsCount - currentGuestNames.length },
+            () => ""
+          ),
+        ],
+        { shouldDirty: true }
+      );
+
+      return;
+    }
+
+    setValue(
+      "guestNames",
+      currentGuestNames.slice(0, visibleGuestFieldsCount),
+      { shouldDirty: true }
+    );
+  }, [setValue, visibleGuestFieldsCount, watchedGuestNames]);
+
+  const onSubmit = async (data: RSVPFormData) => {
+    setSubmitError(null);
+
+    try {
+      const response = await fetch("/api/rsvp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const payload = (await response.json().catch(() => null)) as
+        | { success?: boolean; error?: string }
+        | null;
+
+      if (!response.ok || !payload?.success) {
+        throw new Error(payload?.error ?? "RSVP submission failed.");
+      }
+
+      const trimmedName = data.guestNames[0]?.trim() ?? "";
+      const displayName = trimmedName.split(/\s+/)[0] ?? "";
+
+      setSubmittedName(displayName);
+      setSubmittedAttending(data.attending);
+      reset({
+        guestNames: [""],
+        guests: 1,
+        dietary: "",
+        message: "",
+        website: "",
+      });
+      setShowConfetti(true);
+      setSubmitted(true);
+    } catch (error) {
+      console.warn("RSVP submit error:", error);
+      setSubmitError(
+        process.env.NODE_ENV === "development" && error instanceof Error
+          ? error.message
+          : t("error_generic")
+      );
+    }
   };
 
   useEffect(() => {
@@ -333,13 +411,18 @@ export function RSVP() {
               transition={{ duration: 0.6, delay: 0.7, ease }}
               className="relative z-10 mb-10 max-w-2xl text-base leading-relaxed text-text-secondary/60 md:text-xl"
             >
-              {t("success_subtitle")}
+              {submittedAttending === "no"
+                ? t("success_subtitle_no")
+                : t("success_subtitle_yes")}
             </motion.p>
             <motion.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.1 }}
-              onClick={() => setSubmitted(false)}
+              onClick={() => {
+                setSubmitted(false);
+                setSubmittedAttending(null);
+              }}
               className="relative z-10 cursor-pointer text-xs uppercase tracking-[0.18em] text-text-secondary/50 transition-colors duration-300 hover:text-accent md:text-sm"
             >
               ← {t("return_button")}
@@ -435,6 +518,14 @@ export function RSVP() {
 
               {/* Hidden field */}
               <input type="hidden" {...register("guests")} />
+              <input
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="sr-only"
+                {...register("website")}
+              />
 
               {/* Staggered form fields */}
               <motion.div
@@ -447,16 +538,50 @@ export function RSVP() {
 
                 {/* ── Name ── */}
                 <motion.div variants={formField}>
-                  <FieldLabel required>{t("name_label")}</FieldLabel>
-                  <Input
-                    id="name"
-                    placeholder={t("name_placeholder")}
-                    error={!!errors.name}
-                    className="rounded-2xl py-4 text-base"
-                    {...register("name")}
-                  />
-                  {errors.name && (
-                    <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-red-400/70">{t("name_min")}</p>
+                  <FieldLabel required>
+                    {visibleGuestFieldsCount > 1 ? t("guest_names_label") : t("name_label")}
+                  </FieldLabel>
+                  <div className="space-y-3">
+                    {Array.from({ length: visibleGuestFieldsCount }, (_, index) => {
+                      const fieldError = errors.guestNames?.[index];
+                      const isPrimaryField = index === 0;
+
+                      return (
+                        <div key={`guest-name-${index}`}>
+                          {visibleGuestFieldsCount > 1 && (
+                            <p className="mb-2 text-[10px] uppercase tracking-[0.15em] text-text-secondary/40">
+                              {t("guest_name_field_label", { number: index + 1 })}
+                            </p>
+                          )}
+                          <Input
+                            placeholder={
+                              isPrimaryField
+                                ? t("name_placeholder")
+                                : t("guest_name_placeholder")
+                            }
+                            error={!!fieldError}
+                            disabled={isSubmitting}
+                            className="rounded-2xl py-4 text-base"
+                            {...register(`guestNames.${index}`)}
+                          />
+                          {fieldError && (
+                            <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-red-400/70">
+                              {t("name_min")}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {visibleGuestFieldsCount > 1 && (
+                    <p className="mt-3 text-[10px] uppercase tracking-[0.13em] text-text-secondary/35">
+                      {t("guest_names_hint")}
+                    </p>
+                  )}
+                  {errors.guestNames && !Array.isArray(errors.guestNames) && (
+                    <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-red-400/70">
+                      {t("guest_names_required")}
+                    </p>
                   )}
                 </motion.div>
 
@@ -470,6 +595,7 @@ export function RSVP() {
                     {/* YES */}
                     <motion.button
                       type="button"
+                      disabled={isSubmitting}
                       whileTap={{ scale: 0.97 }}
                       onClick={() => setValue("attending", "yes", { shouldValidate: true })}
                       className={cn(
@@ -505,6 +631,7 @@ export function RSVP() {
                     {/* NO */}
                     <motion.button
                       type="button"
+                      disabled={isSubmitting}
                       whileTap={{ scale: 0.97 }}
                       onClick={() => setValue("attending", "no", { shouldValidate: true })}
                       className={cn(
@@ -556,6 +683,7 @@ export function RSVP() {
                         <div className="flex items-center justify-between w-full px-5 py-3 rounded-2xl border border-accent/15 bg-bg-primary/30">
                           <button
                             type="button"
+                            disabled={isSubmitting}
                             onClick={() => setValue("guests", Math.max(1, guests - 1), { shouldValidate: true })}
                             className="w-11 h-11 rounded-full border border-accent/25 text-accent/70 hover:bg-accent/10 hover:border-accent hover:text-accent transition-all duration-300 flex items-center justify-center text-xl leading-none cursor-pointer"
                             aria-label="−"
@@ -573,6 +701,7 @@ export function RSVP() {
                           </motion.span>
                           <button
                             type="button"
+                            disabled={isSubmitting}
                             onClick={() => setValue("guests", Math.min(10, guests + 1), { shouldValidate: true })}
                             className="w-11 h-11 rounded-full border border-accent/25 text-accent/70 hover:bg-accent/10 hover:border-accent hover:text-accent transition-all duration-300 flex items-center justify-center text-xl leading-none cursor-pointer"
                             aria-label="+"
@@ -588,6 +717,7 @@ export function RSVP() {
                         <Textarea
                           id="dietary"
                           placeholder={t("dietary_placeholder")}
+                          disabled={isSubmitting}
                           className="rounded-2xl text-sm min-h-24"
                           {...register("dietary")}
                         />
@@ -604,6 +734,7 @@ export function RSVP() {
                   <Textarea
                     id="message"
                     placeholder={t("message_placeholder")}
+                    disabled={isSubmitting}
                     className="rounded-2xl"
                     {...register("message")}
                   />
@@ -611,29 +742,36 @@ export function RSVP() {
 
                 {/* ── Submit ── */}
                 <motion.div variants={formField} className="pt-1">
+                  {submitError && (
+                    <p className="mb-3 text-center text-[10px] uppercase tracking-[0.13em] text-red-400/80">
+                      {submitError}
+                    </p>
+                  )}
                   <motion.button
                     type="submit"
-                    disabled={!attending}
-                    whileHover={attending ? { scale: 1.01 } : {}}
-                    whileTap={attending ? { scale: 0.99 } : {}}
+                    disabled={!attending || isSubmitting}
+                    whileHover={attending && !isSubmitting ? { scale: 1.01 } : {}}
+                    whileTap={attending && !isSubmitting ? { scale: 0.99 } : {}}
                     className={cn(
                       "w-full py-4 md:py-5 rounded-2xl relative overflow-hidden font-medium text-base md:text-lg tracking-wide transition-all duration-500",
-                      attending
+                      attending && !isSubmitting
                         ? "bg-accent text-bg-primary shadow-xl shadow-accent/20 cursor-pointer"
                         : "bg-accent/15 text-text-secondary/30 cursor-not-allowed"
                     )}
                   >
                     <span className="relative z-10 flex items-center justify-center gap-3">
-                      <span>{t("submit")}</span>
-                      <motion.span
-                        animate={attending ? { x: [0, 5, 0] } : {}}
-                        transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-                      >
-                        →
-                      </motion.span>
+                      <span>{isSubmitting ? t("submit_loading") : t("submit")}</span>
+                      {!isSubmitting && (
+                        <motion.span
+                          animate={attending ? { x: [0, 5, 0] } : {}}
+                          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+                        >
+                          →
+                        </motion.span>
+                      )}
                     </span>
                     {/* Shimmer sweep on hover — desktop only */}
-                    {attending && !liteMotion && (
+                    {attending && !isSubmitting && !liteMotion && (
                       <motion.div
                         initial={{ x: "-110%" }}
                         whileHover={{ x: "110%" }}
@@ -644,7 +782,11 @@ export function RSVP() {
                   </motion.button>
 
                   <p className="text-center text-[10px] uppercase tracking-[0.13em] text-text-secondary/30 mt-3">
-                    {!attending ? t("attendance_required") : t("coming_soon_note")}
+                    {!attending
+                      ? t("attendance_required")
+                      : isSubmitting
+                        ? t("submit_loading_note")
+                        : t("delivery_note")}
                   </p>
                 </motion.div>
 
