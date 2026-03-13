@@ -105,6 +105,7 @@
     "submit": "Submit",
     "success": "Thank you! Your response has been saved.",
     "success_title": "Thank you for your response!",
+    "success_title_named": "Thank you for your response, {name}!",
     "success_subtitle": "We can't wait to celebrate with you on June 28th.",
     "return_button": "Go back",
     "name_placeholder": "John Doe",

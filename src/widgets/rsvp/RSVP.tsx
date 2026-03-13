@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
@@ -71,17 +71,21 @@ const wave3 = Array.from({ length: 80 }, (_, i) => {
 
 const confettiPieces = [...wave1, ...wave2, ...wave3];
 
-// ── Lite confetti (mobile) — 32 pieces, opacity+y only, GPU-friendly ──────────
-const liteConfettiPieces = Array.from({ length: 32 }, (_, i) => ({
+// ── Lite confetti (mobile) — sustained stream with later waves from the top ───
+const liteConfettiPieces = Array.from({ length: 180 }, (_, i) => ({
   id: i + 5000,
-  x: (i / 32) * 100,
-  startY: -(6 + (i % 5) * 9),
-  delay: i * 0.055,
-  duration: 1.8 + (i % 6) * 0.22,
+  x: ((i * 0.618033988) % 1) * 100,
+  startY: -(18 + (i % 14) * 16),
+  delay: (i % 60) * 0.05,
+  duration: 4.4 + (i % 10) * 0.18,
+  midSwayX: (i % 2 === 0 ? 1 : -1) * (4 + (i % 6) * 2),
+  swayX: (i % 2 === 0 ? 1 : -1) * (10 + (i % 8) * 3),
+  rotate: (i % 2 === 0 ? 1 : -1) * (110 + (i % 7) * 32),
   color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-  width: 6 + (i % 3) * 7,
-  height: 3 + (i % 2) * 4,
-  opacity: 0.78 + (i % 3) * 0.08,
+  width: 2 + (i % 5) * 1.8,
+  height: 2 + (i % 3),
+  opacity: 0.72 + (i % 4) * 0.06,
+  radius: i % 4 === 0 ? 999 : 1.5,
 }));
 
 // ── Confetti overlay ──────────────────────────────────────────────────────────
@@ -91,17 +95,27 @@ function ConfettiOverlay({ onDone, lite }: { onDone: () => void; lite: boolean }
       initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: lite ? 0.7 : 1.5, delay: lite ? 2.4 : 5.0 }}
+      transition={{ duration: lite ? 0.9 : 1.5, delay: lite ? 8.6 : 5.0 }}
       onAnimationComplete={() => setTimeout(onDone, 100)}
-      className="fixed inset-0 pointer-events-none z-200 overflow-hidden"
+      className="fixed inset-0 z-[220] overflow-hidden pointer-events-none"
     >
       {lite
         ? liteConfettiPieces.map((piece) => (
             <motion.div
               key={piece.id}
-              initial={{ y: piece.startY, opacity: piece.opacity }}
-              animate={{ y: "115vh", opacity: [piece.opacity, piece.opacity, 0] }}
-              transition={{ duration: piece.duration, delay: piece.delay, ease: "easeIn" }}
+              initial={{ y: piece.startY, x: 0, rotate: 0, opacity: 0 }}
+              animate={{
+                y: "118vh",
+                x: [0, piece.midSwayX, piece.swayX],
+                rotate: [0, piece.rotate * 0.45, piece.rotate],
+                opacity: [0, piece.opacity, piece.opacity * 0.92, piece.opacity * 0.35, 0, 0],
+              }}
+              transition={{
+                duration: piece.duration,
+                delay: piece.delay,
+                ease: [0.12, 0.32, 0.85, 1],
+                times: [0, 0.08, 0.5, 0.66, 0.78, 1],
+              }}
               style={{
                 position: "absolute",
                 left: `${piece.x}%`,
@@ -109,7 +123,7 @@ function ConfettiOverlay({ onDone, lite }: { onDone: () => void; lite: boolean }
                 width: piece.width,
                 height: piece.height,
                 backgroundColor: piece.color,
-                borderRadius: 2,
+                borderRadius: piece.radius,
                 willChange: "transform, opacity",
               }}
             />
@@ -122,9 +136,14 @@ function ConfettiOverlay({ onDone, lite }: { onDone: () => void; lite: boolean }
                 y: "122vh",
                 x: [0, piece.swayX * 0.2, piece.swayX * 0.6, piece.swayX],
                 rotate: piece.rotate,
-                opacity: [piece.opacity, piece.opacity, piece.opacity * 0.85, 0],
+                opacity: [piece.opacity, piece.opacity, piece.opacity * 0.9, piece.opacity * 0.35, 0, 0],
               }}
-              transition={{ duration: piece.duration, delay: piece.delay, ease: [0.08, 0.3, 0.85, 1] }}
+              transition={{
+                duration: piece.duration,
+                delay: piece.delay,
+                ease: [0.08, 0.3, 0.85, 1],
+                times: [0, 0.45, 0.62, 0.74, 0.84, 1],
+              }}
               style={{
                 position: "absolute",
                 left: `${piece.x}%`,
@@ -183,6 +202,7 @@ export function RSVP() {
   const liteMotion = useLiteMotion();
   const [submitted, setSubmitted] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [submittedName, setSubmittedName] = useState("");
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<RSVPFormData>({
     resolver: zodResolver(rsvpSchema),
@@ -192,10 +212,27 @@ export function RSVP() {
   const attending = watch("attending");
   const guests = watch("guests") ?? 1;
 
-  const onSubmit = (_data: RSVPFormData) => {
+  const onSubmit = (data: RSVPFormData) => {
+    const trimmedName = data.name.trim();
+    const displayName = trimmedName.split(/\s+/)[0] ?? "";
+
+    setSubmittedName(displayName);
     setShowConfetti(true);
     setSubmitted(true);
   };
+
+  useEffect(() => {
+    if (!submitted) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [submitted]);
 
   // Stagger variants — defined inside component so liteMotion can influence delay
   const formStagger: Variants = {
@@ -226,19 +263,43 @@ export function RSVP() {
           )}
         </AnimatePresence>
 
-        <SectionWrapper id="rsvp" className="pt-24 pb-8 md:py-24">
-          <AnimatedReveal
-            direction="up"
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.35 }}
+          className="fixed inset-0 z-[180]"
+        >
+          <motion.div
+            initial={{ opacity: 0, y: liteMotion ? 18 : 28, scale: liteMotion ? 0.98 : 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: liteMotion ? 0.5 : 0.75, ease }}
             className={cn(
-              "max-w-md mx-auto text-center py-20 px-8 rounded-[2.5rem] bg-bg-secondary/50 border border-accent/20 shadow-2xl",
-              !liteMotion && "backdrop-blur-sm"
+              "relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-bg-primary px-8 py-16 text-center md:px-10 md:py-20",
+              !liteMotion && "backdrop-blur-md"
             )}
           >
+            <div
+              aria-hidden="true"
+              className={cn(
+                "absolute inset-0 bg-bg-primary/92",
+                !liteMotion && "backdrop-blur-md"
+              )}
+            />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-linear-to-b from-accent/8 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-accent/7 to-transparent" />
+            {!liteMotion && (
+              <>
+                <div className="pointer-events-none absolute top-[12%] right-[12%] h-64 w-64 rounded-full bg-accent/10 blur-[110px]" />
+                <div className="pointer-events-none absolute bottom-[10%] left-[10%] h-72 w-72 rounded-full bg-accent/9 blur-[120px]" />
+              </>
+            )}
+
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.9, ease }}
-              className="flex justify-center mb-8 text-accent"
+              className="relative z-10 mb-8 flex justify-center text-accent"
             >
               <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
                 <motion.circle
@@ -260,15 +321,17 @@ export function RSVP() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5, ease }}
-              className="heading-serif text-3xl md:text-4xl text-text-primary mb-4"
+              className="relative z-10 mb-4 max-w-3xl heading-serif text-4xl text-text-primary md:max-w-none md:whitespace-nowrap md:text-6xl"
             >
-              {t("success_title")}
+              {submittedName
+                ? t("success_title_named", { name: submittedName })
+                : t("success_title")}
             </motion.h3>
             <motion.p
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.7, ease }}
-              className="text-text-secondary/60 text-sm mb-8 leading-relaxed"
+              className="relative z-10 mb-10 max-w-2xl text-base leading-relaxed text-text-secondary/60 md:text-xl"
             >
               {t("success_subtitle")}
             </motion.p>
@@ -277,12 +340,12 @@ export function RSVP() {
               animate={{ opacity: 1 }}
               transition={{ delay: 1.1 }}
               onClick={() => setSubmitted(false)}
-              className="text-xs uppercase tracking-[0.18em] text-text-secondary/50 hover:text-accent transition-colors duration-300 cursor-pointer"
+              className="relative z-10 cursor-pointer text-xs uppercase tracking-[0.18em] text-text-secondary/50 transition-colors duration-300 hover:text-accent md:text-sm"
             >
               ← {t("return_button")}
             </motion.button>
-          </AnimatedReveal>
-        </SectionWrapper>
+          </motion.div>
+        </motion.div>
       </>
     );
   }
