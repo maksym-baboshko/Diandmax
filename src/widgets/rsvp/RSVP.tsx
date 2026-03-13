@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { SectionWrapper, SectionHeading, AnimatedReveal, Input, Textarea } from "@/shared/ui";
-import { cn } from "@/shared/lib";
+import { cn, useLiteMotion } from "@/shared/lib";
 
 import { rsvpSchema, type RSVPFormData } from "./schema";
 
@@ -153,6 +153,7 @@ function LeafIcon({ active }: { active: boolean }) {
 
 export function RSVP() {
   const t = useTranslations("RSVP");
+  const liteMotion = useLiteMotion();
   const [submitted, setSubmitted] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -179,7 +180,13 @@ export function RSVP() {
         </AnimatePresence>
 
         <SectionWrapper id="rsvp" className="pt-24 pb-8 md:py-24">
-          <AnimatedReveal direction="up" className="max-w-md mx-auto text-center py-20 px-8 rounded-[2.5rem] bg-bg-secondary/50 backdrop-blur-sm border border-accent/20 shadow-2xl">
+          <AnimatedReveal
+            direction="up"
+            className={cn(
+              "max-w-md mx-auto text-center py-20 px-8 rounded-[2.5rem] bg-bg-secondary/50 border border-accent/20 shadow-2xl",
+              !liteMotion && "backdrop-blur-sm"
+            )}
+          >
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -310,8 +317,12 @@ export function RSVP() {
 
             {/* ── FORM CONTENT (redesigned) ── */}
             <form onSubmit={handleSubmit(onSubmit)} className="relative z-10 p-8 md:p-12">
-              <div className="absolute -top-32 -right-32 w-80 h-80 bg-accent/20 rounded-full blur-[100px] pointer-events-none" />
-              <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-accent/20 rounded-full blur-[100px] pointer-events-none" />
+              {!liteMotion && (
+                <>
+                  <div className="absolute -top-32 -right-32 w-80 h-80 bg-accent/20 rounded-full blur-[100px] pointer-events-none" />
+                  <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-accent/20 rounded-full blur-[100px] pointer-events-none" />
+                </>
+              )}
 
               {/* Hidden field keeps "guests" registered with react-hook-form */}
               <input type="hidden" {...register("guests")} />

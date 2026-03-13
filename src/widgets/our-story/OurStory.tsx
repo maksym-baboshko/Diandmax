@@ -3,9 +3,11 @@
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { SectionWrapper, SectionHeading, AnimatedReveal, Ornament } from "@/shared/ui";
+import { useLiteMotion } from "@/shared/lib";
 
 export function OurStory() {
   const t = useTranslations("OurStory");
+  const liteMotion = useLiteMotion();
 
   return (
     <SectionWrapper id="our-story" className="relative overflow-hidden py-24">
@@ -18,10 +20,14 @@ export function OurStory() {
 
       <div className="max-w-5xl mx-auto px-4 mt-16 md:mt-24">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 lg:gap-24 mb-12 md:mb-24 relative">
-          <div className="absolute top-1/3 left-1/4 w-72 h-72 bg-accent/8 rounded-full blur-[80px] pointer-events-none -translate-x-1/2" />
-          <div className="absolute top-1/2 right-1/4 w-72 h-72 bg-accent/8 rounded-full blur-[80px] pointer-events-none translate-x-1/2" />
+          {!liteMotion && (
+            <>
+              <div className="absolute top-1/3 left-1/4 w-72 h-72 bg-accent/8 rounded-full blur-[80px] pointer-events-none -translate-x-1/2" />
+              <div className="absolute top-1/2 right-1/4 w-72 h-72 bg-accent/8 rounded-full blur-[80px] pointer-events-none translate-x-1/2" />
+            </>
+          )}
 
-          <AnimatedReveal direction="up" delay={0.1}>
+          <AnimatedReveal direction="up" delay={liteMotion ? 0 : 0.1}>
             <div className="flex flex-col items-center">
               <div className="relative w-full max-w-70 aspect-3/4 mb-4 md:mb-8 group">
                 <div className="absolute inset-0 border border-accent/70 rounded-t-[100px] rounded-b-sm transition-all duration-500 group-hover:border-accent shadow-[0_0_0_0_transparent] group-hover:shadow-[0_0_30px_4px_color-mix(in_srgb,var(--accent)_15%,transparent)] z-10 pointer-events-none" />
@@ -47,7 +53,7 @@ export function OurStory() {
             </div>
           </AnimatedReveal>
 
-          <AnimatedReveal direction="up" delay={0.2}>
+          <AnimatedReveal direction="up" delay={liteMotion ? 0 : 0.2}>
             <div className="flex flex-col items-center md:pt-16">
               <div className="relative w-full max-w-70 aspect-3/4 mb-4 md:mb-8 group">
                 <div className="absolute inset-0 border border-accent/70 rounded-t-[100px] rounded-b-sm transition-all duration-500 group-hover:border-accent shadow-[0_0_0_0_transparent] group-hover:shadow-[0_0_30px_4px_color-mix(in_srgb,var(--accent)_15%,transparent)] z-10 pointer-events-none" />
@@ -74,7 +80,7 @@ export function OurStory() {
           </AnimatedReveal>
         </div>
 
-        <AnimatedReveal direction="up" delay={0.1} threshold={0.1}>
+        <AnimatedReveal direction="up" delay={liteMotion ? 0 : 0.1} threshold={0.1}>
           <div className="max-w-3xl mx-auto text-center pt-8 md:pt-16 relative">
             <div className="absolute top-0 left-0 right-0 flex items-center justify-center gap-5 -translate-y-1/2">
               <div className="flex-1 h-px bg-accent/30" />

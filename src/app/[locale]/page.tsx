@@ -1,5 +1,3 @@
-"use client";
-
 import { Splash } from "@/widgets/splash";
 import { Navbar } from "@/widgets/navbar";
 import { Hero } from "@/widgets/hero";

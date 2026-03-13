@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { MapPin, ArrowUpRight } from "lucide-react";
 import { SectionWrapper, SectionHeading, AnimatedReveal, Button, Ornament } from "@/shared/ui";
 import { VENUE } from "@/shared/config";
+import { cn, useLiteMotion } from "@/shared/lib";
 
 const chips = [
   { icon: "\u{1F3DB}\u{FE0F}", key: "chip_history" },
@@ -12,6 +13,7 @@ const chips = [
 
 export function Location() {
   const t = useTranslations("Location");
+  const liteMotion = useLiteMotion();
 
   const googleMapsUrl =
     "https://www.google.com/maps/dir/?api=1&destination=Grand+Hotel+Terminus+Bergen";
@@ -21,12 +23,14 @@ export function Location() {
       <Ornament position="top-left" size="lg" className="opacity-20 z-30" />
       <Ornament position="bottom-right" size="lg" className="opacity-20 z-30" />
 
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none flex items-center justify-center"
-      >
-        <div className="w-200 h-100 rounded-full bg-accent/5 blur-3xl" />
-      </div>
+      {!liteMotion && (
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none flex items-center justify-center"
+        >
+          <div className="w-200 h-100 rounded-full bg-accent/5 blur-3xl" />
+        </div>
+      )}
 
       <SectionHeading subtitle={t("subtitle")}>{t("title")}</SectionHeading>
 
@@ -38,7 +42,7 @@ export function Location() {
 
               <div className="relative mb-8 inline-flex items-center justify-center">
                 <span
-                  className="absolute inline-flex h-16 w-16 rounded-full bg-accent/20 animate-ping"
+                  className={cn("absolute inline-flex h-16 w-16 rounded-full bg-accent/20", !liteMotion && "animate-ping")}
                   style={{ animationDuration: "2.5s" }}
                 />
                 <div className="relative inline-flex items-center justify-center p-4 rounded-full bg-accent/15 text-accent ring-1 ring-accent/20">

@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { SectionWrapper, SectionHeading, AnimatedReveal, Ornament } from "@/shared/ui";
-import { cn } from "@/shared/lib";
+import { cn, useLiteMotion } from "@/shared/lib";
 
 type TimelineEvent = {
   id: string;
@@ -56,6 +56,7 @@ const EVENT_ICONS: Record<string, React.ReactNode> = {
 
 export function Timeline() {
   const t = useTranslations("Timeline");
+  const liteMotion = useLiteMotion();
 
   const eventKeys = ["ceremony", "photo_session", "banquet", "activities", "cake", "sparklers"];
   const events: TimelineEvent[] = eventKeys.map((key) => ({
@@ -105,12 +106,12 @@ export function Timeline() {
                       {event.time}
                     </span>
                     <div className="relative flex items-center justify-center w-4 h-4">
-                      <div className="absolute w-6 h-6 rounded-full bg-accent/8 animate-pulse" />
+                      <div className={cn("absolute w-6 h-6 rounded-full bg-accent/8", !liteMotion && "animate-pulse")} />
                       <div className="absolute w-3 h-3 rounded-full bg-accent/15" />
                       <div className="w-1.5 h-1.5 rounded-full bg-accent/60" />
                     </div>
                   </div>
-                  <AnimatedReveal direction="right" delay={index * 0.1} className="pl-20 w-full">
+                  <AnimatedReveal direction={liteMotion ? "up" : "right"} delay={liteMotion ? 0 : index * 0.1} className="pl-20 w-full">
                     {cardContent}
                   </AnimatedReveal>
                 </div>
@@ -118,7 +119,7 @@ export function Timeline() {
                 <div className="hidden md:grid md:grid-cols-[1fr_8rem_1fr] md:items-center md:gap-0">
 
                   {isEven ? (
-                    <AnimatedReveal direction="right" delay={index * 0.1}>
+                    <AnimatedReveal direction={liteMotion ? "up" : "right"} delay={liteMotion ? 0 : index * 0.1}>
                       {cardContent}
                     </AnimatedReveal>
                   ) : (
@@ -132,7 +133,7 @@ export function Timeline() {
                   </div>
 
                   {!isEven ? (
-                    <AnimatedReveal direction="left" delay={index * 0.1}>
+                    <AnimatedReveal direction={liteMotion ? "up" : "left"} delay={liteMotion ? 0 : index * 0.1}>
                       {cardContent}
                     </AnimatedReveal>
                   ) : (

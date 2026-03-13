@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useInView, type Variant } from "framer-motion";
-import { cn } from "@/shared/lib/cn";
+import { cn, useLiteMotion } from "@/shared/lib";
 
 type Direction = "up" | "down" | "left" | "right" | "up-left" | "up-right" | "down-left" | "down-right";
 
@@ -28,6 +28,17 @@ const directionOffsets: Record<Direction, { x: number; y: number }> = {
   "down-right": { x: -80, y: -80 },
 };
 
+const liteDirectionOffsets: Record<Direction, { x: number; y: number }> = {
+  up: { x: 0, y: 24 },
+  down: { x: 0, y: -24 },
+  left: { x: 24, y: 0 },
+  right: { x: -24, y: 0 },
+  "up-left": { x: 20, y: 20 },
+  "up-right": { x: -20, y: 20 },
+  "down-left": { x: 20, y: -20 },
+  "down-right": { x: -20, y: -20 },
+};
+
 export function AnimatedReveal({
   children,
   className,
@@ -40,34 +51,42 @@ export function AnimatedReveal({
 }: AnimatedRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { amount: threshold, once });
+  const liteMotion = useLiteMotion();
 
-  const { x, y } = directionOffsets[direction];
+  const { x, y } = (liteMotion ? liteDirectionOffsets : directionOffsets)[direction];
+  const transitionDuration = liteMotion ? Math.min(duration, 0.45) : duration;
+  const transitionDelay = liteMotion ? Math.min(delay, 0.12) : delay;
+  const backdropBlur = blur && !liteMotion ? "blur(18px)" : undefined;
 
   const hidden: Variant = {
     opacity: 0.001,
     x,
     y,
-    ...(blur && { backdropFilter: "blur(0px)" }),
   };
 
   const visible: Variant = {
     opacity: 1,
     x: 0,
     y: 0,
-    ...(blur && { backdropFilter: "blur(32px)" }),
   };
 
   return (
     <motion.div
       ref={ref}
-      className={className}
+      className={cn("transform-gpu", className)}
       initial={hidden}
       animate={isInView ? visible : hidden}
+      style={{
+        ...(backdropBlur && {
+          backdropFilter: backdropBlur,
+          WebkitBackdropFilter: backdropBlur,
+        }),
+        willChange: isInView ? "auto" : "transform, opacity",
+      }}
       transition={{
-        duration,
-        delay,
+        duration: transitionDuration,
+        delay: transitionDelay,
         ease: [0.22, 1, 0.36, 1],
-        ...(blur && { backdropFilter: { duration: duration * 1.5, ease: "easeOut" } }),
       }}
     >
       {children}

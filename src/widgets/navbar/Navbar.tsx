@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { LanguageSwitcher } from "@/features/language-switcher";
 import { ThemeSwitcher } from "@/features/theme-switcher";
 import { Ornament } from "@/shared/ui";
-import { cn } from "@/shared/lib";
+import { cn, useLiteMotion } from "@/shared/lib";
 import { Link } from "@/shared/i18n/navigation";
 
 const NAV_LINKS = [
@@ -23,6 +23,7 @@ const ease = [0.22, 1, 0.36, 1] as const;
 
 export function Navbar() {
   const t = useTranslations("Navbar");
+  const liteMotion = useLiteMotion();
   const [isScrolled, setIsScrolled]         = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -54,8 +55,12 @@ export function Navbar() {
           "relative z-60 transition-all duration-500 py-4",
           "border-b",
           isScrolled || isMobileMenuOpen
-            ? "bg-bg-primary/80 backdrop-blur-2xl border-accent/10 shadow-lg py-3"
-            : "bg-bg-primary/20 backdrop-blur-md border-transparent"
+            ? liteMotion
+              ? "bg-bg-primary/96 border-accent/10 shadow-lg py-3"
+              : "bg-bg-primary/80 backdrop-blur-2xl border-accent/10 shadow-lg py-3"
+            : liteMotion
+              ? "bg-bg-primary/92 border-transparent"
+              : "bg-bg-primary/20 backdrop-blur-md border-transparent"
         )}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
@@ -113,7 +118,10 @@ export function Navbar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-bg-primary/96 backdrop-blur-2xl z-50 lg:hidden overflow-hidden"
+            className={cn(
+              "fixed inset-0 bg-bg-primary/96 z-50 lg:hidden overflow-hidden",
+              !liteMotion && "backdrop-blur-2xl"
+            )}
           >
             {/* Ghost M&D watermark bottom-right */}
             <div aria-hidden="true" className="absolute bottom-0 right-0 pointer-events-none overflow-hidden">
