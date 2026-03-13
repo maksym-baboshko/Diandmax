@@ -4,10 +4,10 @@ export const VENUE = {
   name: "Grand Hotel Terminus",
   address: "Zander Kaaes gate 6, Bergen, Norway",
   mapsUrl:
-    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1975.6!2d5.3290!3d60.3912!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x463cf9be0c15a9c3%3A0x9e3e0f8a7c7e8f0!2sGrand%20Hotel%20Terminus!5e0!3m2!1sen!2sno!4v1",
+    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7885.211927431506!2d5.3317077777744!3d60.39067347514558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x463cfeaee5dd6657%3A0xc2191cbcc53f2cb4!2sGrand%20Hotel%20Terminus!5e0!3m2!1sen!2sus!4v1773371922926!5m2!1sen!2sus",
   coordinates: {
-    lat: 60.3912,
-    lng: 5.329,
+    lat: 60.39067347514558,
+    lng: 5.3317077777744,
   },
 } as const;
 
@@ -33,8 +33,8 @@ export const DRESS_CODE = {
     colors: [
       { hex: "#C4B29A", name: { uk: "Теплий пісочний", en: "Warm Sand" } },
       { hex: "#4A3728", name: { uk: "Темний шоколад", en: "Dark Chocolate" } },
-      { hex: "#838C76", name: { uk: "Срібляста шавлія", en: "Silver Sage" } },
       { hex: "#383E42", name: { uk: "Благородний графіт", en: "Slate Graphite" } },
+      { hex: "#0A0A0A", name: { uk: "Опівнічний чорний", en: "Midnight Black" } },
     ],
   },
 } as const;

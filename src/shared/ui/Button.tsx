@@ -25,9 +25,9 @@ export function Button<T extends React.ElementType = "button">({
   const Component = as || "button";
 
   const variantStyles: Record<ButtonVariant, string> = {
-    primary: "bg-accent text-white hover:bg-accent-soft hover:text-text-primary shadow-sm hover:shadow-md",
+    primary: "bg-accent text-bg-primary hover:bg-accent-hover hover:text-bg-primary shadow-sm hover:shadow-md",
     secondary: "bg-bg-secondary text-text-primary hover:bg-accent-soft border border-accent/20",
-    outline: "border border-accent text-accent hover:bg-accent hover:text-white",
+    outline: "border border-accent text-accent hover:bg-accent hover:text-bg-primary",
     ghost: "text-text-secondary hover:text-accent hover:bg-accent-soft/20",
   };
 

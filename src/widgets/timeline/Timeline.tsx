@@ -74,7 +74,7 @@ export function Timeline() {
 
       <div className="max-w-5xl mx-auto px-4 mt-16 md:mt-24 relative">
         <div className="flex flex-col gap-12 md:gap-16 relative">
-          <div className="absolute left-9 md:left-1/2 top-0 bottom-0 w-px bg-linear-to-b from-transparent via-accent/60 to-transparent -translate-x-1/2 shadow-[0_0_8px_1px_color-mix(in_srgb,var(--accent)_25%,transparent)]" />
+          <div className="absolute left-9 md:left-1/2 top-0 bottom-0 w-px bg-linear-to-b from-transparent via-accent/40 to-transparent -translate-x-1/2" />
 
           {events.map((event, index) => {
             const isEven = index % 2 === 0;
@@ -101,13 +101,13 @@ export function Timeline() {
 
                 <div className="flex items-start md:hidden">
                   <div className="absolute left-9 top-5 -translate-x-1/2 flex flex-col items-center z-10">
-                    <span className="font-cinzel text-sm text-accent mb-3 bg-bg-primary px-2.5 py-1 border border-accent/25 rounded-full whitespace-nowrap shadow-[0_2px_12px_rgba(0,0,0,0.15)]">
+                    <span className="font-cinzel text-sm text-accent mb-3 bg-bg-primary px-2.5 py-1 border border-accent/25 rounded-full whitespace-nowrap">
                       {event.time}
                     </span>
                     <div className="relative flex items-center justify-center w-4 h-4">
-                      <div className="absolute w-8 h-8 rounded-full bg-accent/10 animate-pulse" />
-                      <div className="absolute w-4 h-4 rounded-full bg-accent/20" />
-                      <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_10px_3px_color-mix(in_srgb,var(--accent)_40%,transparent)]" />
+                      <div className="absolute w-6 h-6 rounded-full bg-accent/8 animate-pulse" />
+                      <div className="absolute w-3 h-3 rounded-full bg-accent/15" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-accent/60" />
                     </div>
                   </div>
                   <AnimatedReveal direction="right" delay={index * 0.1} className="pl-20 w-full">
@@ -126,7 +126,7 @@ export function Timeline() {
                   )}
 
                   <div className="flex items-center justify-center relative z-10">
-                    <span className="font-cinzel text-base text-accent bg-bg-primary px-3 py-1.5 border border-accent/35 rounded-full whitespace-nowrap shadow-[0_2px_16px_rgba(0,0,0,0.2),0_0_14px_3px_color-mix(in_srgb,var(--accent)_18%,transparent)]">
+                    <span className="font-cinzel text-base text-accent bg-bg-primary px-3 py-1.5 border border-accent/25 rounded-full whitespace-nowrap">
                       {event.time}
                     </span>
                   </div>

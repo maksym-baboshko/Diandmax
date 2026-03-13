@@ -18,8 +18,8 @@ export function Ornament({
   };
 
   const positionClasses = {
-    "top-left": "top-0 left-0",
-    "top-right": "top-0 right-0 -scale-x-100",
+    "top-left": "top-16 left-0",
+    "top-right": "top-16 right-0 -scale-x-100",
     "bottom-left": "bottom-0 left-0 -scale-y-100",
     "bottom-right": "bottom-0 right-0 -scale-x-100 -scale-y-100",
   };

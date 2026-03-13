@@ -2,31 +2,131 @@
 
 import { useTranslations } from "next-intl";
 import { Ornament } from "@/shared/ui";
-import { COUPLE, WEDDING_DATE } from "@/shared/config";
+import { VENUE, WEDDING_DATE } from "@/shared/config";
 
-const formattedDate = `${WEDDING_DATE.getDate().toString().padStart(2, "0")}.${(WEDDING_DATE.getMonth() + 1).toString().padStart(2, "0")}.${WEDDING_DATE.getFullYear()}`;
+const romanDate = "XXVIII · VI · MMXXVI";
 
 export function Footer() {
   const t = useTranslations("Footer");
+  const tHero = useTranslations("Hero");
+  const tNavbar = useTranslations("Navbar");
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  return (
-    <footer className="relative py-16 md:py-24 overflow-hidden bg-bg-primary">
-      <Ornament position="top-left" size="sm" className="opacity-10" />
-      <Ornament position="top-right" size="sm" className="opacity-10" />
+  const navLinks = [
+    { href: "#story", label: tNavbar("story") },
+    { href: "#timeline", label: tNavbar("timeline") },
+    { href: "#location", label: tNavbar("location") },
+    { href: "#dress-code", label: tNavbar("dress_code") },
+    { href: "#gifts", label: tNavbar("gifts") },
+    { href: "#rsvp", label: tNavbar("rsvp") },
+  ];
 
-      <div className="max-w-7xl mx-auto px-6 flex flex-col items-center">
+  return (
+    <footer className="relative overflow-hidden bg-bg-secondary">
+      {/* Smooth fade from previous section (bg-primary → bg-secondary) */}
+      <div
+        aria-hidden="true"
+        className="absolute top-0 inset-x-0 h-16 md:h-32 bg-linear-to-b from-bg-primary to-transparent pointer-events-none z-10"
+      />
+
+      {/* Top gold separator */}
+      <div className="relative z-20 mt-12 md:mt-28">
+        <hr className="gold-rule" />
+      </div>
+
+      {/* Ghost script watermark */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden"
+      >
+        {/* Mobile: initials only */}
+        <span className="md:hidden font-vibes text-[55vw] leading-none text-accent/4.5 whitespace-nowrap -translate-x-[10%]">
+          М &amp; Д
+        </span>
+        {/* Desktop: full names */}
+        <span className="hidden md:inline font-vibes text-[26vw] leading-none text-accent/4.5 whitespace-nowrap -translate-x-[8%] translate-y-[12%]">
+          {tHero("groom_name")} &amp; {tHero("bride_name")}
+        </span>
+      </div>
+
+      {/* Corner ornaments */}
+      <Ornament position="top-left"     size="lg" className="opacity-[0.09]" />
+      <Ornament position="top-right"    size="lg" className="opacity-[0.09]" />
+      <Ornament position="bottom-left"  size="sm" className="opacity-[0.06]" />
+      <Ornament position="bottom-right" size="sm" className="opacity-[0.06]" />
+
+      <div className="relative max-w-4xl mx-auto px-6 pt-10 md:pt-32 pb-10 flex flex-col items-center gap-10">
+
+        {/* Location label */}
+        <div className="flex items-center gap-3">
+          <span className="block h-px w-10 bg-linear-to-r from-transparent to-accent/35" />
+          <span className="text-[9px] tracking-[0.35em] uppercase text-text-secondary/55 font-medium">
+            Bergen · Norway
+          </span>
+          <span className="block h-px w-10 bg-linear-to-l from-transparent to-accent/35" />
+        </div>
+
+        {/* Names block */}
+        <div className="flex flex-col items-center gap-3 text-center">
+          <h2 className="heading-serif text-[2.5rem] md:text-[4.25rem] leading-none tracking-tight text-text-primary">
+            {tHero("groom_name")}
+            <span className="heading-serif-italic text-accent mx-3 md:mx-5 text-[2rem] md:text-[3.25rem]">
+              &amp;
+            </span>
+            {tHero("bride_name")}
+          </h2>
+
+          <p className="font-cinzel text-[0.6rem] md:text-[0.7rem] tracking-[0.45em] text-text-secondary/70 uppercase mt-1">
+            {romanDate}
+          </p>
+
+          <p className="text-xs tracking-wider text-text-secondary/50 mt-0.5">
+            {VENUE.name}
+          </p>
+        </div>
+
+        {/* Diamond divider */}
+        <div className="flex items-center gap-3 w-full max-w-[12rem]">
+          <div className="h-px flex-1 bg-linear-to-r from-transparent to-accent/35" />
+          <svg
+            width="7"
+            height="7"
+            viewBox="0 0 7 7"
+            className="text-accent/45 flex-shrink-0 rotate-45"
+          >
+            <rect width="7" height="7" fill="currentColor" />
+          </svg>
+          <div className="h-px flex-1 bg-linear-to-l from-transparent to-accent/35" />
+        </div>
+
+        {/* Nav links */}
+        <nav aria-label={t("back_to_top")}>
+          <ul className="flex flex-wrap justify-center gap-x-5 gap-y-2">
+            {navLinks.map(({ href, label }) => (
+              <li key={href}>
+                <a
+                  href={href}
+                  className="text-[9px] md:text-[10px] tracking-[0.2em] uppercase text-text-secondary/45 hover:text-accent transition-colors duration-300"
+                >
+                  {label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Back to top */}
         <button
           onClick={scrollToTop}
-          className="group flex flex-col items-center gap-3 mb-16 cursor-pointer"
+          className="group flex flex-col items-center gap-2 cursor-pointer mt-1"
         >
-          <div className="w-10 h-10 rounded-full border border-accent/30 flex items-center justify-center text-accent group-hover:bg-accent group-hover:text-white transition-all duration-500">
+          <div className="w-11 h-11 rounded-full border border-accent/20 flex items-center justify-center text-accent/45 group-hover:border-accent/50 group-hover:text-accent group-hover:bg-accent/10 transition-all duration-500">
             <svg
-              width="20"
-              height="20"
+              width="15"
+              height="15"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -37,33 +137,16 @@ export function Footer() {
               <path d="M18 15l-6-6-6 6" />
             </svg>
           </div>
-          <span className="text-xs tracking-[0.2em] uppercase text-text-secondary/60 font-medium group-hover:text-accent transition-colors duration-500">
+          <span className="text-[8px] tracking-[0.25em] uppercase text-text-secondary/35 group-hover:text-accent/55 transition-colors duration-300">
             {t("back_to_top")}
           </span>
         </button>
 
-        <div className="flex flex-col items-center gap-4 mb-8">
-          <h2 className="heading-serif text-3xl md:text-4xl text-text-primary">
-            {COUPLE.groom.name.en} <span className="text-accent italic">&</span> {COUPLE.bride.name.en}
-          </h2>
-          <div className="flex items-center gap-4">
-            <div className="h-px w-8 bg-accent/20" />
-            <span className="font-cinzel text-sm tracking-widest text-text-secondary">
-              {formattedDate}
-            </span>
-            <div className="h-px w-8 bg-accent/20" />
-          </div>
-        </div>
-
-        <p className="text-[10px] md:text-xs tracking-widest uppercase text-text-secondary/40 font-medium text-center">
-          &copy; {new Date().getFullYear()} &bull; {t("made_with_love")}
-        </p>
-
-        <div className="mt-8 text-accent/20">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-             <path d="M12 22C12 22 17 18 17 12C17 7 14 2 12 2C10 2 7 7 7 12C7 18 12 22 12 22Z" />
-             <path d="M12 2V22" />
-          </svg>
+        {/* Copyright */}
+        <div className="w-full border-t border-accent/[0.07] pt-5 flex items-center justify-center">
+          <p className="text-[8px] md:text-[9px] tracking-[0.25em] uppercase text-text-secondary/28 text-center">
+            &copy; {WEDDING_DATE.getFullYear()} &middot; {t("made_with_love")}
+          </p>
         </div>
       </div>
     </footer>

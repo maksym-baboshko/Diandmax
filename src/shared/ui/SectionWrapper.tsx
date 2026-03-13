@@ -24,7 +24,7 @@ export function SectionWrapper({
       id={id}
       className={cn(
         "relative w-full overflow-hidden",
-        !noPadding && "px-5 py-16 md:px-8 md:py-24 lg:py-32",
+        !noPadding && "px-5 py-10 md:px-8 md:py-24 lg:py-32",
         alternate ? "bg-bg-secondary" : "bg-bg-primary",
         fullHeight && "min-h-screen flex flex-col items-center justify-center",
         className

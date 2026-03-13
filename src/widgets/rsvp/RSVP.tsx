@@ -5,17 +5,156 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
-import { SectionWrapper, SectionHeading, AnimatedReveal, Button, Label, Input, Textarea } from "@/shared/ui";
+import { motion, AnimatePresence } from "framer-motion";
+import { SectionWrapper, SectionHeading, AnimatedReveal, Input, Textarea } from "@/shared/ui";
 import { cn } from "@/shared/lib";
 
 import { rsvpSchema, type RSVPFormData } from "./schema";
 
+const ease = [0.22, 1, 0.36, 1] as const;
+
+// ── Confetti ─────────────────────────────────────────────────────────────────
+const CONFETTI_COLORS = [
+  "#C9A96E", "#E8D5A3", "#F5E6C0", "#D4AF37",
+  "#B8860B", "#FAF0DC", "#E4C97E", "#F0E0B0",
+  "#C8A05E", "#EDD888", "#FFF3D4", "#A0782A",
+];
+
+// Wave 1 — instant burst: dense center cluster, very tight stagger (100 pieces)
+const wave1 = Array.from({ length: 100 }, (_, i) => ({
+  id: i,
+  x: 10 + ((i * 0.618033988) % 1) * 80,
+  startY: -15 - Math.abs(Math.sin(i * 2)) * 30,
+  delay: i * 0.007,
+  duration: 3.0 + Math.abs(Math.sin(i * 1.1)) * 2.5,
+  rotate: Math.cos(i * 1.2) * 1080,
+  swayX: Math.sin(i * 0.9) * 340,
+  width: 8 + Math.abs(Math.sin(i * 2.3)) * 16,
+  height: 3 + Math.abs(Math.cos(i * 1.7)) * 8,
+  color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+  opacity: 0.85 + Math.abs(Math.sin(i * 0.5)) * 0.15,
+}));
+
+// Wave 2 — full-width rain: spread across entire screen (160 pieces)
+const wave2 = Array.from({ length: 160 }, (_, i) => {
+  const j = i + 100;
+  return {
+    id: j,
+    x: ((i * 0.618033988) % 1) * 100,
+    startY: -25 - Math.abs(Math.sin(j * 0.7)) * 120,
+    delay: 0.05 + (i % 20) * 0.09,
+    duration: 4.0 + Math.abs(Math.sin(j * 1.7)) * 3.5,
+    rotate: Math.cos(j * 0.8) * 800,
+    swayX: Math.sin(j * 1.3) * 280,
+    width: 4 + Math.abs(Math.sin(j * 2.1)) * 20,
+    height: 2 + Math.abs(Math.cos(j * 1.9)) * 8,
+    color: CONFETTI_COLORS[j % CONFETTI_COLORS.length],
+    opacity: 0.65 + Math.abs(Math.sin(j * 0.5)) * 0.35,
+  };
+});
+
+// Wave 3 — slow drifters: wide sway, linger long (80 pieces)
+const wave3 = Array.from({ length: 80 }, (_, i) => {
+  const j = i + 260;
+  return {
+    id: j,
+    x: ((i * 0.618033988) % 1) * 100,
+    startY: -8,
+    delay: 0.4 + i * 0.028,
+    duration: 5.5 + Math.abs(Math.sin(j * 1.3)) * 3,
+    rotate: Math.cos(j * 0.5) * 540,
+    swayX: Math.sin(j * 0.7) * 460,
+    width: 9 + Math.abs(Math.sin(j * 1.8)) * 13,
+    height: 4 + Math.abs(Math.cos(j * 2.2)) * 5,
+    color: CONFETTI_COLORS[j % CONFETTI_COLORS.length],
+    opacity: 0.55 + Math.abs(Math.sin(j * 0.5)) * 0.4,
+  };
+});
+
+const confettiPieces = [...wave1, ...wave2, ...wave3];
+
+function ConfettiOverlay({ onDone }: { onDone: () => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 1.5, delay: 5.0 }}
+      onAnimationComplete={() => {
+        setTimeout(onDone, 100);
+      }}
+      className="fixed inset-0 pointer-events-none z-[200] overflow-hidden"
+    >
+      {confettiPieces.map((piece) => (
+        <motion.div
+          key={piece.id}
+          initial={{ y: piece.startY, x: 0, rotate: 0, opacity: piece.opacity }}
+          animate={{
+            y: "122vh",
+            x: [0, piece.swayX * 0.2, piece.swayX * 0.6, piece.swayX],
+            rotate: piece.rotate,
+            opacity: [piece.opacity, piece.opacity, piece.opacity * 0.85, 0],
+          }}
+          transition={{
+            duration: piece.duration,
+            delay: piece.delay,
+            ease: [0.08, 0.3, 0.85, 1],
+          }}
+          style={{
+            position: "absolute",
+            left: `${piece.x}%`,
+            top: 0,
+            width: piece.width,
+            height: piece.height,
+            backgroundColor: piece.color,
+            borderRadius: 2,
+          }}
+        />
+      ))}
+    </motion.div>
+  );
+}
+
+function FieldLabel({ children, required }: { children: React.ReactNode; required?: boolean }) {
+  return (
+    <p className="text-xs uppercase tracking-[0.18em] text-text-secondary/55 mb-3 font-medium">
+      {children}
+      {required && <span className="text-accent ml-1">*</span>}
+    </p>
+  );
+}
+
+function Divider() {
+  return <div className="h-px bg-accent/8" />;
+}
+
+function RingIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+      className={cn("transition-all duration-500", active ? "text-accent" : "text-text-secondary/25")}
+    >
+      <circle cx="13" cy="13" r="8.5" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="13" cy="13" r="4.5" stroke="currentColor" strokeWidth="1" strokeOpacity="0.5" />
+      <path d="M8.5 13 Q13 7.5 17.5 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+    </svg>
+  );
+}
+
+function LeafIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+      className={cn("transition-all duration-500", active ? "text-text-primary" : "text-text-secondary/25")}
+    >
+      <circle cx="13" cy="13" r="8.5" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M9 13 L17 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function RSVP() {
   const t = useTranslations("RSVP");
   const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<RSVPFormData>({
     resolver: zodResolver(rsvpSchema),
@@ -23,51 +162,85 @@ export function RSVP() {
   });
 
   const attending = watch("attending");
+  const guests = watch("guests") ?? 1;
 
-  const onSubmit = async (data: RSVPFormData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch("/api/rsvp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error("Submission failed");
-      }
-
-      setSubmitted(true);
-    } catch (err) {
-      console.error("Form submission error:", err);
-      setError(t("error_generic"));
-    } finally {
-      setLoading(false);
-    }
+  const onSubmit = (_data: RSVPFormData) => {
+    setShowConfetti(true);
+    setSubmitted(true);
   };
 
   if (submitted) {
     return (
-      <SectionWrapper id="rsvp" className="py-24">
-        <AnimatedReveal direction="up" className="max-w-md mx-auto text-center py-16 px-8 rounded-[2.5rem] bg-bg-secondary/50 backdrop-blur-sm border border-accent/20 shadow-2xl">
-          <div className="text-6xl mb-8 animate-bounce">🎉</div>
-          <h3 className="heading-serif text-3xl md:text-4xl text-text-primary mb-6">{t("success")}</h3>
-          <Button onClick={() => setSubmitted(false)} variant="outline">
-            ← {t("return_button")}
-          </Button>
-        </AnimatedReveal>
-      </SectionWrapper>
+      <>
+        <AnimatePresence>
+          {showConfetti && (
+            <ConfettiOverlay onDone={() => setShowConfetti(false)} />
+          )}
+        </AnimatePresence>
+
+        <SectionWrapper id="rsvp" className="pt-24 pb-8 md:py-24">
+          <AnimatedReveal direction="up" className="max-w-md mx-auto text-center py-20 px-8 rounded-[2.5rem] bg-bg-secondary/50 backdrop-blur-sm border border-accent/20 shadow-2xl">
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.9, ease }}
+              className="flex justify-center mb-8 text-accent"
+            >
+              <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                <motion.circle
+                  cx="32" cy="32" r="28"
+                  stroke="currentColor" strokeWidth="1.5"
+                  initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+                  transition={{ duration: 1.2, delay: 0.2, ease }}
+                />
+                <motion.path
+                  d="M19 32 L28 41 L45 24"
+                  stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                  fill="none"
+                  initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+                  transition={{ duration: 0.7, delay: 0.9, ease }}
+                />
+              </svg>
+            </motion.div>
+            <motion.h3
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5, ease }}
+              className="heading-serif text-3xl md:text-4xl text-text-primary mb-4"
+            >
+              {t("success_title")}
+            </motion.h3>
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.7, ease }}
+              className="text-text-secondary/60 text-sm mb-8 leading-relaxed"
+            >
+              {t("success_subtitle")}
+            </motion.p>
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.1 }}
+              onClick={() => setSubmitted(false)}
+              className="text-xs uppercase tracking-[0.18em] text-text-secondary/50 hover:text-accent transition-colors duration-300 cursor-pointer"
+            >
+              ← {t("return_button")}
+            </motion.button>
+          </AnimatedReveal>
+        </SectionWrapper>
+      </>
     );
   }
 
   return (
-    <SectionWrapper id="rsvp" className="py-24 relative overflow-hidden">
+    <SectionWrapper id="rsvp" className="pt-12 pb-8 md:py-24 relative overflow-hidden">
       <SectionHeading subtitle={t("subtitle")}>{t("title")}</SectionHeading>
 
-      <div className="max-w-7xl mx-auto mt-24 md:mt-32 px-4 relative z-10 flex flex-col xl:flex-row items-center justify-center">
+      <div className="max-w-7xl mx-auto mt-12 md:mt-32 px-4 relative z-10 flex flex-col xl:flex-row items-center justify-center">
         <div className="w-full max-w-2xl shrink-0 relative py-12">
 
+          {/* Photos — untouched */}
           <div className="hidden lg:block">
             <motion.div
               initial={{ opacity: 0, x: 40, y: 40 }}
@@ -78,14 +251,7 @@ export function RSVP() {
             >
               <div className="relative group">
                 <div className="relative aspect-3/4 rounded-[2.5rem] overflow-hidden border border-accent/20 shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-transform duration-700 hover:scale-[1.05] hover:rotate-6 rotate-2">
-                  <Image
-                    src="/images/rsvp/1.jpeg"
-                    alt=""
-                    fill
-                    sizes="(min-width: 1280px) 240px, 208px"
-                    loading="lazy"
-                    className="object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all duration-1000"
-                  />
+                  <Image src="/images/rsvp/1.jpeg" alt="" fill sizes="(min-width: 1280px) 240px, 208px" loading="lazy" className="object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all duration-1000" />
                 </div>
               </div>
             </motion.div>
@@ -99,14 +265,7 @@ export function RSVP() {
             >
               <div className="relative group">
                 <div className="relative aspect-3/4 rounded-[2.5rem] overflow-hidden border border-accent/30 shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-transform duration-700 hover:scale-[1.05] hover:-rotate-6 -rotate-2">
-                  <Image
-                    src="/images/rsvp/2.jpeg"
-                    alt=""
-                    fill
-                    sizes="(min-width: 1280px) 240px, 208px"
-                    loading="lazy"
-                    className="object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all duration-1000"
-                  />
+                  <Image src="/images/rsvp/2.jpeg" alt="" fill sizes="(min-width: 1280px) 240px, 208px" loading="lazy" className="object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all duration-1000" />
                 </div>
               </div>
             </motion.div>
@@ -120,14 +279,7 @@ export function RSVP() {
             >
               <div className="relative group">
                 <div className="relative aspect-3/4 rounded-[2.5rem] overflow-hidden border border-accent/20 shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-transform duration-700 hover:scale-[1.05] hover:-rotate-6 -rotate-2">
-                  <Image
-                    src="/images/rsvp/3.jpeg"
-                    alt=""
-                    fill
-                    sizes="(min-width: 1280px) 240px, 208px"
-                    loading="lazy"
-                    className="object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all duration-1000"
-                  />
+                  <Image src="/images/rsvp/3.jpeg" alt="" fill sizes="(min-width: 1280px) 240px, 208px" loading="lazy" className="object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all duration-1000" />
                 </div>
               </div>
             </motion.div>
@@ -141,19 +293,13 @@ export function RSVP() {
             >
               <div className="relative group">
                 <div className="relative aspect-3/4 rounded-[2.5rem] overflow-hidden border border-accent/20 shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-transform duration-700 hover:scale-[1.05] hover:rotate-6 rotate-2">
-                  <Image
-                    src="/images/rsvp/4.jpeg"
-                    alt=""
-                    fill
-                    sizes="(min-width: 1280px) 240px, 208px"
-                    loading="lazy"
-                    className="object-cover object-[center_60%] grayscale-[0.3] group-hover:grayscale-0 transition-all duration-1000"
-                  />
+                  <Image src="/images/rsvp/4.jpeg" alt="" fill sizes="(min-width: 1280px) 240px, 208px" loading="lazy" className="object-cover object-[center_60%] grayscale-[0.3] group-hover:grayscale-0 transition-all duration-1000" />
                 </div>
               </div>
             </motion.div>
           </div>
 
+          {/* Glass card — untouched */}
           <AnimatedReveal
             direction="up"
             duration={1.2}
@@ -162,109 +308,219 @@ export function RSVP() {
           >
             <div className="absolute inset-0 rounded-[2.5rem] border border-accent/0 group-hover/form:border-accent/30 transition-colors duration-500 pointer-events-none z-20" />
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 p-8 md:p-12 relative z-10">
+            {/* ── FORM CONTENT (redesigned) ── */}
+            <form onSubmit={handleSubmit(onSubmit)} className="relative z-10 p-8 md:p-12">
               <div className="absolute -top-32 -right-32 w-80 h-80 bg-accent/20 rounded-full blur-[100px] pointer-events-none" />
               <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-accent/20 rounded-full blur-[100px] pointer-events-none" />
 
-              <div className="space-y-8 relative z-10">
-                <div className="space-y-2">
-                  <Label htmlFor="name" required>{t("name_label")}</Label>
+              {/* Hidden field keeps "guests" registered with react-hook-form */}
+              <input type="hidden" {...register("guests")} />
+
+              <div className="relative z-10 space-y-9">
+
+                {/* ── Name ── */}
+                <div>
+                  <FieldLabel required>{t("name_label")}</FieldLabel>
                   <Input
                     id="name"
                     placeholder={t("name_placeholder")}
                     error={!!errors.name}
+                    className="rounded-2xl py-4 text-base"
                     {...register("name")}
                   />
                   {errors.name && (
-                    <p className="text-sm text-red-500/70">{t("name_min")}</p>
+                    <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-red-400/70">{t("name_min")}</p>
                   )}
                 </div>
 
-                <div className="space-y-3">
-                  <Label>{t("attending_label")}</Label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button
+                <Divider />
+
+                {/* ── Attending ── */}
+                <div>
+                  <FieldLabel>{t("attending_label")}</FieldLabel>
+                  <div className="grid grid-cols-2 gap-3">
+
+                    {/* YES */}
+                    <motion.button
                       type="button"
+                      whileTap={{ scale: 0.97 }}
                       onClick={() => setValue("attending", "yes", { shouldValidate: true })}
                       className={cn(
-                        "flex items-center justify-center gap-3 px-6 py-5 rounded-2xl border transition-all duration-500 font-medium group relative overflow-hidden cursor-pointer",
+                        "relative flex flex-col items-center justify-center gap-2.5 px-4 py-8 rounded-2xl border-2 transition-all duration-500 cursor-pointer overflow-hidden",
                         attending === "yes"
-                          ? "bg-accent text-white border-accent shadow-xl shadow-accent/20"
-                          : "bg-bg-primary text-text-secondary border-accent/10 hover:border-accent/40 hover:text-text-primary"
+                          ? "border-accent bg-accent/8"
+                          : "border-accent/10 hover:border-accent/30 bg-bg-primary/50"
                       )}
                     >
-                      <span className={cn("text-2xl transition-transform duration-500", attending === "yes" ? "scale-110" : "grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100")}>😎</span>
-                      {t("attending_yes")}
-                      {attending === "yes" && (
-                        <div className="absolute inset-0 bg-white/10 animate-pulse pointer-events-none" />
-                      )}
-                    </button>
-                    <button
+                      <AnimatePresence>
+                        {attending === "yes" && (
+                          <motion.div
+                            key="yes-glow"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-linear-to-b from-accent/12 to-transparent pointer-events-none"
+                          />
+                        )}
+                      </AnimatePresence>
+                      <RingIcon active={attending === "yes"} />
+                      <span className={cn(
+                        "heading-serif text-xl transition-colors duration-300",
+                        attending === "yes" ? "text-accent" : "text-text-secondary/70"
+                      )}>
+                        {t("attending_yes_heading")}
+                      </span>
+                      <span className="text-[10px] uppercase tracking-[0.16em] text-text-secondary/40">
+                        {t("attending_yes_note")}
+                      </span>
+                    </motion.button>
+
+                    {/* NO */}
+                    <motion.button
                       type="button"
+                      whileTap={{ scale: 0.97 }}
                       onClick={() => setValue("attending", "no", { shouldValidate: true })}
                       className={cn(
-                        "flex items-center justify-center gap-3 px-6 py-5 rounded-2xl border transition-all duration-500 font-medium group relative overflow-hidden cursor-pointer",
+                        "relative flex flex-col items-center justify-center gap-2.5 px-4 py-8 rounded-2xl border-2 transition-all duration-500 cursor-pointer overflow-hidden",
                         attending === "no"
-                          ? "bg-text-primary text-bg-primary border-text-primary shadow-xl shadow-black/10"
-                          : "bg-bg-primary text-text-secondary border-accent/10 hover:border-accent/40 hover:text-text-primary"
+                          ? "border-text-secondary/40 bg-text-primary/6"
+                          : "border-accent/10 hover:border-accent/20 bg-bg-primary/50"
                       )}
                     >
-                      <span className={cn("text-2xl transition-transform duration-500", attending === "no" ? "scale-110" : "grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100")}>😔</span>
-                      {t("attending_no")}
-                    </button>
+                      <LeafIcon active={attending === "no"} />
+                      <span className={cn(
+                        "heading-serif text-xl transition-colors duration-300",
+                        attending === "no" ? "text-text-primary" : "text-text-secondary/70"
+                      )}>
+                        {t("attending_no_heading")}
+                      </span>
+                      <span className="text-[10px] uppercase tracking-[0.16em] text-text-secondary/40">
+                        {t("attending_no_note")}
+                      </span>
+                    </motion.button>
+
                   </div>
-                </div>
-
-                <div className={cn(
-                  "space-y-8 overflow-hidden transition-all duration-500 ease-in-out",
-                  attending === "yes" ? "max-h-125 opacity-100 pb-2" : "max-h-0 opacity-0"
-                )}>
-                  <div className="pt-4 border-t border-accent/5 space-y-8">
-                    <div className="space-y-2">
-                      <Label htmlFor="guests">{t("guests_label")}</Label>
-                      <Input id="guests" type="number" min="1" max="10" className="md:w-32" {...register("guests")} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="dietary">{t("dietary_label")}</Label>
-                      <Textarea id="dietary" placeholder={t("dietary_placeholder")} {...register("dietary")} />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="message">{t("message_label")}</Label>
-                  <Textarea id="message" placeholder={t("message_placeholder")} {...register("message")} />
-                </div>
-
-                <div className="pt-6">
-                  {error && (
-                    <p className="text-center text-sm text-red-500/80 mb-4 animate-pulse">
-                      {error}
-                    </p>
+                  {errors.attending && (
+                    <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-red-400/70">{t("attendance_required")}</p>
                   )}
-                  <Button
-                    type="submit"
-                    className="w-full py-5 text-xl shadow-2xl shadow-accent/20 group relative overflow-hidden"
-                    disabled={!attending || loading}
+                </div>
+
+                {/* ── Conditional: guests + dietary ── */}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateRows: attending === "yes" ? "1fr" : "0fr",
+                    transition: "grid-template-rows 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
+                  }}
+                >
+                  <div
+                    className="overflow-hidden"
+                    style={{
+                      opacity: attending === "yes" ? 1 : 0,
+                      transition: `opacity ${attending === "yes" ? "0.4s 0.08s" : "0.25s 0s"} cubic-bezier(0.22, 1, 0.36, 1)`,
+                    }}
                   >
-                    <span className="relative z-10 flex items-center justify-center gap-2">
-                      {loading ? (
-                        <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      ) : (
-                        <>
-                          {t("submit")}
-                          <span className="group-hover:translate-x-2 transition-transform duration-300">→</span>
-                        </>
-                      )}
-                    </span>
-                    <div className="absolute inset-0 bg-linear-to-r from-accent to-accent-soft opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </Button>
-                  {!attending && !loading && (
-                    <p className="text-center text-sm text-red-500/60 mt-4 animate-pulse">
-                      {t("attendance_required")}
-                    </p>
-                  )}
+                    <div className="space-y-9">
+                      <Divider />
+
+                      {/* Guest stepper */}
+                      <div>
+                        <FieldLabel>{t("guests_label")}</FieldLabel>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setValue("guests", Math.max(1, guests - 1), { shouldValidate: true })}
+                            className="w-11 h-11 rounded-full border border-accent/25 text-accent/70 hover:bg-accent/10 hover:border-accent hover:text-accent transition-all duration-300 flex items-center justify-center text-xl leading-none cursor-pointer"
+                            aria-label="−"
+                          >
+                            −
+                          </button>
+                          <motion.span
+                            key={guests}
+                            initial={{ scale: 1.25, opacity: 0.6 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.22, ease }}
+                            className="w-18 text-center font-cinzel text-3xl text-accent select-none"
+                          >
+                            {guests}
+                          </motion.span>
+                          <button
+                            type="button"
+                            onClick={() => setValue("guests", Math.min(10, guests + 1), { shouldValidate: true })}
+                            className="w-11 h-11 rounded-full border border-accent/25 text-accent/70 hover:bg-accent/10 hover:border-accent hover:text-accent transition-all duration-300 flex items-center justify-center text-xl leading-none cursor-pointer"
+                            aria-label="+"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Dietary */}
+                      <div>
+                        <FieldLabel>{t("dietary_label")}</FieldLabel>
+                        <Textarea
+                          id="dietary"
+                          placeholder={t("dietary_placeholder")}
+                          className="rounded-2xl text-sm min-h-24"
+                          {...register("dietary")}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
+
+                <Divider />
+
+                {/* ── Message ── */}
+                <div>
+                  <FieldLabel>{t("message_label")}</FieldLabel>
+                  <Textarea
+                    id="message"
+                    placeholder={t("message_placeholder")}
+                    className="rounded-2xl"
+                    {...register("message")}
+                  />
+                </div>
+
+                {/* ── Submit ── */}
+                <div className="pt-1">
+                  <motion.button
+                    type="submit"
+                    disabled={!attending}
+                    whileHover={attending ? { scale: 1.01 } : {}}
+                    whileTap={attending ? { scale: 0.99 } : {}}
+                    className={cn(
+                      "w-full py-5 rounded-2xl relative overflow-hidden font-medium text-lg tracking-wide transition-all duration-500",
+                      attending
+                        ? "bg-accent text-bg-primary shadow-xl shadow-accent/20 cursor-pointer"
+                        : "bg-accent/15 text-text-secondary/30 cursor-not-allowed"
+                    )}
+                  >
+                    <span className="relative z-10 flex items-center justify-center gap-3">
+                      <span>{t("submit")}</span>
+                      <motion.span
+                        animate={attending ? { x: [0, 5, 0] } : {}}
+                        transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+                      >
+                        →
+                      </motion.span>
+                    </span>
+                    {/* Shimmer sweep on hover */}
+                    {attending && (
+                      <motion.div
+                        initial={{ x: "-110%" }}
+                        whileHover={{ x: "110%" }}
+                        transition={{ duration: 0.55, ease }}
+                        className="absolute inset-0 bg-linear-to-r from-transparent via-white/15 to-transparent skew-x-[-20deg] pointer-events-none"
+                      />
+                    )}
+                  </motion.button>
+
+                  <p className="text-center text-[10px] uppercase tracking-[0.13em] text-text-secondary/30 mt-3">
+                    {!attending ? t("attendance_required") : t("coming_soon_note")}
+                  </p>
+                </div>
+
               </div>
             </form>
           </AnimatedReveal>
