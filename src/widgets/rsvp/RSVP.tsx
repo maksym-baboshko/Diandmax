@@ -5,13 +5,13 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { SectionWrapper, SectionHeading, AnimatedReveal, Input, Textarea } from "@/shared/ui";
 import { cn, useLiteMotion } from "@/shared/lib";
 
 import { rsvpSchema, type RSVPFormData } from "./schema";
 
-const ease = [0.22, 1, 0.36, 1] as const;
+const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 // ── Confetti colors ───────────────────────────────────────────────────────────
 const CONFETTI_COLORS = [
@@ -198,7 +198,7 @@ export function RSVP() {
   };
 
   // Stagger variants — defined inside component so liteMotion can influence delay
-  const formStagger = {
+  const formStagger: Variants = {
     hidden: {},
     visible: {
       transition: {
@@ -208,12 +208,12 @@ export function RSVP() {
     },
   };
 
-  const formField = {
+  const formField: Variants = {
     hidden: { opacity: 0, y: liteMotion ? 14 : 20 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: liteMotion ? 0.4 : 0.55, ease: [0.22, 1, 0.36, 1] as number[] },
+      transition: { duration: liteMotion ? 0.4 : 0.55, ease },
     },
   };
 
