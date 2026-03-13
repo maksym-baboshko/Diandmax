@@ -168,10 +168,10 @@ export function DressCode() {
   const t = useTranslations("DressCode");
   const locale = useLocale() as "uk" | "en";
   const liteMotion = useLiteMotion();
-  const allColors = [
-    ...DRESS_CODE.ladies.colors,
-    ...DRESS_CODE.gentlemen.colors,
-  ];
+  const allColors = [...DRESS_CODE.ladies.colors, ...DRESS_CODE.gentlemen.colors];
+  const uniqueStripColors = allColors.filter(
+    (color, index, colors) => colors.findIndex((entry) => entry.hex === color.hex) === index
+  );
 
   return (
     <SectionWrapper id="dress-code" className="py-24 relative overflow-hidden">
@@ -194,7 +194,7 @@ export function DressCode() {
         style={{ transformOrigin: "left" }}
         className="max-w-xl mx-auto mt-10 h-0.75 flex rounded-full overflow-hidden"
       >
-        {allColors.map((c, i) => (
+        {uniqueStripColors.map((c, i) => (
           <div key={i} className="flex-1" style={{ backgroundColor: c.hex }} />
         ))}
       </motion.div>

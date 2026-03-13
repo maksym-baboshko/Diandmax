@@ -24,9 +24,9 @@ export const DRESS_CODE = {
   ladies: {
     colors: [
       { hex: "#E9E0D2", name: { uk: "Перлинно-кремовий", en: "Pearl Cream" } },
-      { hex: "#D4B0A8", name: { uk: "Пильна троянда", en: "Dusty rose" } },
       { hex: "#A8B8A0", name: { uk: "Шавлія зелена", en: "Sage green" } },
-      { hex: "#8FA88E", name: { uk: "Приглушений зелений", en: "Muted green" } },
+      { hex: "#D4B0A8", name: { uk: "Пильна троянда", en: "Dusty rose" } },
+      { hex: "#4A3728", name: { uk: "Темний шоколад", en: "Dark Chocolate" } },
     ],
   },
   gentlemen: {
