@@ -45,14 +45,31 @@ export async function sendRsvpNotification(
   config: RsvpEmailConfig
 ) {
   const normalizedSubmission = normalizeSubmission(submission);
-  const resend = getResendClient(config.apiKey);
+  const subject = buildRsvpEmailSubject(
+    normalizedSubmission,
+    config.subjectPrefix
+  );
+  const text = buildRsvpEmailText(normalizedSubmission);
+
+  if (config.mode === "mock") {
+    console.info("RSVP mock email preview:", {
+      from: config.from,
+      to: config.to,
+      subject,
+      text,
+    });
+
+    return "mock";
+  }
+
+  const resend = getResendClient(config.apiKey!);
 
   const sendResult = await resend.emails.send({
     from: config.from,
     to: config.to,
-    subject: buildRsvpEmailSubject(normalizedSubmission, config.subjectPrefix),
+    subject,
     react: <RsvpNotificationEmail submission={normalizedSubmission} />,
-    text: buildRsvpEmailText(normalizedSubmission),
+    text,
     tags: [
       { name: "source", value: "wedding-rsvp" },
       { name: "attending", value: normalizedSubmission.attending },

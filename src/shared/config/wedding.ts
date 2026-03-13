@@ -23,10 +23,10 @@ export const COUPLE = {
 export const DRESS_CODE = {
   ladies: {
     colors: [
-      { hex: "#E9E0D2", name: { uk: "Перлинно-кремовий", en: "Pearl Cream" } },
-      { hex: "#A8B8A0", name: { uk: "Шавлія зелена", en: "Sage green" } },
-      { hex: "#D4B0A8", name: { uk: "Пильна троянда", en: "Dusty rose" } },
+      { hex: "#C4B29A", name: { uk: "Теплий пісочний", en: "Warm Sand" } },
       { hex: "#4A3728", name: { uk: "Темний шоколад", en: "Dark Chocolate" } },
+      { hex: "#D4B0A8", name: { uk: "Пильна троянда", en: "Dusty rose" } },
+      { hex: "#A8B8A0", name: { uk: "Шавлія зелена", en: "Sage green" } },
     ],
   },
   gentlemen: {

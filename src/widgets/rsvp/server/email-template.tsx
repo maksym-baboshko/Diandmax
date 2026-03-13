@@ -492,7 +492,7 @@ export function RsvpNotificationEmail({
                                     color: EMAIL_THEME.textSecondary,
                                   }}
                                 >
-                                  Це повідомлення надійшло з RSVP форми вашого весільного сайту.
+                                  Це повідомлення надійшло з RSVP форми нашого весільного сайту.
                                 </p>
                                 <p
                                   style={{
@@ -502,7 +502,15 @@ export function RsvpNotificationEmail({
                                     color: EMAIL_THEME.textSecondary,
                                   }}
                                 >
-                                  {VENUE.address}
+                                  <a
+                                    href="https://diandmax.com"
+                                    style={{
+                                      color: EMAIL_THEME.accent,
+                                      textDecoration: "none",
+                                    }}
+                                  >
+                                    diandmax.com
+                                  </a>
                                 </p>
                               </td>
                             </tr>
