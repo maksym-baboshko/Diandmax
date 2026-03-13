@@ -1,0 +1,127 @@
+{
+  "Metadata": {
+    "title": "Maksym & Diana — 28.06.2026",
+    "description": "Wedding invitation of Maksym and Diana. June 28, 2026, Grand Hotel Terminus, Bergen, Norway."
+  },
+  "Hero": {
+    "title": "Maksym & Diana",
+    "groom_name": "Maksym",
+    "bride_name": "Diana",
+    "date": "June 28, 2026",
+    "location": "Grand Hotel Terminus",
+    "scroll_down": "Scroll Down",
+    "rsvp": "RSVP will be here"
+  },
+  "OurStory": {
+    "title": "Our Story",
+    "subtitle": "Our journey of love",
+    "groom_name": "Maksym",
+    "bride_name": "Diana",
+    "groom_bio": "The Groom",
+    "bride_bio": "The Bride",
+    "how_we_met_title": "How We Met",
+    "how_we_met_text": "Our journey began unexpectedly, but from the very first meeting, we knew we had found something special. Through years of support, laughter, and shared dreams, our love story has brought us to this special day. We look forward to sharing our joy with you and creating many more unforgettable memories together."
+  },
+  "Timeline": {
+    "title": "Schedule",
+    "subtitle": "How our day will unfold",
+    "events": {
+      "ceremony": {
+        "time": "12:00",
+        "title": "Wedding Ceremony",
+        "description": "The beginning of our journey together"
+      },
+      "photo_session": {
+        "time": "13:30",
+        "title": "Break & Photo Session",
+        "description": "Time for beautiful photos and light socializing"
+      },
+      "banquet": {
+        "time": "16:00",
+        "title": "Wedding Banquet",
+        "description": "Dinner, warm toasts, and first dance"
+      },
+      "activities": {
+        "time": "18:30",
+        "title": "Activities & Fun",
+        "description": "Interactions, socializing, and pleasant surprises"
+      },
+      "cake": {
+        "time": "19:00",
+        "title": "Wedding Cake",
+        "description": "A sweet moment of our celebration"
+      },
+      "sparklers": {
+        "time": "21:30",
+        "title": "Sparklers",
+        "description": "A beautiful end to the evening under the glow of lights"
+      }
+    }
+  },
+  "Location": {
+    "title": "Location",
+    "subtitle": "We look forward to seeing you here",
+    "venue_name": "Grand Hotel Terminus",
+    "address": "Zander Kaaes gate 6, 5015 Bergen, Norway",
+    "description": "A historic hotel in the heart of Bergen, where timeless elegance meets modern comfort.",
+    "cta": "Open in Maps",
+    "chip_history": "Historic since 1928",
+    "chip_location": "Bergen City Centre"
+  },
+  "DressCode": {
+    "title": "Dress Code",
+    "subtitle": "Style Wishes",
+    "ladies_title": "For Ladies",
+    "ladies_description": "Dear ladies, you will look magnificent in outfits of pastel shades:",
+    "gentlemen_title": "For Gentlemen",
+    "gentlemen_description": "Gentlemen, do not limit yourself to only black — we've added light shades to allow for more diverse looks. We also ask you to refrain from jeans."
+  },
+  "Countdown": {
+    "days": "days",
+    "hours": "hours",
+    "minutes": "mins",
+    "seconds": "secs"
+  },
+  "Splash": {
+    "title": "Maksym & Diana",
+    "subtitle": "Wedding Invitation"
+  },
+  "RSVP": {
+    "title": "RSVP",
+    "subtitle": "Please let us know if you can make it by June 1st",
+    "name_label": "Your Name",
+    "attending_label": "Will you attend?",
+    "attending_yes": "Yes, I'll be there",
+    "attending_no": "Regretfully, I can't",
+    "guests_label": "Number of guests",
+    "dietary_label": "Dietary requirements",
+    "dietary_placeholder": "Do you have any special dietary needs?",
+    "message_label": "Message to the couple",
+    "message_placeholder": "Your warm words for us...",
+    "submit": "Submit",
+    "success": "Thank you! Your response has been saved.",
+    "return_button": "Go back",
+    "name_placeholder": "John Doe",
+    "attendance_required": "* Please select if you are attending",
+    "name_min": "Please enter at least 2 characters",
+    "error_generic": "Something went wrong. Please try again later."
+  },
+  "Gifts": {
+    "title": "Gifts",
+    "subtitle": "Our Wishes",
+    "description": "To keep things simple, we would be sincerely grateful for your contributions in white envelopes. These gifts will help our new family cover the banquet costs (suggested amount — from <bold>1300 NOK</bold> or <bold>120 €</bold> per guest). Thank you for your understanding and for supporting our very first step into married life!"
+  },
+  "Navbar": {
+    "hero": "Home",
+    "story": "Story",
+    "timeline": "Schedule",
+    "location": "Location",
+    "dress_code": "Dress Code",
+    "gifts": "Gifts",
+    "rsvp": "RSVP"
+  },
+  "Footer": {
+    "back_to_top": "Back to top",
+    "made_with_love": "Made with love for our big day"
+  }
+}
