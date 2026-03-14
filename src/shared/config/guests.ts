@@ -136,6 +136,13 @@ export const guests: Guest[] = [
     vocative: { uk: 'Олексію', en: 'Oleksii Turchyn' },
     formName: { uk: 'Олексій Турчин', en: 'Oleksii Turchyn' },
     seats: 1
+  },
+  {
+    slug: 'hlib-viola',
+    name: { uk: 'Гліб і Віола', en: 'Hlib and Viola' },
+    vocative: { uk: 'Гліб та Віола', en: 'Hlib and Viola' },
+    formName: { uk: 'Гліб Сопинській', en: 'Hlib Sopinskyi' },
+    seats: 2
   }
 ];
 
