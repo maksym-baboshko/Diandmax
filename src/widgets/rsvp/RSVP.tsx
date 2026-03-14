@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
@@ -174,10 +174,18 @@ function Divider() {
   return <div className="h-px bg-accent/8" />;
 }
 
+interface RSVPDefaultValues {
+  guestNames: string[];
+  guests: number;
+  dietary: string;
+  message: string;
+  website: string;
+}
+
 function createDefaultFormValues(
   guest: Guest | undefined,
   locale: "uk" | "en"
-) {
+): RSVPDefaultValues {
   return {
     guestNames: [guest?.formName?.[locale] ?? guest?.name[locale] ?? ""],
     guests: guest?.seats ?? 1,
@@ -225,7 +233,15 @@ export function RSVP({ guest }: RSVPProps) {
   const [submittedAttending, setSubmittedAttending] = useState<RSVPFormData["attending"] | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const maxGuestCount = guest?.seats ?? 10;
-  const defaultFormValues = createDefaultFormValues(guest, locale);
+  const defaultFormValues = useMemo(
+    () => createDefaultFormValues(guest, locale),
+    [guest, locale]
+  );
+  const personalizedDefaultsKey = guest ? `${guest.slug}:${locale}` : null;
+  const previousPersonalizedDefaultsRef = useRef<{
+    key: string;
+    values: RSVPDefaultValues;
+  } | null>(null);
 
   const {
     register,
@@ -278,7 +294,26 @@ export function RSVP({ guest }: RSVPProps) {
   }, [setValue, visibleGuestFieldsCount, watchedGuestNames]);
 
   useEffect(() => {
-    if (!guest || submitted) {
+    if (!guest || !personalizedDefaultsKey) {
+      previousPersonalizedDefaultsRef.current = null;
+      return;
+    }
+
+    if (submitted) {
+      return;
+    }
+
+    const previousPersonalizedDefaults = previousPersonalizedDefaultsRef.current;
+
+    if (!previousPersonalizedDefaults) {
+      previousPersonalizedDefaultsRef.current = {
+        key: personalizedDefaultsKey,
+        values: defaultFormValues,
+      };
+      return;
+    }
+
+    if (previousPersonalizedDefaults.key === personalizedDefaultsKey) {
       return;
     }
 
@@ -286,21 +321,26 @@ export function RSVP({ guest }: RSVPProps) {
     const currentPrimaryGuest = currentNames?.[0] ?? "";
     const currentGuestCount = getValues("guests") ?? 1;
 
-    const isDefaultState =
-      currentPrimaryGuest === defaultFormValues.guestNames[0] &&
-      currentGuestCount === defaultFormValues.guests &&
+    const isUsingPreviousDefaults =
+      currentPrimaryGuest === previousPersonalizedDefaults.values.guestNames[0] &&
+      currentGuestCount === previousPersonalizedDefaults.values.guests &&
       !getValues("attending") &&
       !getValues("dietary") &&
       !getValues("message");
 
-    if (isDefaultState) {
+    if (isUsingPreviousDefaults) {
       reset(defaultFormValues);
     }
+
+    previousPersonalizedDefaultsRef.current = {
+      key: personalizedDefaultsKey,
+      values: defaultFormValues,
+    };
   }, [
     defaultFormValues,
     getValues,
     guest,
-    locale,
+    personalizedDefaultsKey,
     reset,
     submitted,
   ]);
