@@ -75,5 +75,5 @@ export default async function InvitePage({ params }: InvitePageProps) {
 
   setRequestLocale(typedLocale);
 
-  return <InvitationPage guest={guest} showSplash={false} />;
+  return <InvitationPage guest={guest} />;
 }
