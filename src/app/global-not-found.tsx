@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { cookies } from "next/headers";
 import { playfair, inter, cinzel, vibes, THEME_INIT_SCRIPT } from "@/shared/lib";
 import { Button, Ornament } from "@/shared/ui";
@@ -145,6 +146,7 @@ export default async function GlobalNotFound() {
           </div>
         </div>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

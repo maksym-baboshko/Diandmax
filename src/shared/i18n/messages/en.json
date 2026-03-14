@@ -109,7 +109,7 @@
     "title": "RSVP",
     "subtitle": "Please let us know if you can make it by June 1st",
     "personalized_note_label": "Prepared for you",
-    "personalized_note": "{name}, we have already reserved {seats, plural, one {# seat} other {# seats}} for your invitation. If your plans change, you can submit a smaller guest count before sending the form.",
+    "personalized_note": "{seats, plural, one {{name}, this invitation is intended for you. If your plans change and you can no longer attend, please let us know using the form below.} other {{name}, we have already reserved {seats} seats for your invitation. If your plans change, you can submit a smaller guest count before sending the form.}}",
     "personalized_limit_error": "You can confirm no more than {seats, plural, one {# seat.} other {# seats.}}",
     "name_label": "Your Name",
     "guest_names_label": "Guest Names",
