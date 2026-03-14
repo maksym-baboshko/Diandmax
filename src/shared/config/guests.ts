@@ -130,6 +130,13 @@ export const guests: Guest[] = [
     formName: { uk: "Дмитро Ржавський", en: "Dmytro Rzhavskyi" },
     seats: 2,
   },
+  {
+    slug: "aleksii-turchyn",
+    name: { uk: "Алексій Турчин", en: "Aleksii Turchyn" },
+    vocative: { uk: "Алексію Турчине", en: "Aleksii Turchyn" },
+    formName: { uk: "Алексій Турчин", en: "Aleksii Turchyn" },
+    seats: 1,
+  },
 ];
 
 export function getGuestBySlug(slug: string): Guest | undefined {
