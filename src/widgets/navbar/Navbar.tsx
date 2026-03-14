@@ -20,6 +20,7 @@ const NAV_LINKS = [
 ];
 
 const ease = [0.22, 1, 0.36, 1] as const;
+const desktopMediaQuery = "(min-width: 1024px)";
 const focusRingClass =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary";
 
@@ -30,9 +31,11 @@ export function Navbar() {
   const prefersReducedMotion = useReducedMotion();
   const [isScrolled, setIsScrolled]         = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDesktopViewport, setIsDesktopViewport] = useState(false);
   const [isKeyboardNavigation, setIsKeyboardNavigation] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const firstMobileLinkRef = useRef<HTMLAnchorElement>(null);
+  const isMobileOverlayActive = isMobileMenuOpen && !isDesktopViewport;
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -41,12 +44,33 @@ export function Navbar() {
   }, []);
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia(desktopMediaQuery);
+    const syncViewport = (matches: boolean) => {
+      setIsDesktopViewport(matches);
+
+      if (matches) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    syncViewport(mediaQuery.matches);
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      syncViewport(event.matches);
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
+
+  useEffect(() => {
     const mainContent = document.getElementById("main-content");
     const siteFooter = document.getElementById("site-footer");
 
-    document.body.style.overflow = isMobileMenuOpen ? "hidden" : "unset";
+    document.body.style.overflow = isMobileOverlayActive ? "hidden" : "unset";
 
-    if (isMobileMenuOpen) {
+    if (isMobileOverlayActive) {
       mainContent?.setAttribute("inert", "");
       siteFooter?.setAttribute("inert", "");
       queueMicrotask(() => firstMobileLinkRef.current?.focus());
@@ -60,7 +84,7 @@ export function Navbar() {
       mainContent?.removeAttribute("inert");
       siteFooter?.removeAttribute("inert");
     };
-  }, [isMobileMenuOpen]);
+  }, [isMobileOverlayActive]);
 
   useEffect(() => {
     const enableKeyboardNavigation = (event: KeyboardEvent) => {
@@ -134,7 +158,7 @@ export function Navbar() {
         className={cn(
           "relative z-60 transition-all duration-500 py-4",
           "border-b",
-          isScrolled || isMobileMenuOpen
+          isScrolled || isMobileOverlayActive
             ? liteMotion
               ? "bg-bg-primary border-accent/10 shadow-lg py-3 lg:bg-bg-primary/96"
               : "bg-bg-primary border-accent/10 shadow-lg py-3 lg:bg-bg-primary/80 lg:backdrop-blur-2xl"
@@ -205,7 +229,7 @@ export function Navbar() {
 
       {/* ── Mobile menu overlay ──────────────────────────────────────────────── */}
       <AnimatePresence>
-        {isMobileMenuOpen && (
+        {isMobileOverlayActive && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
