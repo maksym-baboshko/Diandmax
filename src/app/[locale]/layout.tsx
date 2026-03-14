@@ -10,6 +10,8 @@ const TITLE = "Максим & Діана — 28.06.2026";
 const DESCRIPTION =
   "Весільне запрошення Максима та Діани. 28 червня 2026, Grand Hotel Terminus, Bergen, Norway.";
 const PREVIEW_IMAGE = "/images/preview/og-image.jpg";
+const PREVIEW_IMAGE_WIDTH = 1200;
+const PREVIEW_IMAGE_HEIGHT = 630;
 
 const DEFAULT_SITE_URL = new URL("http://localhost:3000");
 
@@ -31,14 +33,18 @@ async function getMetadataBase() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
+  const metadataBase = await getMetadataBase();
+
   return {
-    metadataBase: await getMetadataBase(),
+    metadataBase,
     title: TITLE,
     description: DESCRIPTION,
     icons: {
       icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
     },
     openGraph: {
+      url: metadataBase,
+      siteName: "Diandmax",
       title: TITLE,
       description: DESCRIPTION,
       type: "website",
@@ -47,6 +53,8 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [
         {
           url: PREVIEW_IMAGE,
+          width: PREVIEW_IMAGE_WIDTH,
+          height: PREVIEW_IMAGE_HEIGHT,
           alt: TITLE,
         },
       ],
