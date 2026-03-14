@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { SectionWrapper, SectionHeading, AnimatedReveal, Input, Textarea } from "@/shared/ui";
 import { cn, useLiteMotion } from "@/shared/lib";
+import type { Guest } from "@/shared/config";
 
 import { rsvpSchema, type RSVPFormData } from "@/widgets/rsvp/model";
 
@@ -197,14 +198,27 @@ function LeafIcon({ active }: { active: boolean }) {
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-export function RSVP() {
+interface RSVPProps {
+  guest?: Guest;
+}
+
+export function RSVP({ guest }: RSVPProps) {
   const t = useTranslations("RSVP");
+  const locale = useLocale() as "uk" | "en";
   const liteMotion = useLiteMotion();
   const [submitted, setSubmitted] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [submittedName, setSubmittedName] = useState("");
   const [submittedAttending, setSubmittedAttending] = useState<RSVPFormData["attending"] | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const maxGuestCount = guest?.seats ?? 10;
+  const defaultFormValues = {
+    guestNames: [guest?.formName?.[locale] ?? guest?.name[locale] ?? ""],
+    guests: guest?.seats ?? 1,
+    dietary: "",
+    message: "",
+    website: "",
+  };
 
   const {
     register,
@@ -215,7 +229,7 @@ export function RSVP() {
     formState: { errors, isSubmitting },
   } = useForm<RSVPFormData>({
     resolver: zodResolver(rsvpSchema),
-    defaultValues: { guestNames: [""], guests: 1, website: "" },
+    defaultValues: defaultFormValues,
   });
 
   const attending = watch("attending");
@@ -258,6 +272,11 @@ export function RSVP() {
   const onSubmit = async (data: RSVPFormData) => {
     setSubmitError(null);
 
+    if (guest && data.attending === "yes" && (data.guests ?? 1) > guest.seats) {
+      setSubmitError(t("personalized_limit_error", { seats: guest.seats }));
+      return;
+    }
+
     try {
       const response = await fetch("/api/rsvp", {
         method: "POST",
@@ -280,13 +299,7 @@ export function RSVP() {
 
       setSubmittedName(displayName);
       setSubmittedAttending(data.attending);
-      reset({
-        guestNames: [""],
-        guests: 1,
-        dietary: "",
-        message: "",
-        website: "",
-      });
+      reset(defaultFormValues);
       setShowConfetti(true);
       setSubmitted(true);
     } catch (error) {
@@ -535,6 +548,25 @@ export function RSVP() {
                 viewport={{ once: true, amount: 0.05 }}
                 className="relative z-10 space-y-7 md:space-y-9"
               >
+                {guest ? (
+                  <>
+                    <motion.div variants={formField}>
+                      <div className="rounded-[1.75rem] border border-accent/15 bg-accent/8 px-5 py-4 text-left">
+                        <p className="text-[10px] uppercase tracking-[0.2em] text-accent/80">
+                          {t("personalized_note_label")}
+                        </p>
+                        <p className="mt-2 text-sm leading-relaxed text-text-secondary/80 md:text-[15px]">
+                          {t("personalized_note", {
+                            name: guest.vocative[locale],
+                            seats: guest.seats,
+                          })}
+                        </p>
+                      </div>
+                    </motion.div>
+
+                    <motion.div variants={formField}><Divider /></motion.div>
+                  </>
+                ) : null}
 
                 {/* ── Name ── */}
                 <motion.div variants={formField}>
@@ -683,9 +715,14 @@ export function RSVP() {
                         <div className="flex items-center justify-between w-full px-5 py-3 rounded-2xl border border-accent/15 bg-bg-primary/30">
                           <button
                             type="button"
-                            disabled={isSubmitting}
+                            disabled={isSubmitting || guests <= 1}
                             onClick={() => setValue("guests", Math.max(1, guests - 1), { shouldValidate: true })}
-                            className="w-11 h-11 rounded-full border border-accent/25 text-accent/70 hover:bg-accent/10 hover:border-accent hover:text-accent transition-all duration-300 flex items-center justify-center text-xl leading-none cursor-pointer"
+                            className={cn(
+                              "w-11 h-11 rounded-full border border-accent/25 transition-all duration-300 flex items-center justify-center text-xl leading-none",
+                              isSubmitting || guests <= 1
+                                ? "cursor-not-allowed text-accent/25"
+                                : "cursor-pointer text-accent/70 hover:bg-accent/10 hover:border-accent hover:text-accent"
+                            )}
                             aria-label="−"
                           >
                             −
@@ -701,9 +738,14 @@ export function RSVP() {
                           </motion.span>
                           <button
                             type="button"
-                            disabled={isSubmitting}
-                            onClick={() => setValue("guests", Math.min(10, guests + 1), { shouldValidate: true })}
-                            className="w-11 h-11 rounded-full border border-accent/25 text-accent/70 hover:bg-accent/10 hover:border-accent hover:text-accent transition-all duration-300 flex items-center justify-center text-xl leading-none cursor-pointer"
+                            disabled={isSubmitting || guests >= maxGuestCount}
+                            onClick={() => setValue("guests", Math.min(maxGuestCount, guests + 1), { shouldValidate: true })}
+                            className={cn(
+                              "w-11 h-11 rounded-full border border-accent/25 transition-all duration-300 flex items-center justify-center text-xl leading-none",
+                              isSubmitting || guests >= maxGuestCount
+                                ? "cursor-not-allowed text-accent/25"
+                                : "cursor-pointer text-accent/70 hover:bg-accent/10 hover:border-accent hover:text-accent"
+                            )}
                             aria-label="+"
                           >
                             +

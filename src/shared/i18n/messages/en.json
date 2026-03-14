@@ -12,6 +12,20 @@
     "scroll_down": "Scroll Down",
     "rsvp": "RSVP will be here"
   },
+  "PersonalInvitation": {
+    "eyebrow": "Personal Invitation",
+    "headline": "We are so happy to share this day with you",
+    "body_1": "{name}, your presence in our lives is something we deeply cherish. That is why it means so much to us to invite you to be near on the day when, before God and our loved ones, we will say “yes” to one another.",
+    "body_2": "We are sincerely grateful for your love, support, kindness, and warmth along the way. It would bring us real joy to see you among the people with whom we most want to share the brightest moments of our celebration.",
+    "closing": "With love, we will be so happy to welcome you",
+    "seats_label": "Reserved for you",
+    "seat_word": "{seats, plural, one {seat} other {seats}}",
+    "seats_note": "Your place is already prepared at our celebration table, and it would mean a great deal to have you with us on this special day.",
+    "details_label": "Invitation Details",
+    "date_label": "Date",
+    "venue_label": "Venue",
+    "details_note": "It is a true honor for us to share this moment with you. Your presence will make our celebration feel even warmer and more meaningful."
+  },
   "OurStory": {
     "title": "Our Story",
     "subtitle": "Our journey of love",
@@ -94,6 +108,9 @@
   "RSVP": {
     "title": "RSVP",
     "subtitle": "Please let us know if you can make it by June 1st",
+    "personalized_note_label": "Prepared for you",
+    "personalized_note": "{name}, we have already reserved {seats, plural, one {# seat} other {# seats}} for your invitation. If your plans change, you can submit a smaller guest count before sending the form.",
+    "personalized_limit_error": "You can confirm no more than {seats, plural, one {# seat.} other {# seats.}}",
     "name_label": "Your Name",
     "guest_names_label": "Guest Names",
     "guest_name_field_label": "Guest {number}",
@@ -150,5 +167,9 @@
   "Footer": {
     "back_to_top": "Back to top",
     "made_with_love": "Made with love for our big day"
+  },
+  "InvitePage": {
+    "title": "Invitation for {name} | Maksym & Diana",
+    "description": "A personalized wedding invitation for {name}. Join us on June 28, 2026 at Grand Hotel Terminus in Bergen."
   }
 }

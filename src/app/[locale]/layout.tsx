@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
-import { headers } from "next/headers";
-import { getMessages } from "next-intl/server";
+import { setRequestLocale, getMessages } from "next-intl/server";
+import { notFound } from "next/navigation";
 import { playfair, inter, cinzel, vibes } from "@/shared/lib";
 import { ThemeProvider } from "@/features/theme-switcher";
+import { routing, type Locale } from "@/shared/i18n/routing";
 import "../globals.css";
 
 const TITLE = "Максим & Діана — 28.06.2026";
@@ -13,27 +14,35 @@ const PREVIEW_IMAGE = "/images/preview/og-image.jpg";
 const PREVIEW_IMAGE_WIDTH = 1200;
 const PREVIEW_IMAGE_HEIGHT = 630;
 
-const DEFAULT_SITE_URL = new URL("http://localhost:3000");
+const DEFAULT_SITE_URL = "http://localhost:3000";
 
-async function getMetadataBase() {
-  const requestHeaders = await headers();
-  const host =
-    requestHeaders.get("x-forwarded-host") ??
-    requestHeaders.get("host") ??
-    DEFAULT_SITE_URL.host;
-  const protocol =
-    requestHeaders.get("x-forwarded-proto") ??
-    (host.includes("localhost") || host.startsWith("127.0.0.1") ? "http" : "https");
+function getMetadataBase() {
+  const configuredSiteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    process.env.SITE_URL ??
+    process.env.VERCEL_PROJECT_PRODUCTION_URL;
+
+  if (!configuredSiteUrl) {
+    return new URL(DEFAULT_SITE_URL);
+  }
+
+  const normalizedSiteUrl = configuredSiteUrl.startsWith("http")
+    ? configuredSiteUrl
+    : `https://${configuredSiteUrl}`;
 
   try {
-    return new URL(`${protocol}://${host}`);
+    return new URL(normalizedSiteUrl);
   } catch {
-    return DEFAULT_SITE_URL;
+    return new URL(DEFAULT_SITE_URL);
   }
 }
 
-export async function generateMetadata(): Promise<Metadata> {
-  const metadataBase = await getMetadataBase();
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+export function generateMetadata(): Metadata {
+  const metadataBase = getMetadataBase();
 
   return {
     metadataBase,
@@ -76,10 +85,16 @@ export default async function RootLayout({
   params: Promise<{ locale: string }>;
 }>) {
   const { locale } = await params;
+  if (!routing.locales.includes(locale as Locale)) {
+    notFound();
+  }
+
+  const typedLocale = locale as Locale;
+  setRequestLocale(typedLocale);
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={typedLocale} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
