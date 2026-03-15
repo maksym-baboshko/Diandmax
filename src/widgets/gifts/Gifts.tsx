@@ -43,11 +43,13 @@ const desktopCardVariants: Variants = {
 const mobileCardVariants: Variants = {
   hidden: {
     opacity: 0.001,
+    x: 0,
     y: 24,
     scale: 0.985,
   },
   visible: {
     opacity: 1,
+    x: 0,
     y: 0,
     scale: 1,
     transition: {
