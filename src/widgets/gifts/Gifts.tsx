@@ -22,15 +22,19 @@ const cardListVariants: Variants = {
 };
 
 const desktopCardVariants: Variants = {
-  hidden: {
+  hidden: (index: number = 0) => ({
     opacity: 0.001,
-    y: 28,
-  },
+    x: index === 0 ? -24 : 24,
+    y: 18,
+    scale: 0.985,
+  }),
   visible: {
     opacity: 1,
+    x: 0,
     y: 0,
+    scale: 1,
     transition: {
-      duration: 0.75,
+      duration: 0.72,
       ease,
     },
   },
@@ -243,17 +247,32 @@ export function Gifts() {
           variants={cardListVariants}
           className="grid grid-cols-1 gap-5 mb-12 sm:grid-cols-2"
         >
-          {giftCards.map(({ currency, amount, label }) => (
+          {giftCards.map(({ currency, amount, label }, index) => (
             <motion.div
               key={currency}
+              custom={index}
               variants={liteMotion ? mobileCardVariants : desktopCardVariants}
+              whileHover={
+                liteMotion
+                  ? undefined
+                  : {
+                      y: -8,
+                      scale: 1.012,
+                      borderColor: "rgba(var(--accent-rgb),0.42)",
+                      boxShadow: "0 28px 54px -38px rgba(var(--accent-rgb),0.38)",
+                      transition: {
+                        duration: 0.28,
+                        ease,
+                      },
+                    }
+              }
               className={cn(
                 "group relative overflow-hidden rounded-3xl border border-accent/24 transform-gpu",
                 liteMotion
                   ? "bg-bg-primary/90 shadow-[0_18px_40px_-28px_rgba(0,0,0,0.45)]"
-                  : "bg-bg-primary/58 backdrop-blur-lg transition-[transform,border-color] duration-500 hover:-translate-y-1 hover:border-accent/40"
+                  : "bg-bg-primary/58 backdrop-blur-lg transition-[border-color,box-shadow] duration-500"
               )}
-              style={{ willChange: "transform, opacity" }}
+              style={{ willChange: "transform, opacity", transformOrigin: "center bottom" }}
             >
               {liteMotion ? (
                 <div className="pointer-events-none absolute inset-x-5 top-0 h-px bg-linear-to-r from-transparent via-accent/35 to-transparent" />
