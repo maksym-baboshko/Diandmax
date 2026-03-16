@@ -74,6 +74,32 @@ Notes:
 - `RSVP_DELIVERY_MODE=mock` lets you test without sending real email
 - if `RSVP_DELIVERY_MODE` is not `mock`, both `RESEND_API_KEY` and `RSVP_TO_EMAILS` are required
 
+## Wedding Game Hub and Supabase
+
+The game hub uses server-side route handlers and stores shared game data in Supabase.
+The browser does not talk to Supabase directly.
+
+Required environment variables:
+
+```bash
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+```
+
+Local setup flow:
+
+1. Create a Supabase project.
+2. Open the SQL Editor in Supabase.
+3. Run the script from `supabase/games_hub_schema.sql`.
+4. Add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to `.env.local`.
+5. Restart the Next.js dev server.
+
+Notes:
+
+- prepared images for games should stay in `public/images/games/...`
+- Supabase Storage is intentionally not used for the current MVP
+- the current MVP saves only finished interactions, not every click or draft change
+
 ## Project structure
 
 The codebase follows a lightweight FSD-style structure:

@@ -193,5 +193,107 @@
     "hint": "Якщо це було персональне запрошення, напишіть нам, і ми із радістю надішлемо правильне посилання ще раз.",
     "primary_cta": "Повернутись на головну",
     "secondary_cta": "Повернутись назад"
+  },
+  "GamesMetadata": {
+    "games_title": "Wedding Game Hub | Максим & Діана",
+    "games_description": "Легка mobile-first зона ігор для гостей весілля Максима і Діани.",
+    "wheel_title": "Колесо фортуни | Wedding Game Hub",
+    "wheel_description": "Крути колесо, отримуй питання або маленьке завдання і збирай points.",
+    "live_title": "Live Screen | Wedding Game Hub",
+    "live_description": "Майбутня сторінка для телевізора або проектора з live-контентом весілля."
+  },
+  "GamesCommon": {
+    "home_nav": "Головна",
+    "games_nav": "Ігри",
+    "live_nav": "Live",
+    "games_navigation": "Навігація по іграх",
+    "play_cta": "Грати",
+    "coming_soon_cta": "Скоро",
+    "coming_soon_badge": "Скоро",
+    "live_badge": "Вже зараз",
+    "back_to_games": "Назад до hub",
+    "tap_ready": "Можна починати",
+    "results_saved": "Результат зберігається після завершеного spin",
+    "points_unit": "points"
+  },
+  "GamesShell": {
+    "eyebrow": "Wedding Game Hub",
+    "note": "Маленькі інтерактиви для моментів між тостами, розмовами та танцями."
+  },
+  "GamesHub": {
+    "eyebrow": "Wedding Game Hub",
+    "title": "Легкі ігри для гостей між активностями",
+    "description": "Відкрий гру на телефоні, введи nickname і грай без довгої реєстрації. Починаємо з одного polished loop, а далі розширимо hub новими міні-іграми.",
+    "chip_quick": "Швидко",
+    "chip_fun": "Весело",
+    "chip_no_signup": "Без signup",
+    "grid_title": "Обери гру",
+    "grid_subtitle": "Починаємо з одного live-format MVP",
+    "live_title": "Live Screen буде наступним кроком",
+    "live_description": "Ми вже заклали окремий маршрут під телевізор або проектор. На цьому етапі там лише підготовлений placeholder, а повний live feed підключимо після Supabase setup.",
+    "live_cta": "Відкрити /live"
+  },
+  "GamesSession": {
+    "new_label": "Гостьова сесія",
+    "new_title": "Як тебе показувати в грі?",
+    "new_note": "Введи ім'я або короткий nickname. Ми збережемо його для цього пристрою й використаємо для points та майбутнього leaderboard.",
+    "edit_label": "Оновлення гравця",
+    "edit_title": "Онови nickname",
+    "edit_note": "Можеш змінити ім'я, якщо хочеш інший підпис у таблиці лідерів.",
+    "nickname_label": "Ім'я або nickname",
+    "nickname_placeholder": "Наприклад: Анна або Table 3 Hero",
+    "save_cta": "Почати грати",
+    "update_cta": "Оновити ім'я",
+    "saving_cta": "Зберігаємо...",
+    "cancel_cta": "Скасувати",
+    "playing_as_label": "Ти граєш як",
+    "saved_note": "Сесію вже створено. Можеш заходити в ігри й поступово накопичувати points.",
+    "compact_note": "Сесія активна для цього пристрою.",
+    "points_label": "Твої points",
+    "edit_cta": "Змінити ім'я",
+    "reset_cta": "Скинути сесію",
+    "errors": {
+      "storage_unavailable": "Supabase ще не підключений. Спочатку додай env variables і виконай SQL script, а тоді сесія почне зберігатися.",
+      "session_missing": "Схоже, цю сесію не знайдено. Збережи nickname ще раз.",
+      "generic": "Щось пішло не так. Спробуй ще раз за кілька секунд."
+    }
+  },
+  "WheelOfFortune": {
+    "page_subtitle": "Перша жива гра в hub",
+    "page_description": "Один tap, одне випадкове питання або завдання, один збережений результат. Саме так ми тримаємо MVP швидким і чистим.",
+    "locked_label": "Потрібна сесія",
+    "locked_title": "Спочатку збережи nickname",
+    "locked_description": "Щойно сесія з'явиться, ми зможемо зберегти результат spin у Supabase і додати points до твого профілю.",
+    "eyebrow": "Wheel of Fortune",
+    "title": "Крути колесо й отримуй завдання",
+    "description": "Після кожного завершеного spin ми зберігаємо лише фінальний результат: який сектор випав і скільки points отримано.",
+    "rules_label": "Як це працює",
+    "rule_one": "Натисни spin, щоб випадково вибрати один сектор.",
+    "rule_two": "Дочекайся зупинки колеса і прочитай свій prompt.",
+    "rule_three": "Після завершення spin результат автоматично збережеться в базі.",
+    "spin_cta": "Spin",
+    "spinning_cta": "Крутиться...",
+    "saving_result": "Зберігаємо фінальний результат...",
+    "result_label": "Твій результат",
+    "question_badge": "Питання",
+    "task_badge": "Завдання",
+    "points_awarded": "Нараховано +{points} points за цей spin.",
+    "empty_state": "Крути колесо, щоб побачити, що випаде цього разу.",
+    "recent_label": "Останні spin-и",
+    "recent_empty": "Тут з'являться твої останні результати.",
+    "errors": {
+      "storage_unavailable": "Результат показано, але Supabase ще не підключений, тому points не збережено.",
+      "generic": "Результат показано, але зберегти його не вдалося. Спробуй ще раз."
+    }
+  },
+  "LivePage": {
+    "eyebrow": "Live Screen",
+    "subtitle": "Phase 2",
+    "title": "Сторінка для телевізора вже зарезервована",
+    "description": "Тут з'явиться ротація топ-гравців, submissions, мемів, порад і передбачень. Для старту ми свідомо не вмикаємо realtime всюди, а підемо через простий polling і batched refresh.",
+    "status_label": "Поточний статус",
+    "status_title": "Підготовлено під наступний етап",
+    "status_description": "Маршрут уже існує, але сам live feed підключимо після того, як ти створиш Supabase project, виконаєш SQL schema і ми додамо наступні ігри поверх цього persistence layer.",
+    "primary_cta": "Повернутися до ігор"
   }
 }

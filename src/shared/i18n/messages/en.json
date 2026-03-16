@@ -193,5 +193,107 @@
     "hint": "If this was a personal invitation, message us and we will gladly send you the correct link again.",
     "primary_cta": "Return Home",
     "secondary_cta": "Go Back"
+  },
+  "GamesMetadata": {
+    "games_title": "Wedding Game Hub | Maksym & Diana",
+    "games_description": "A light mobile-first game area for Maksym and Diana's wedding guests.",
+    "wheel_title": "Wheel of Fortune | Wedding Game Hub",
+    "wheel_description": "Spin the wheel, get a prompt, and collect points.",
+    "live_title": "Live Screen | Wedding Game Hub",
+    "live_description": "A future TV or projector page for wedding live content."
+  },
+  "GamesCommon": {
+    "home_nav": "Home",
+    "games_nav": "Games",
+    "live_nav": "Live",
+    "games_navigation": "Game navigation",
+    "play_cta": "Play",
+    "coming_soon_cta": "Coming soon",
+    "coming_soon_badge": "Soon",
+    "live_badge": "Live now",
+    "back_to_games": "Back to hub",
+    "tap_ready": "Ready to play",
+    "results_saved": "Each finished spin is saved automatically",
+    "points_unit": "points"
+  },
+  "GamesShell": {
+    "eyebrow": "Wedding Game Hub",
+    "note": "Small interactive moments for the time between toasts, chats, and dancing."
+  },
+  "GamesHub": {
+    "eyebrow": "Wedding Game Hub",
+    "title": "Light games for guests between the main moments",
+    "description": "Open a game on your phone, enter a nickname, and start playing without a long signup flow. We begin with one polished loop and expand the hub from there.",
+    "chip_quick": "Quick",
+    "chip_fun": "Fun",
+    "chip_no_signup": "No signup",
+    "grid_title": "Pick a game",
+    "grid_subtitle": "Starting with one live MVP experience",
+    "live_title": "Live Screen comes next",
+    "live_description": "The route for a TV or projector page is already reserved. At this stage it is only a prepared placeholder, and we will wire the full live feed after the Supabase setup is in place.",
+    "live_cta": "Open /live"
+  },
+  "GamesSession": {
+    "new_label": "Guest session",
+    "new_title": "How should we show you in the game?",
+    "new_note": "Enter a name or short nickname. We store it for this device and use it for points and the future leaderboard.",
+    "edit_label": "Update player",
+    "edit_title": "Update your nickname",
+    "edit_note": "You can change the name if you want a different label on the leaderboard.",
+    "nickname_label": "Name or nickname",
+    "nickname_placeholder": "For example: Anna or Table 3 Hero",
+    "save_cta": "Start playing",
+    "update_cta": "Update name",
+    "saving_cta": "Saving...",
+    "cancel_cta": "Cancel",
+    "playing_as_label": "You are playing as",
+    "saved_note": "Your session is already active. Jump into games and start collecting points.",
+    "compact_note": "This device session is active.",
+    "points_label": "Your points",
+    "edit_cta": "Edit name",
+    "reset_cta": "Reset session",
+    "errors": {
+      "storage_unavailable": "Supabase is not connected yet. Add the env variables and run the SQL script first, then the session will start saving.",
+      "session_missing": "This session was not found. Save your nickname once more.",
+      "generic": "Something went wrong. Try again in a few seconds."
+    }
+  },
+  "WheelOfFortune": {
+    "page_subtitle": "The first live game in the hub",
+    "page_description": "One tap, one random question or task, one saved result. That is how we keep the MVP fast and clean.",
+    "locked_label": "Session required",
+    "locked_title": "Save your nickname first",
+    "locked_description": "As soon as the session exists, we can save the spin result in Supabase and add points to your profile.",
+    "eyebrow": "Wheel of Fortune",
+    "title": "Spin the wheel and get a challenge",
+    "description": "After each finished spin we save only the final result: which segment landed and how many points were awarded.",
+    "rules_label": "How it works",
+    "rule_one": "Tap spin to choose one random segment.",
+    "rule_two": "Wait for the wheel to stop and read your prompt.",
+    "rule_three": "After the finished spin, the result is saved automatically.",
+    "spin_cta": "Spin",
+    "spinning_cta": "Spinning...",
+    "saving_result": "Saving the finished result...",
+    "result_label": "Your result",
+    "question_badge": "Question",
+    "task_badge": "Task",
+    "points_awarded": "+{points} points awarded for this spin.",
+    "empty_state": "Spin the wheel to see what lands this time.",
+    "recent_label": "Recent spins",
+    "recent_empty": "Your latest results will appear here.",
+    "errors": {
+      "storage_unavailable": "The result is visible, but Supabase is not connected yet, so the points were not saved.",
+      "generic": "The result is visible, but it could not be saved. Try again."
+    }
+  },
+  "LivePage": {
+    "eyebrow": "Live Screen",
+    "subtitle": "Phase 2",
+    "title": "The TV page is already reserved",
+    "description": "This is where the rotation of top players, submissions, memes, advice, and predictions will appear. For the first step we deliberately avoid full realtime and use simple polling with batched refresh instead.",
+    "status_label": "Current status",
+    "status_title": "Prepared for the next phase",
+    "status_description": "The route already exists, but we will connect the full live feed after you create the Supabase project, run the SQL schema, and we add the next games on top of the same persistence layer.",
+    "primary_cta": "Back to games"
   }
 }
