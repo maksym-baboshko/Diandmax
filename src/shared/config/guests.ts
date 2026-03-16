@@ -86,7 +86,7 @@ export const guests: Guest[] = [
     name: { uk: 'Сергій', en: 'Serhii' },
     vocative: { uk: 'Сергію', en: 'Serhii' },
     formName: { uk: 'Сергій Продан', en: 'Serhii Prodan' },
-    seats: 1
+    seats: 2
   },
   {
     slug: 'family-sundal',
@@ -143,6 +143,34 @@ export const guests: Guest[] = [
     vocative: { uk: 'Гліб та Віола', en: 'Hlib and Viola' },
     formName: { uk: 'Гліб Сопинській', en: 'Hlib Sopinskyi' },
     seats: 2
+  },
+  {
+    slug: 'tornes-family',
+    name: { uk: 'Родина Tornes', en: 'Tornes Family' },
+    vocative: { uk: 'Родино Tornes', en: 'Tornes Family' },
+    formName: { uk: 'Jan Tore Tornes', en: 'Jan Tore Tornes' },
+    seats: 2
+  },
+  {
+    slug: 'edhar-harik',
+    name: { uk: 'Едгар та Гарік', en: 'Edgar and Harik' },
+    vocative: { uk: 'Едгаре та Гаріку', en: 'Edgar and Harik' },
+    formName: { uk: 'Едгар Міразізян', en: 'Edgar Mirazizian' },
+    seats: 2
+  },
+  {
+    slug: 'roman-anna',
+    name: { uk: 'Роман та Анна', en: 'Roman and Anna' },
+    vocative: { uk: 'Романе та Анно', en: 'Roman and Anna' },
+    formName: { uk: 'Роман Хараньян', en: 'Roman Kharanian' },
+    seats: 2
+  },
+  {
+    slug: 'fen-family',
+    name: { uk: 'Родина Фень', en: 'Fen Family' },
+    vocative: { uk: 'Родино Фень', en: 'Fen Family' },
+    formName: { uk: 'Аліна Фень', en: 'Alina Fen' },
+    seats: 4
   }
 ];
 
