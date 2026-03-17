@@ -8,28 +8,51 @@ export function GamesFooter() {
   const tCommon = useTranslations("GamesCommon");
 
   return (
-    <footer className="border-t border-accent/12 bg-bg-primary/88">
-      <div className="mx-auto flex max-w-6xl flex-col gap-5 px-5 py-8 md:flex-row md:items-center md:justify-between md:px-8">
+    <footer id="site-footer" className="relative">
+      {/* Ornamental divider */}
+      <div className="mx-auto max-w-6xl px-5 md:px-8">
+        <div className="flex items-center gap-4">
+          <div className="h-px flex-1 bg-linear-to-r from-transparent to-accent/12" />
+          <span
+            className="font-cinzel text-[8px] tracking-[0.5em] text-accent/20"
+            aria-hidden="true"
+          >
+            ✦
+          </span>
+          <div className="h-px flex-1 bg-linear-to-l from-transparent to-accent/12" />
+        </div>
+      </div>
+
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-5 py-10 md:flex-row md:items-end md:justify-between md:px-8 md:py-12">
         <div>
           <p className="text-[10px] uppercase tracking-[0.34em] text-accent md:text-xs">
             {t("eyebrow")}
           </p>
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-text-secondary">
+          <p className="mt-2.5 max-w-md text-sm leading-relaxed text-text-secondary">
             {t("note")}
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-4 text-xs uppercase tracking-[0.24em] text-text-secondary">
-          <Link href="/" className="transition-colors hover:text-accent">
+        <nav className="flex flex-wrap gap-5 text-xs uppercase tracking-[0.24em] text-text-secondary md:justify-end">
+          <Link
+            href="/"
+            className="transition-colors duration-300 hover:text-accent"
+          >
             {tCommon("home_nav")}
           </Link>
-          <Link href="/games" className="transition-colors hover:text-accent">
+          <Link
+            href="/games"
+            className="transition-colors duration-300 hover:text-accent"
+          >
             {tCommon("games_nav")}
           </Link>
-          <Link href="/live" className="transition-colors hover:text-accent">
+          <Link
+            href="/live"
+            className="transition-colors duration-300 hover:text-accent"
+          >
             {tCommon("live_nav")}
           </Link>
-        </div>
+        </nav>
       </div>
     </footer>
   );

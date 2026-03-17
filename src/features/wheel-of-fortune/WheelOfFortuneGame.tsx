@@ -28,6 +28,16 @@ const segmentFills = [
   "color-mix(in srgb, var(--accent) 26%, var(--bg-secondary))",
   "color-mix(in srgb, var(--accent) 16%, var(--bg-primary))",
 ] as const;
+const legendAccentTones = [
+  "bg-accent/14 border-accent/18",
+  "bg-bg-primary/92 border-accent/14",
+  "bg-accent/18 border-accent/18",
+  "bg-bg-primary/92 border-accent/14",
+  "bg-accent/14 border-accent/18",
+  "bg-bg-primary/92 border-accent/14",
+  "bg-accent/18 border-accent/18",
+  "bg-bg-primary/92 border-accent/14",
+] as const;
 
 interface WheelOfFortuneGameProps {
   session: PlayerSessionSnapshot;
@@ -173,128 +183,160 @@ export function WheelOfFortuneGame({
     }, wheelDurationSeconds * 1000);
   }
 
-  return (
-    <div className="rounded-[2rem] border border-accent/18 bg-bg-secondary/70 p-6 shadow-lg shadow-accent/8 md:p-8">
-      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_320px] xl:items-start">
-        <div>
-          <p className="text-[10px] uppercase tracking-[0.34em] text-accent md:text-xs">
-            {t("eyebrow")}
-          </p>
-          <h2 className="heading-serif mt-4 text-3xl text-text-primary md:text-4xl">
-            {t("title")}
-          </h2>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-text-secondary md:text-base">
-            {t("description")}
-          </p>
+  const wheelLegend = (
+    <div className="rounded-4xl border border-accent/12 bg-bg-primary/55 p-5 shadow-[0_22px_60px_-46px_rgba(0,0,0,0.4)] md:p-6">
+      <p className="text-[10px] uppercase tracking-[0.28em] text-accent">
+        {t("legend_label")}
+      </p>
+      <p className="mt-2 max-w-xl text-sm leading-relaxed text-text-secondary">
+        {tCommon("results_saved")}
+      </p>
 
-          <div className="mt-8 flex flex-col items-center gap-6">
-            <div className="relative">
-              <div className="absolute left-1/2 top-[-8px] z-20 -translate-x-1/2">
-                <div className="h-0 w-0 border-x-[18px] border-b-[28px] border-x-transparent border-b-accent drop-shadow-[0_10px_20px_rgba(0,0,0,0.18)]" />
+      <div className="mt-5 grid gap-3 xl:grid-cols-2">
+        {WHEEL_OF_FORTUNE_SEGMENTS.map((segment, index) => (
+          <div
+            key={segment.id}
+            className={cn(
+              "flex items-start justify-between gap-4 rounded-3xl border px-4 py-4 md:px-5",
+              legendAccentTones[index % legendAccentTones.length]
+            )}
+          >
+            <div className="flex min-w-0 items-start gap-4">
+              <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-accent/18 bg-bg-secondary font-cinzel text-sm text-text-primary">
+                {(index + 1).toString().padStart(2, "0")}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-lg leading-tight font-medium text-text-primary">
+                  {segment.label[locale]}
+                </p>
+                <p className="mt-2 text-xs uppercase tracking-[0.18em] text-text-secondary">
+                  {segment.type === "question"
+                    ? t("question_badge")
+                    : t("task_badge")}
+                </p>
               </div>
+            </div>
+            <span className="shrink-0 pt-1 text-[11px] uppercase tracking-[0.18em] text-text-secondary">
+              +{segment.points} {tCommon("points_unit")}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
-              <div className="relative aspect-square w-full max-w-[21rem] rounded-full border border-accent/24 bg-bg-primary p-3 shadow-[0_24px_70px_-36px_rgba(0,0,0,0.55)]">
-                <div className="absolute inset-0 rounded-full bg-linear-to-br from-accent/8 via-transparent to-accent/10" />
+  const stageCardClass =
+    "rounded-[2.5rem] border border-accent/12 bg-bg-primary/60 p-6 shadow-[0_26px_70px_-54px_rgba(0,0,0,0.45)] md:p-8";
 
-                <motion.div
-                  animate={{ rotate: rotation }}
-                  transition={{
-                    duration: wheelDurationSeconds,
-                    ease: wheelEase,
-                  }}
-                  className="relative h-full w-full"
-                  style={{ willChange: "transform" }}
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1.08fr)_320px] xl:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
+        <div className={stageCardClass}>
+          <div className="grid gap-8 xl:grid-cols-[minmax(240px,0.52fr)_minmax(0,1fr)] xl:items-center">
+            <div className="max-w-md">
+              <p className="text-[10px] uppercase tracking-[0.34em] text-accent md:text-xs">
+                {t("eyebrow")}
+              </p>
+              <h2 className="heading-serif mt-4 text-3xl leading-[0.94] text-text-primary md:text-4xl">
+                {t("title")}
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-text-secondary md:text-base">
+                {t("description")}
+              </p>
+
+              <div className="mt-6 flex flex-col gap-4">
+                <Button
+                  type="button"
+                  size="lg"
+                  onClick={handleSpin}
+                  disabled={isSpinning || isSaving}
+                  className="min-w-50 md:min-w-60"
                 >
-                  <svg viewBox="0 0 100 100" className="h-full w-full">
-                    {WHEEL_OF_FORTUNE_SEGMENTS.map((segment, index) => {
-                      const startAngle = index * segmentAngle;
-                      const endAngle = (index + 1) * segmentAngle;
-                      const midAngle = startAngle + segmentAngle / 2;
-                      const textPosition = polarToCartesian(31, midAngle);
-                      const label = segment.label[locale];
+                  {isSpinning ? t("spinning_cta") : t("spin_cta")}
+                </Button>
 
-                      return (
-                        <g key={segment.id}>
-                          <path
-                            d={describeSlice(startAngle, endAngle)}
-                            style={{
-                              fill: segmentFills[index % segmentFills.length],
-                            }}
-                            stroke="color-mix(in srgb, var(--accent) 26%, transparent)"
-                            strokeWidth="0.9"
-                          />
-                          <text
-                            x={textPosition.x}
-                            y={textPosition.y}
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                            fill="var(--text-primary)"
-                            fontSize="4.25"
-                            fontWeight="600"
-                            transform={`rotate(${midAngle} ${textPosition.x} ${textPosition.y})`}
-                          >
-                            <tspan x={textPosition.x} dy="-1.8">
-                              {label.split(" ").slice(0, 2).join(" ")}
-                            </tspan>
-                            {label.split(" ").length > 2 ? (
-                              <tspan x={textPosition.x} dy="4.6">
-                                {label.split(" ").slice(2).join(" ")}
-                              </tspan>
-                            ) : null}
-                          </text>
-                        </g>
-                      );
-                    })}
-
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="10.5"
-                      fill="var(--bg-primary)"
-                      stroke="color-mix(in srgb, var(--accent) 38%, transparent)"
-                      strokeWidth="1.1"
-                    />
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="4.5"
-                      fill="var(--accent)"
-                      opacity="0.78"
-                    />
-                  </svg>
-                </motion.div>
+                <p className="text-xs uppercase tracking-[0.24em] text-text-secondary">
+                  {isSaving ? t("saving_result") : tCommon("results_saved")}
+                </p>
               </div>
             </div>
 
-            <Button
-              type="button"
-              size="lg"
-              onClick={handleSpin}
-              disabled={isSpinning || isSaving}
-              className="min-w-[220px]"
-            >
-              {isSpinning ? t("spinning_cta") : t("spin_cta")}
-            </Button>
+            <div className="flex flex-1 flex-col items-center">
+              <div className="relative">
+                <div className="absolute left-1/2 -top-2 z-20 -translate-x-1/2">
+                  <div className="h-0 w-0 border-x-18 border-b-28 border-x-transparent border-b-accent drop-shadow-[0_10px_20px_rgba(0,0,0,0.18)]" />
+                </div>
 
-            <p className="text-xs uppercase tracking-[0.24em] text-text-secondary">
-              {isSaving ? t("saving_result") : tCommon("results_saved")}
-            </p>
+                <div className="relative aspect-square w-full max-w-84 rounded-full border border-accent/24 bg-bg-primary p-3 shadow-[0_24px_70px_-36px_rgba(0,0,0,0.55)] md:max-w-[25rem]">
+                  <div className="absolute inset-0 rounded-full bg-linear-to-br from-accent/8 via-transparent to-accent/10" />
+
+                  <motion.div
+                    animate={{ rotate: rotation }}
+                    transition={{
+                      duration: wheelDurationSeconds,
+                      ease: wheelEase,
+                    }}
+                    className="relative h-full w-full"
+                    style={{ willChange: "transform" }}
+                  >
+                    <svg viewBox="0 0 100 100" className="h-full w-full">
+                      {WHEEL_OF_FORTUNE_SEGMENTS.map((segment, index) => {
+                        const startAngle = index * segmentAngle;
+                        const endAngle = (index + 1) * segmentAngle;
+                        const midAngle = startAngle + segmentAngle / 2;
+                        const numberPosition = polarToCartesian(34, midAngle);
+
+                        return (
+                          <g key={segment.id}>
+                            <path
+                              d={describeSlice(startAngle, endAngle)}
+                              style={{
+                                fill: segmentFills[index % segmentFills.length],
+                              }}
+                              stroke="color-mix(in srgb, var(--accent) 26%, transparent)"
+                              strokeWidth="0.9"
+                            />
+                            <text
+                              x={numberPosition.x}
+                              y={numberPosition.y}
+                              textAnchor="middle"
+                              dominantBaseline="middle"
+                              fill="var(--text-primary)"
+                              fontSize="9"
+                              fontWeight="600"
+                              className="font-cinzel"
+                            >
+                              {(index + 1).toString().padStart(2, "0")}
+                            </text>
+                          </g>
+                        );
+                      })}
+
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="10.5"
+                        fill="var(--bg-primary)"
+                        stroke="color-mix(in srgb, var(--accent) 38%, transparent)"
+                        strokeWidth="1.1"
+                      />
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="4.5"
+                        fill="var(--accent)"
+                        opacity="0.78"
+                      />
+                    </svg>
+                  </motion.div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-[1.75rem] border border-accent/16 bg-bg-primary/80 p-5">
-            <p className="text-[10px] uppercase tracking-[0.28em] text-accent">
-              {t("rules_label")}
-            </p>
-            <ul className="mt-4 space-y-3 text-sm leading-relaxed text-text-secondary">
-              <li>{t("rule_one")}</li>
-              <li>{t("rule_two")}</li>
-              <li>{t("rule_three")}</li>
-            </ul>
-          </div>
-
-          <div className="rounded-[1.75rem] border border-accent/16 bg-bg-primary/80 p-5">
+          <div className="rounded-[1.75rem] border border-accent/12 bg-accent/[0.07] p-5">
             <p className="text-[10px] uppercase tracking-[0.28em] text-accent">
               {t("result_label")}
             </p>
@@ -306,7 +348,7 @@ export function WheelOfFortuneGame({
                     "inline-flex rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.22em]",
                     activeResult.type === "question"
                       ? "border-accent/24 bg-accent/10 text-accent"
-                      : "border-accent/20 bg-bg-secondary text-text-primary"
+                      : "border-accent/20 bg-bg-primary/80 text-text-primary"
                   )}
                 >
                   {activeResult.type === "question"
@@ -327,13 +369,24 @@ export function WheelOfFortuneGame({
             )}
 
             {wheelError ? (
-              <p className="mt-4 rounded-2xl border border-accent/18 bg-bg-secondary/55 px-4 py-3 text-sm text-text-secondary">
+              <p className="mt-4 rounded-2xl border border-accent/16 bg-bg-primary/65 px-4 py-3 text-sm text-text-secondary">
                 {wheelError}
               </p>
             ) : null}
           </div>
 
-          <div className="rounded-[1.75rem] border border-accent/16 bg-bg-primary/80 p-5">
+          <div className="rounded-[1.75rem] border border-accent/12 bg-bg-primary/50 p-5">
+            <p className="text-[10px] uppercase tracking-[0.28em] text-accent">
+              {t("rules_label")}
+            </p>
+            <ul className="mt-4 space-y-3 text-sm leading-relaxed text-text-secondary">
+              <li>{t("rule_one")}</li>
+              <li>{t("rule_two")}</li>
+              <li>{t("rule_three")}</li>
+            </ul>
+          </div>
+
+          <div className="rounded-[1.75rem] border border-accent/12 bg-bg-primary/50 p-5">
             <p className="text-[10px] uppercase tracking-[0.28em] text-accent">
               {t("recent_label")}
             </p>
@@ -342,7 +395,7 @@ export function WheelOfFortuneGame({
                 {recentResults.map((segment) => (
                   <div
                     key={`${segment.id}-${segment.prompt[locale]}`}
-                    className="rounded-2xl border border-accent/14 bg-bg-secondary/50 px-4 py-3"
+                    className="rounded-2xl border border-accent/12 bg-bg-primary/70 px-4 py-3"
                   >
                     <p className="text-sm text-text-primary">
                       {segment.prompt[locale]}
@@ -361,6 +414,8 @@ export function WheelOfFortuneGame({
           </div>
         </div>
       </div>
+
+      {wheelLegend}
     </div>
   );
 }

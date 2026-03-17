@@ -48,7 +48,7 @@ export const GAMES: GameCatalogItem[] = [
   {
     slug: "baby-detective",
     title: {
-      uk: "Baby Detective",
+      uk: "Дитячий детектив",
       en: "Baby Detective",
     },
     description: {
@@ -60,11 +60,11 @@ export const GAMES: GameCatalogItem[] = [
   {
     slug: "meme-generator",
     title: {
-      uk: "Meme Generator",
+      uk: "Генератор мемів",
       en: "Meme Generator",
     },
     description: {
-      uk: "Придумай смішний caption до фото молодят або гостей.",
+      uk: "Придумай смішний підпис до фото молодят або гостей.",
       en: "Write a funny caption for a photo of the couple or the guests.",
     },
     status: "comingSoon",
@@ -72,7 +72,7 @@ export const GAMES: GameCatalogItem[] = [
   {
     slug: "secret-missions",
     title: {
-      uk: "Secret Missions",
+      uk: "Таємні місії",
       en: "Secret Missions",
     },
     description: {
@@ -137,11 +137,11 @@ export const WHEEL_OF_FORTUNE_SEGMENTS: WheelSegment[] = [
     id: "cross-table-selfie",
     type: "task",
     label: {
-      uk: "Selfie-знайомство",
+      uk: "Фото-знайомство",
       en: "Cross-table selfie",
     },
     prompt: {
-      uk: "Зроби selfie з кимось за іншим столом.",
+      uk: "Зроби фото з кимось за іншим столом.",
       en: "Take a selfie with someone from another table.",
     },
     points: 18,

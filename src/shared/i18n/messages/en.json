@@ -211,27 +211,27 @@
     "coming_soon_cta": "Coming soon",
     "coming_soon_badge": "Soon",
     "live_badge": "Live now",
-    "back_to_games": "Back to hub",
+    "back_to_games": "Back to games",
     "tap_ready": "Ready to play",
-    "results_saved": "Each finished spin is saved automatically",
+    "results_saved": "The result is saved after the spin ends",
     "points_unit": "points"
   },
   "GamesShell": {
-    "eyebrow": "Wedding Game Hub",
-    "note": "Small interactive moments for the time between toasts, chats, and dancing."
+    "eyebrow": "Wedding Games",
+    "note": "Small interactive moments for guests between the evening's highlights."
   },
   "GamesHub": {
-    "eyebrow": "Wedding Game Hub",
+    "eyebrow": "Wedding Games",
     "title": "Light games for guests between the main moments",
-    "description": "Open a game on your phone, enter a nickname, and start playing without a long signup flow. We begin with one polished loop and expand the hub from there.",
+    "description": "Enter your name, pick a game, and start collecting points. Winners announced at the end of the evening.",
     "chip_quick": "Quick",
     "chip_fun": "Fun",
     "chip_no_signup": "No signup",
     "grid_title": "Pick a game",
-    "grid_subtitle": "Starting with one live MVP experience",
-    "live_title": "Live Screen comes next",
-    "live_description": "The route for a TV or projector page is already reserved. At this stage it is only a prepared placeholder, and we will wire the full live feed after the Supabase setup is in place.",
-    "live_cta": "Open /live"
+    "grid_subtitle": "All games of the evening",
+    "live_title": "The guest screen comes next",
+    "live_description": "The page for a TV or projector is already prepared. For now it is only a placeholder, and the full display will appear a bit later.",
+    "live_cta": "Open the screen"
   },
   "GamesSession": {
     "new_label": "Guest session",
@@ -250,8 +250,10 @@
     "saved_note": "Your session is already active. Jump into games and start collecting points.",
     "compact_note": "This device session is active.",
     "points_label": "Your points",
+    "status_label": "Session status",
+    "status_ready": "Ready to play",
     "edit_cta": "Edit name",
-    "reset_cta": "Reset session",
+    "reset_cta": "Switch player",
     "errors": {
       "storage_unavailable": "Supabase is not connected yet. Add the env variables and run the SQL script first, then the session will start saving.",
       "session_missing": "This session was not found. Save your nickname once more.",
@@ -259,8 +261,8 @@
     }
   },
   "WheelOfFortune": {
-    "page_subtitle": "The first live game in the hub",
-    "page_description": "One tap, one random question or task, one saved result. That is how we keep the MVP fast and clean.",
+    "page_subtitle": "The first game in the hub",
+    "page_description": "One tap, one random question or task, one saved result. That is how we keep the first version simple and fast.",
     "locked_label": "Session required",
     "locked_title": "Save your nickname first",
     "locked_description": "As soon as the session exists, we can save the spin result in Supabase and add points to your profile.",
@@ -273,7 +275,8 @@
     "rule_three": "After the finished spin, the result is saved automatically.",
     "spin_cta": "Spin",
     "spinning_cta": "Spinning...",
-    "saving_result": "Saving the finished result...",
+    "saving_result": "Saving the result...",
+    "legend_label": "Sector legend",
     "result_label": "Your result",
     "question_badge": "Question",
     "task_badge": "Task",
@@ -287,13 +290,13 @@
     }
   },
   "LivePage": {
-    "eyebrow": "Live Screen",
+    "eyebrow": "Live screen",
     "subtitle": "Phase 2",
     "title": "The TV page is already reserved",
-    "description": "This is where the rotation of top players, submissions, memes, advice, and predictions will appear. For the first step we deliberately avoid full realtime and use simple polling with batched refresh instead.",
+    "description": "This is where the rotation of top players, answers, memes, advice, and predictions will appear. For the first step we use simple periodic refresh without extra complexity.",
     "status_label": "Current status",
     "status_title": "Prepared for the next phase",
-    "status_description": "The route already exists, but we will connect the full live feed after you create the Supabase project, run the SQL schema, and we add the next games on top of the same persistence layer.",
+    "status_description": "The route already exists, but we will connect the full display after you create the Supabase project, run the SQL schema, and we add the next games.",
     "primary_cta": "Back to games"
   }
 }

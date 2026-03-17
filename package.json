@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint:classes": "node scripts/lint-canonical-classes.mjs",
+    "lint": "eslint && pnpm lint:classes"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",

@@ -30,7 +30,7 @@ export function GamesWheelPage() {
   return (
     <>
       <SectionWrapper noFade noPadding className="relative overflow-hidden">
-        <div className="mx-auto max-w-6xl px-5 pb-12 pt-10 md:px-8 md:pb-16 md:pt-16">
+        <div className="mx-auto max-w-6xl px-5 pb-10 pt-10 md:px-8 md:pb-12 md:pt-16">
           <Button
             as={Link}
             href="/games"
@@ -41,40 +41,43 @@ export function GamesWheelPage() {
             {tCommon("back_to_games")}
           </Button>
 
-          <div className="mt-6 max-w-3xl">
-            <p className="text-[10px] uppercase tracking-[0.34em] text-accent md:text-xs">
-              {t("page_subtitle")}
-            </p>
-            <h1 className="heading-serif mt-4 text-5xl leading-[0.94] text-text-primary md:text-6xl">
-              {wheelGame.title[locale]}
-            </h1>
-            <div className="mt-5 h-px w-24 bg-linear-to-r from-accent to-transparent" />
-            <p className="max-w-2xl text-base leading-relaxed text-text-secondary md:text-lg">
-              {t("page_description")}
-            </p>
+          <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(320px,360px)] lg:items-start">
+            <div className="max-w-3xl">
+              <p className="text-[10px] uppercase tracking-[0.34em] text-accent md:text-xs">
+                {t("page_subtitle")}
+              </p>
+              <h1 className="heading-serif mt-4 text-5xl leading-[0.94] text-text-primary md:text-6xl">
+                {wheelGame.title[locale]}
+              </h1>
+              <div className="mt-5 h-px w-24 bg-linear-to-r from-accent to-transparent" />
+              <p className="mt-5 max-w-2xl text-base leading-relaxed text-text-secondary md:text-lg">
+                {t("page_description")}
+              </p>
+            </div>
+
+            <PlayerSessionCard
+              session={session}
+              isHydrating={isHydrating}
+              isSaving={isSaving}
+              errorCode={errorCode}
+              onSave={registerPlayer}
+              onClear={clearPlayer}
+              compact
+              className="lg:justify-self-end"
+            />
           </div>
         </div>
       </SectionWrapper>
 
-      <SectionWrapper noPadding alternate className="relative overflow-hidden">
-        <div className="mx-auto grid max-w-6xl gap-6 px-5 py-12 md:px-8 md:py-16 xl:grid-cols-[340px_minmax(0,1fr)] xl:items-start">
-          <PlayerSessionCard
-            session={session}
-            isHydrating={isHydrating}
-            isSaving={isSaving}
-            errorCode={errorCode}
-            onSave={registerPlayer}
-            onClear={clearPlayer}
-            compact
-          />
-
+      <SectionWrapper noPadding noFade className="relative overflow-hidden">
+        <div className="mx-auto max-w-6xl px-5 py-8 md:px-8 md:py-10">
           {session ? (
             <WheelOfFortuneGame
               session={session}
               onPlayerUpdate={updatePlayerSnapshot}
             />
           ) : (
-            <div className="rounded-[2rem] border border-accent/18 bg-bg-secondary/70 p-6 shadow-lg shadow-accent/8 md:p-8">
+            <div className="rounded-4xl border border-accent/12 bg-bg-primary/55 p-6 shadow-[0_22px_60px_-46px_rgba(0,0,0,0.4)] md:p-8">
               <p className="text-[10px] uppercase tracking-[0.34em] text-accent md:text-xs">
                 {t("locked_label")}
               </p>

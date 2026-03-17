@@ -4,6 +4,8 @@ import type { PlayerSessionSnapshot } from "./types";
 
 const PLAYER_SESSION_STORAGE_KEY = "big-day.games.player-session.v1";
 const playerSessionListeners = new Set<() => void>();
+let cachedRawPlayerSession: string | null | undefined;
+let cachedPlayerSessionSnapshot: PlayerSessionSnapshot | null = null;
 
 function isPlayerSessionSnapshot(
   value: unknown
@@ -29,13 +31,27 @@ export function readStoredPlayerSession() {
 
   try {
     const rawValue = window.localStorage.getItem(PLAYER_SESSION_STORAGE_KEY);
+
+    if (rawValue === cachedRawPlayerSession) {
+      return cachedPlayerSessionSnapshot;
+    }
+
     if (!rawValue) {
+      cachedRawPlayerSession = null;
+      cachedPlayerSessionSnapshot = null;
       return null;
     }
 
     const parsedValue = JSON.parse(rawValue) as unknown;
-    return isPlayerSessionSnapshot(parsedValue) ? parsedValue : null;
+    const nextSnapshot = isPlayerSessionSnapshot(parsedValue) ? parsedValue : null;
+
+    cachedRawPlayerSession = rawValue;
+    cachedPlayerSessionSnapshot = nextSnapshot;
+
+    return nextSnapshot;
   } catch {
+    cachedRawPlayerSession = null;
+    cachedPlayerSessionSnapshot = null;
     return null;
   }
 }
@@ -49,6 +65,8 @@ export function writeStoredPlayerSession(session: PlayerSessionSnapshot) {
     PLAYER_SESSION_STORAGE_KEY,
     JSON.stringify(session)
   );
+  cachedRawPlayerSession = JSON.stringify(session);
+  cachedPlayerSessionSnapshot = session;
   playerSessionListeners.forEach((listener) => listener());
 }
 
@@ -58,6 +76,8 @@ export function clearStoredPlayerSession() {
   }
 
   window.localStorage.removeItem(PLAYER_SESSION_STORAGE_KEY);
+  cachedRawPlayerSession = null;
+  cachedPlayerSessionSnapshot = null;
   playerSessionListeners.forEach((listener) => listener());
 }
 

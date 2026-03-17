@@ -66,7 +66,7 @@ export function NotFoundPage() {
             </AnimatedReveal>
 
             <AnimatedReveal direction="right" delay={0.12} blur className="relative">
-              <div className="relative overflow-hidden rounded-[2rem] border border-accent/18 bg-text-primary/96 text-bg-primary shadow-2xl shadow-accent/10 dark:bg-bg-secondary dark:text-text-primary md:rounded-[2.75rem]">
+              <div className="relative overflow-hidden rounded-4xl border border-accent/18 bg-text-primary/96 text-bg-primary shadow-2xl shadow-accent/10 dark:bg-bg-secondary dark:text-text-primary md:rounded-[2.75rem]">
                 <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-accent/12 via-transparent to-accent/8 dark:from-accent/10 dark:to-accent/5" />
                 <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-linear-to-r from-transparent via-accent/70 to-transparent" />
                 <div className="pointer-events-none absolute -left-12 top-10 h-32 w-32 rounded-full bg-accent/10 blur-3xl" />
@@ -105,7 +105,7 @@ export function NotFoundPage() {
                       as={Link}
                       href={homeHref}
                       size="lg"
-                      className="min-w-[220px]"
+                      className="min-w-55"
                     >
                       {t("primary_cta")}
                     </Button>
@@ -115,7 +115,7 @@ export function NotFoundPage() {
                       variant="outline"
                       size="lg"
                       onClick={handleBack}
-                      className="min-w-[220px] border-accent/30 text-bg-primary hover:bg-bg-primary/10 hover:text-bg-primary dark:text-text-primary dark:hover:bg-accent/12 dark:hover:text-text-primary"
+                      className="min-w-55 border-accent/30 text-bg-primary hover:bg-bg-primary/10 hover:text-bg-primary dark:text-text-primary dark:hover:bg-accent/12 dark:hover:text-text-primary"
                     >
                       {t("secondary_cta")}
                     </Button>

@@ -24,7 +24,7 @@ export function PersonalInvitation({ guest }: PersonalInvitationProps) {
     <SectionWrapper noPadding noFade className="relative overflow-visible">
       <div className="mx-auto w-full max-w-6xl px-5 pt-24 pb-12 md:px-8 md:pt-32 md:pb-24">
         <AnimatedReveal direction="up" delay={0.08} className="relative">
-          <div className="relative overflow-hidden rounded-[2rem] border border-accent/18 bg-text-primary/96 text-bg-primary shadow-2xl shadow-accent/10 dark:bg-bg-secondary dark:text-text-primary md:rounded-[2.75rem]">
+          <div className="relative overflow-hidden rounded-4xl border border-accent/18 bg-text-primary/96 text-bg-primary shadow-2xl shadow-accent/10 dark:bg-bg-secondary dark:text-text-primary md:rounded-[2.75rem]">
             <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-accent/12 via-transparent to-accent/10 dark:from-accent/10 dark:to-accent/6" />
             <div className="pointer-events-none absolute -left-20 top-12 h-40 w-40 rounded-full bg-accent/12 blur-3xl" />
             <div className="pointer-events-none absolute -right-16 bottom-8 h-48 w-48 rounded-full bg-accent/10 blur-3xl" />
