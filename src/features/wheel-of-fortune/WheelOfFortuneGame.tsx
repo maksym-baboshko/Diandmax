@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { startTransition, useEffect, useEffectEvent, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   animate,
@@ -15,9 +15,13 @@ import {
   type WheelInteractionType,
 } from "@/shared/config";
 import {
+  getSupabaseBrowserClient,
   getGameAuthAccessToken,
   type GameApiErrorCode,
+  type GameLeaderboardApiResponse,
+  type LeaderboardEntrySnapshot,
   type PlayerSessionSnapshot,
+  type WheelRoundReadApiResponse,
   type WheelRoundResolution,
   type WheelRoundResolveApiResponse,
   type WheelRoundSnapshot,
@@ -103,6 +107,213 @@ function ConfettiPop({ trigger }: { trigger: number }) {
           />
         );
       })}
+    </div>
+  );
+}
+
+function getAvatarMonogram(avatarKey: string, fallbackName: string) {
+  const keyMonogram = avatarKey
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("")
+    .slice(0, 2);
+
+  if (keyMonogram.length > 0) {
+    return keyMonogram;
+  }
+
+  return fallbackName.trim().charAt(0).toUpperCase();
+}
+
+function WheelLeaderboardCard() {
+  const t = useTranslations("WheelOfFortune");
+  const tCommon = useTranslations("GamesCommon");
+  const [leaderboard, setLeaderboard] =
+    useState<GameLeaderboardApiResponse["leaderboard"] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  const loadLeaderboard = useEffectEvent(async () => {
+    try {
+      const accessToken = await getGameAuthAccessToken();
+      const response = await fetch(
+        "/api/games/leaderboard?game=wheel-of-fortune&topLimit=5&radius=2",
+        {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        setHasError(true);
+        setIsLoading(false);
+        return;
+      }
+
+      const payload = (await response.json()) as GameLeaderboardApiResponse;
+
+      startTransition(() => {
+        setLeaderboard(payload.leaderboard);
+        setHasError(false);
+        setIsLoading(false);
+      });
+    } catch {
+      setHasError(true);
+      setIsLoading(false);
+    }
+  });
+
+  useEffect(() => {
+    void loadLeaderboard();
+  }, []);
+
+  useEffect(() => {
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const channel = supabase
+        .channel("wheel-leaderboard")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "xp_transactions" },
+          () => {
+            void loadLeaderboard();
+          }
+        )
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "player_profiles" },
+          () => {
+            void loadLeaderboard();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        void supabase.removeChannel(channel);
+      };
+    } catch {
+      return undefined;
+    }
+  }, []);
+
+  const currentPlayerId = leaderboard?.currentPlayerId ?? null;
+  const playerEntry = leaderboard?.playerEntry ?? null;
+  const showPlayerWindow =
+    Boolean(playerEntry) &&
+    Boolean(leaderboard?.playerWindow.length) &&
+    (playerEntry?.rank ?? 0) > (leaderboard?.top.length ?? 0);
+
+  function renderRow(entry: LeaderboardEntrySnapshot) {
+    const isCurrentPlayer = entry.playerId === currentPlayerId;
+
+    return (
+      <div
+        key={entry.playerId}
+        className={cn(
+          "flex items-center gap-3 rounded-2xl border px-4 py-3",
+          isCurrentPlayer
+            ? "border-accent/20 bg-accent/10"
+            : "border-accent/8 bg-bg-primary/40"
+        )}
+      >
+        <div className="w-7 shrink-0 text-center font-cinzel text-lg text-accent">
+          {entry.rank}
+        </div>
+        <div className="flex h-9 w-9 items-center justify-center rounded-full border border-accent/18 bg-accent/8 font-cinzel text-xs tracking-[0.16em] text-accent">
+          {getAvatarMonogram(entry.avatarKey, entry.nickname)}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm text-text-primary">
+            {entry.nickname}
+            {isCurrentPlayer ? (
+              <span className="ml-2 text-[10px] uppercase tracking-[0.2em] text-accent">
+                {t("leaderboard_you")}
+              </span>
+            ) : null}
+          </p>
+        </div>
+        <div className="shrink-0 text-right">
+          <p className="font-cinzel text-xl text-text-primary">{entry.totalPoints}</p>
+          <p className="text-[9px] uppercase tracking-[0.2em] text-text-secondary/50">
+            {tCommon("points_unit")}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-3xl border border-accent/10 bg-bg-primary/40 p-5 backdrop-blur-sm">
+      <div className="flex items-center gap-3">
+        <p className="text-[10px] uppercase tracking-[0.32em] text-accent">
+          {t("leaderboard_label")}
+        </p>
+        <span className="h-px flex-1 bg-linear-to-r from-accent/20 to-transparent" />
+      </div>
+
+      {isLoading ? (
+        <div className="mt-4 space-y-2">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div
+              key={index}
+              className="h-16 animate-pulse rounded-2xl border border-accent/8 bg-bg-primary/30"
+            />
+          ))}
+        </div>
+      ) : hasError ? (
+        <p className="mt-4 text-sm leading-relaxed text-text-secondary">
+          {t("leaderboard_error")}
+        </p>
+      ) : (
+        <div className="mt-4 space-y-4">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary/55">
+              {t("leaderboard_top_label")}
+            </p>
+            {leaderboard?.top.length ? (
+              <div className="mt-3 space-y-2">{leaderboard.top.map(renderRow)}</div>
+            ) : (
+              <p className="mt-3 text-sm leading-relaxed text-text-secondary">
+                {t("leaderboard_empty")}
+              </p>
+            )}
+          </div>
+
+          {playerEntry ? (
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary/55">
+                {t("leaderboard_window_label")}
+              </p>
+              <div className="mt-3 rounded-2xl border border-accent/10 bg-bg-primary/30 px-4 py-3">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-accent/80">
+                  {t("leaderboard_rank_label")}
+                </p>
+                <div className="mt-2 flex items-baseline justify-between gap-3">
+                  <p className="font-cinzel text-3xl text-text-primary">
+                    #{playerEntry.rank}
+                  </p>
+                  <p className="font-cinzel text-2xl text-accent">
+                    {playerEntry.totalPoints}
+                  </p>
+                </div>
+              </div>
+
+              {showPlayerWindow ? (
+                <div className="mt-3 space-y-2">
+                  {leaderboard?.playerWindow.map(renderRow)}
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <p className="text-sm leading-relaxed text-text-secondary">
+              {t("leaderboard_unranked")}
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -206,6 +417,7 @@ export function WheelOfFortuneGame({
 
   const rotation = useMotionValue(0);
   const [isPreparingRound, setIsPreparingRound] = useState(false);
+  const [isRestoringRound, setIsRestoringRound] = useState(false);
   const [isSpinning, setIsSpinning] = useState(false);
   const [isStartingTimer, setIsStartingTimer] = useState(false);
   const [isResolving, setIsResolving] = useState(false);
@@ -224,20 +436,29 @@ export function WheelOfFortuneGame({
   const spinTimeoutRef = useRef<number | null>(null);
   const confettiTimeoutRef = useRef<number | null>(null);
   const timerIntervalRef = useRef<number | null>(null);
+  const timerRemainingRef = useRef<number | null>(null);
   const spinAnimationRef = useRef<AnimationPlaybackControls | null>(null);
   const idleAnimationRef = useRef<AnimationPlaybackControls | null>(null);
+  const timerAnchorRef = useRef<{
+    startedAtMs: number;
+    initialRemaining: number;
+  } | null>(null);
+  const autoTimedOutRoundRef = useRef<string | null>(null);
+  const restoreAttemptedRef = useRef(false);
+  const accessTokenRef = useRef<string | null>(null);
 
   const segmentAngle = 360 / WHEEL_CONTENT_CATEGORIES.length;
   const displayRound = getDisplayRound(activeRound, resolvedRound);
   const canSpin =
     !isPreparingRound &&
+    !isRestoringRound &&
     !isSpinning &&
     !isResolving &&
     !isChallengeOpen &&
     errorCode !== "NO_TASKS_LEFT";
   const wheelError = getWheelErrorMessage(errorCode, t);
   const statusMessageKey = getStatusMessageKey({
-    isPreparingRound,
+    isPreparingRound: isPreparingRound || isRestoringRound,
     isResolving,
     isSpinning,
   });
@@ -255,6 +476,10 @@ export function WheelOfFortuneGame({
   const canPromiseActiveRound = activeRound
     ? activeRound.task.allowPromise
     : false;
+
+  useEffect(() => {
+    timerRemainingRef.current = timerRemaining;
+  }, [timerRemaining]);
 
   useEffect(
     () => () => {
@@ -277,6 +502,28 @@ export function WheelOfFortuneGame({
     []
   );
 
+  useEffect(() => {
+    let cancelled = false;
+
+    void getGameAuthAccessToken()
+      .then((token) => {
+        if (!cancelled) {
+          accessTokenRef.current = token;
+        }
+      })
+      .catch(() => {
+        accessTokenRef.current = null;
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    restoreAttemptedRef.current = false;
+  }, [locale]);
+
   // Idle slow rotation — plays whenever the wheel is at rest
   useEffect(() => {
     if (!isSpinning && !isPreparingRound) {
@@ -292,7 +539,7 @@ export function WheelOfFortuneGame({
     return () => {
       idleAnimationRef.current?.stop();
     };
-  }, [isSpinning, isPreparingRound]);
+  }, [isPreparingRound, isSpinning, rotation]);
 
   useEffect(() => {
     if (!isChallengeOpen || activeRound?.task.executionMode !== "timed") {
@@ -300,19 +547,34 @@ export function WheelOfFortuneGame({
         window.clearInterval(timerIntervalRef.current);
         timerIntervalRef.current = null;
       }
+      timerAnchorRef.current = null;
       return;
     }
 
-    const deadlineAt = activeRound.timer?.deadlineAt;
+    const initialRemaining =
+      activeRound.timer?.remainingSeconds ?? activeRound.task.timerSeconds;
 
-    if (timerStatus !== "running" || !deadlineAt) {
+    if (timerStatus !== "running" || initialRemaining == null) {
+      timerAnchorRef.current = null;
       return;
     }
+
+    timerAnchorRef.current = {
+      startedAtMs: Date.now(),
+      initialRemaining,
+    };
 
     const tick = () => {
+      if (!timerAnchorRef.current) {
+        return;
+      }
+
+      const elapsedSeconds = Math.floor(
+        (Date.now() - timerAnchorRef.current.startedAtMs) / 1000
+      );
       const remaining = Math.max(
         0,
-        Math.ceil((new Date(deadlineAt).getTime() - Date.now()) / 1000)
+        timerAnchorRef.current.initialRemaining - elapsedSeconds
       );
       setTimerRemaining(remaining);
     };
@@ -325,11 +587,13 @@ export function WheelOfFortuneGame({
         window.clearInterval(timerIntervalRef.current);
         timerIntervalRef.current = null;
       }
+      timerAnchorRef.current = null;
     };
   }, [
     activeRound?.roundId,
     activeRound?.task.executionMode,
-    activeRound?.timer?.deadlineAt,
+    activeRound?.task.timerSeconds,
+    activeRound?.timer?.remainingSeconds,
     isChallengeOpen,
     timerStatus,
   ]);
@@ -354,6 +618,7 @@ export function WheelOfFortuneGame({
 
   async function startWheelRoundRequest() {
     const accessToken = await getGameAuthAccessToken();
+    accessTokenRef.current = accessToken;
     const res = await fetch("/api/games/wheel", {
       method: "POST",
       headers: {
@@ -376,9 +641,11 @@ export function WheelOfFortuneGame({
 
   async function resolveWheelRoundRequest(
     round: WheelRoundSnapshot,
-    resolution: WheelRoundResolution
+    resolution: WheelRoundResolution,
+    remainingSeconds?: number | null
   ) {
     const accessToken = await getGameAuthAccessToken();
+    accessTokenRef.current = accessToken;
     const res = await fetch(`/api/games/wheel/${round.roundId}`, {
       method: "POST",
       headers: {
@@ -389,6 +656,7 @@ export function WheelOfFortuneGame({
         locale,
         resolution,
         responseText: responseText.trim().length > 0 ? responseText : null,
+        remainingSeconds,
       }),
     });
 
@@ -399,7 +667,7 @@ export function WheelOfFortuneGame({
       if (
         nextErrorCode === "INVALID_DATA" &&
         round.task.responseMode === "text_input" &&
-        responseText.trim().length === 0
+        responseText.trim().replace(/\s+/g, " ").length < 10
       ) {
         setValidationMessage(t("overlay_text_input_required"));
       }
@@ -413,6 +681,7 @@ export function WheelOfFortuneGame({
 
   async function startWheelTimerRequest(round: WheelRoundSnapshot) {
     const accessToken = await getGameAuthAccessToken();
+    accessTokenRef.current = accessToken;
     const res = await fetch(`/api/games/wheel/${round.roundId}/timer`, {
       method: "POST",
       headers: {
@@ -432,6 +701,117 @@ export function WheelOfFortuneGame({
     const payload = (await res.json()) as WheelRoundTimerStartApiResponse;
     return payload.round;
   }
+
+  useEffect(() => {
+    if (restoreAttemptedRef.current || activeRound || resolvedRound) {
+      return;
+    }
+
+    let cancelled = false;
+    restoreAttemptedRef.current = true;
+    queueMicrotask(() => {
+      if (!cancelled) {
+        setIsRestoringRound(true);
+      }
+    });
+
+    void (async () => {
+      const accessToken = await getGameAuthAccessToken();
+      accessTokenRef.current = accessToken;
+      const res = await fetch(`/api/games/wheel?locale=${encodeURIComponent(locale)}`, {
+        method: "GET",
+        cache: "no-store",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!res.ok) {
+        setErrorCode(await readApiErrorCode(res));
+        return null;
+      }
+
+      const payload = (await res.json()) as WheelRoundReadApiResponse;
+      return payload.round;
+    })()
+      .then((round) => {
+        if (cancelled || !round) {
+          return;
+        }
+
+        setResolvedRound(null);
+        setActiveRound(round);
+        setIsChallengeOpen(true);
+        setResponseText("");
+        setValidationMessage(null);
+        clearTimerTicker();
+        setTimerRemaining(
+          round.timer?.remainingSeconds ?? round.task.timerSeconds ?? null
+        );
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setErrorCode("PERSISTENCE_ERROR");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsRestoringRound(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeRound, locale, resolvedRound]);
+
+  useEffect(() => {
+    if (
+      !activeRound ||
+      activeRound.task.executionMode !== "timed" ||
+      timerStatus !== "running"
+    ) {
+      return;
+    }
+
+    const handlePageHide = () => {
+      const accessToken = accessTokenRef.current;
+      if (!accessToken) {
+        return;
+      }
+
+      const nextRemaining = Math.max(
+        0,
+        timerRemainingRef.current ??
+          activeRound.timer?.remainingSeconds ??
+          activeRound.task.timerSeconds ??
+          0
+      );
+
+      void fetch(`/api/games/wheel/${activeRound.roundId}/timer/pause`, {
+        method: "POST",
+        keepalive: true,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          locale,
+          remainingSeconds: nextRemaining,
+        }),
+      }).catch(() => {});
+    };
+
+    window.addEventListener("pagehide", handlePageHide);
+
+    return () => {
+      window.removeEventListener("pagehide", handlePageHide);
+    };
+  }, [
+    activeRound,
+    locale,
+    timerStatus,
+  ]);
 
   async function handleSpin() {
     if (!canSpin) {
@@ -544,15 +924,22 @@ export function WheelOfFortuneGame({
     }
   }
 
-  async function handleResolve(resolution: WheelRoundResolution) {
+  async function handleResolve(
+    resolution: WheelRoundResolution,
+    options?: {
+      remainingSeconds?: number | null;
+    }
+  ) {
     if (!activeRound || isResolving || isStartingTimer) {
       return;
     }
 
+    const normalizedResponseText = responseText.trim().replace(/\s+/g, " ");
+
     if (
       resolution === "completed" &&
       activeRound.task.responseMode === "text_input" &&
-      responseText.trim().length === 0
+      normalizedResponseText.length < 10
     ) {
       setValidationMessage(t("overlay_text_input_required"));
       return;
@@ -581,13 +968,28 @@ export function WheelOfFortuneGame({
     setIsResolving(true);
 
     try {
-      const payload = await resolveWheelRoundRequest(activeRound, resolution);
+      const payload = await resolveWheelRoundRequest(
+        activeRound,
+        resolution,
+        options?.remainingSeconds ??
+          timerRemaining ??
+          activeRound.timer?.remainingSeconds ??
+          null
+      );
 
       if (!payload) {
+        if (
+          resolution === "skipped" &&
+          isTimerRound &&
+          (options?.remainingSeconds ?? timerRemaining ?? 0) === 0
+        ) {
+          autoTimedOutRoundRef.current = null;
+        }
         setIsResolving(false);
         return;
       }
 
+      autoTimedOutRoundRef.current = null;
       onPlayerUpdate(payload.player);
       setResolvedRound(payload.round);
       setActiveRound(payload.round);
@@ -618,10 +1020,43 @@ export function WheelOfFortuneGame({
         setShowConfetti(false);
       }, 1000);
     } catch {
+      if (
+        resolution === "skipped" &&
+        isTimerRound &&
+        (options?.remainingSeconds ?? timerRemaining ?? 0) === 0
+      ) {
+        autoTimedOutRoundRef.current = null;
+      }
       setErrorCode("PERSISTENCE_ERROR");
       setIsResolving(false);
     }
   }
+
+  const handleTimedOutRound = useEffectEvent(() => {
+    void handleResolve("skipped", { remainingSeconds: 0 });
+  });
+
+  useEffect(() => {
+    if (
+      !activeRound ||
+      !isChallengeOpen ||
+      activeRound.task.executionMode !== "timed"
+    ) {
+      autoTimedOutRoundRef.current = null;
+      return;
+    }
+
+    if (
+      timerStatus === "done" &&
+      !isResolving &&
+      autoTimedOutRoundRef.current !== activeRound.roundId
+    ) {
+      autoTimedOutRoundRef.current = activeRound.roundId;
+      queueMicrotask(() => {
+        handleTimedOutRound();
+      });
+    }
+  }, [activeRound, isChallengeOpen, isResolving, timerStatus]);
 
   return (
     <>
@@ -1055,7 +1490,7 @@ export function WheelOfFortuneGame({
             </AnimatePresence>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 md:items-start">
+          <div className="grid gap-6 xl:grid-cols-3 xl:items-start">
             <div className="rounded-3xl border border-accent/10 bg-bg-primary/40 p-5 backdrop-blur-sm">
               <p className="text-[10px] uppercase tracking-[0.32em] text-accent">
                 {t("rules_label")}
@@ -1127,6 +1562,8 @@ export function WheelOfFortuneGame({
                 </p>
               )}
             </div>
+
+            <WheelLeaderboardCard />
           </div>
         </div>
 
@@ -1297,6 +1734,8 @@ export function WheelOfFortuneGame({
                             ? t("overlay_timer_start")
                             : timerStatus === "running"
                               ? t("overlay_timer_running")
+                              : timerStatus === "paused"
+                                ? t("overlay_timer_paused")
                               : t("overlay_timer_complete")}
                         </p>
                       </div>
@@ -1320,7 +1759,10 @@ export function WheelOfFortuneGame({
                   <button
                     type="button"
                     onClick={() => {
-                      if (isTimerRound && timerStatus === "idle") {
+                      if (
+                        isTimerRound &&
+                        (timerStatus === "idle" || timerStatus === "paused")
+                      ) {
                         void handleBeginTimedTask();
                         return;
                       }
@@ -1343,6 +1785,8 @@ export function WheelOfFortuneGame({
                       : isTimerRound
                         ? timerStatus === "idle"
                           ? t("overlay_timer_begin_cta")
+                          : timerStatus === "paused"
+                            ? t("overlay_timer_resume_cta")
                           : timerStatus === "running"
                             ? canFinishTimedRoundEarly
                               ? t("overlay_timer_finish_early_cta")

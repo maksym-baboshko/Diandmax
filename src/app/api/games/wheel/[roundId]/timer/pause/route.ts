@@ -2,11 +2,10 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import type { SupportedLocale } from "@/shared/config";
 import {
-  InvalidWheelRoundResponseError,
   InvalidWheelRoundStateError,
+  pauseWheelRoundTimer,
   PlayerProfileNotReadyError,
   requireAuthenticatedGameUser,
-  resolveWheelRound,
   SupabaseConfigurationError,
   UnauthorizedGameRequestError,
   WheelRoundAlreadyResolvedError,
@@ -15,10 +14,8 @@ import {
 
 export const runtime = "nodejs";
 
-const wheelResolutionSchema = z.object({
+const wheelTimerPauseSchema = z.object({
   locale: z.enum(["uk", "en"]),
-  resolution: z.enum(["completed", "promised", "skipped"]),
-  responseText: z.string().trim().max(300).optional().nullable(),
   remainingSeconds: z.number().int().min(0).optional().nullable(),
 });
 
@@ -30,25 +27,23 @@ export async function POST(
     const user = await requireAuthenticatedGameUser(request);
     const { roundId } = await context.params;
     const body = await request.json();
-    const result = wheelResolutionSchema.safeParse(body);
+    const result = wheelTimerPauseSchema.safeParse(body);
 
     if (!result.success || !roundId) {
       return NextResponse.json(
-        { error: "Invalid wheel resolution payload.", code: "INVALID_DATA" },
+        { error: "Invalid wheel timer pause payload.", code: "INVALID_DATA" },
         { status: 400 }
       );
     }
 
-    const resolution = await resolveWheelRound({
+    const timerPause = await pauseWheelRoundTimer({
       playerId: user.id,
       roundId,
       locale: result.data.locale as SupportedLocale,
-      resolution: result.data.resolution,
-      responseText: result.data.responseText ?? null,
       remainingSeconds: result.data.remainingSeconds ?? null,
     });
 
-    return NextResponse.json(resolution);
+    return NextResponse.json(timerPause);
   } catch (error) {
     if (error instanceof SupabaseConfigurationError) {
       return NextResponse.json(
@@ -100,16 +95,6 @@ export async function POST(
       );
     }
 
-    if (error instanceof InvalidWheelRoundResponseError) {
-      return NextResponse.json(
-        {
-          error: "Wheel round response is invalid.",
-          code: "INVALID_DATA",
-        },
-        { status: 400 }
-      );
-    }
-
     if (error instanceof InvalidWheelRoundStateError) {
       return NextResponse.json(
         {
@@ -120,9 +105,9 @@ export async function POST(
       );
     }
 
-    console.error("Wheel resolution route error:", error);
+    console.error("Wheel timer pause route error:", error);
     return NextResponse.json(
-      { error: "Failed to resolve wheel round.", code: "PERSISTENCE_ERROR" },
+      { error: "Failed to pause wheel timer.", code: "PERSISTENCE_ERROR" },
       { status: 500 }
     );
   }

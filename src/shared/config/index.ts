@@ -42,4 +42,5 @@ export type {
   WheelResponseMode,
   WheelExecutionMode,
   WheelDifficulty,
+  WheelPhysicalContactLevel,
 } from "./wheel-content";

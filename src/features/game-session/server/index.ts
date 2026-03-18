@@ -1,7 +1,12 @@
 export {
   bootstrapPlayerProfile,
+  getGameLeaderboard,
+  getGlobalLeaderboard,
+  getLivePageSnapshot,
+  getOpenWheelRound,
   savePlayerProfile,
   startWheelRound,
+  pauseWheelRoundTimer,
   startWheelRoundTimer,
   resolveWheelRound,
   PlayerProfileNotReadyError,

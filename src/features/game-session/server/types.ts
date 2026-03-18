@@ -25,28 +25,55 @@ export type PlayerProfileRow = Record<string, unknown> & {
   last_seen_at: string;
 };
 
-export type GameRoundRow = Record<string, unknown> & {
+export type GameSessionRow = Record<string, unknown> & {
   id: string;
   player_id: string;
   game_slug: string;
   status: string;
+  current_cycle: number;
+  total_rounds: number;
+  resolved_rounds: number;
+  last_round_started_at: string | null;
+  last_round_resolved_at: string | null;
+  metadata: JsonValue;
+  created_at: string;
+  updated_at: string;
+};
+
+export type GameRoundRow = Record<string, unknown> & {
+  id: string;
+  session_id: string;
+  player_id: string;
+  game_slug: string;
+  status: string;
   started_at: string;
-  timer_started_at: string | null;
-  timer_deadline_at: string | null;
   resolved_at: string | null;
   resolution: string | null;
+  resolution_reason: string | null;
+  timer_status: string;
+  timer_duration_seconds: number | null;
+  timer_remaining_seconds: number | null;
+  timer_last_started_at: string | null;
+  timer_last_paused_at: string | null;
+  timer_last_sync_at: string | null;
   response_payload: JsonValue;
   metadata: JsonValue;
 };
 
 export type ActivityEventRow = Record<string, unknown> & {
   id: string;
+  session_id: string | null;
   player_id: string | null;
   game_slug: string;
   round_id: string | null;
   event_type: string;
   visibility: string;
   payload: JsonValue;
+  snapshot_name: string | null;
+  snapshot_avatar_key: string | null;
+  snapshot_prompt_i18n: JsonValue;
+  snapshot_answer_text: string | null;
+  snapshot_xp_delta: number | null;
   created_at: string;
 };
 
@@ -57,6 +84,7 @@ export type XpTransactionRow = Record<string, unknown> & {
   round_id: string | null;
   reason: string;
   delta: number;
+  event_snapshot: JsonValue;
   metadata: JsonValue;
   created_at: string;
 };
@@ -88,7 +116,14 @@ export type WheelTaskRow = Record<string, unknown> & {
   base_xp: number;
   promise_xp: number;
   skip_penalty_xp: number;
+  timeout_penalty_xp: number;
   timer_seconds: number | null;
+  feed_safe: boolean;
+  requires_other_guest: boolean;
+  phone_allowed: boolean;
+  public_speaking: boolean;
+  physical_contact_level: string;
+  couple_centric: boolean;
   is_active: boolean;
   metadata: JsonValue;
   created_at: string;
@@ -100,14 +135,18 @@ export type WheelRoundAssignmentRow = Record<string, unknown> & {
   category_id: string;
   task_id: string;
   spin_angle: number;
+  cycle_number: number;
+  selection_rank: number;
   created_at: string;
 };
 
 export type WheelPlayerTaskHistoryRow = Record<string, unknown> & {
+  session_id: string;
   player_id: string;
   task_id: string;
-  first_round_id: string;
-  created_at: string;
+  round_id: string;
+  cycle_number: number;
+  assigned_at: string;
 };
 
 export type LeaderboardViewRow = Record<string, unknown> & {
@@ -122,7 +161,45 @@ export type LeaderboardViewRow = Record<string, unknown> & {
   last_seen_at: string;
 };
 
+export type LeaderboardGlobalViewRow = LeaderboardViewRow & {
+  score_reached_at: string;
+  rank: number;
+};
+
+export type LeaderboardGameViewRow = Record<string, unknown> & {
+  player_id: string;
+  game_slug: string;
+  nickname: string | null;
+  avatar_key: string;
+  total_points: number;
+  last_scored_at: string | null;
+  onboarding_completed: boolean;
+  score_reached_at: string | null;
+  rank: number;
+};
+
+export type LiveFeedViewRow = Record<string, unknown> & {
+  id: string;
+  session_id: string | null;
+  player_id: string | null;
+  game_slug: string;
+  round_id: string | null;
+  event_type: string;
+  visibility: string;
+  payload: JsonValue;
+  snapshot_name: string | null;
+  snapshot_avatar_key: string | null;
+  snapshot_prompt_i18n: JsonValue;
+  snapshot_answer_text: string | null;
+  snapshot_xp_delta: number | null;
+  is_hero_event: boolean;
+  created_at: string;
+};
+
 export type WheelRoundPayload = Record<string, JsonValue> & {
+  sessionId: string;
+  cycleNumber: number;
+  selectionRank: number;
   categorySlug: string;
   categoryTitle: string;
   taskKey: string;
@@ -138,10 +215,14 @@ export type WheelRoundPayload = Record<string, JsonValue> & {
   completionXp: number;
   promiseXp: number;
   skipPenaltyXp: number;
+  timeoutPenaltyXp: number;
   locale: string;
   spinAngle: number;
-  timerStartedAt?: string | null;
-  timerDeadlineAt?: string | null;
+  timerStatus?: string | null;
+  timerDurationSeconds?: number | null;
+  timerRemainingSeconds?: number | null;
+  timerLastStartedAt?: string | null;
+  timerLastPausedAt?: string | null;
 };
 
 export interface GamesDatabase {
@@ -173,31 +254,75 @@ export interface GamesDatabase {
         };
         Relationships: [];
       };
-      game_rounds: {
-        Row: GameRoundRow;
+      game_sessions: {
+        Row: GameSessionRow;
         Insert: {
           id?: string;
           player_id: string;
           game_slug: string;
-          status: string;
-          started_at?: string;
-          timer_started_at?: string | null;
-          timer_deadline_at?: string | null;
-          resolved_at?: string | null;
-          resolution?: string | null;
-          response_payload?: JsonValue;
+          status?: string;
+          current_cycle?: number;
+          total_rounds?: number;
+          resolved_rounds?: number;
+          last_round_started_at?: string | null;
+          last_round_resolved_at?: string | null;
           metadata?: JsonValue;
+          created_at?: string;
+          updated_at?: string;
         };
         Update: {
           id?: string;
           player_id?: string;
           game_slug?: string;
           status?: string;
+          current_cycle?: number;
+          total_rounds?: number;
+          resolved_rounds?: number;
+          last_round_started_at?: string | null;
+          last_round_resolved_at?: string | null;
+          metadata?: JsonValue;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      game_rounds: {
+        Row: GameRoundRow;
+        Insert: {
+          id?: string;
+          session_id: string;
+          player_id: string;
+          game_slug: string;
+          status: string;
           started_at?: string;
-          timer_started_at?: string | null;
-          timer_deadline_at?: string | null;
           resolved_at?: string | null;
           resolution?: string | null;
+          resolution_reason?: string | null;
+          timer_status?: string;
+          timer_duration_seconds?: number | null;
+          timer_remaining_seconds?: number | null;
+          timer_last_started_at?: string | null;
+          timer_last_paused_at?: string | null;
+          timer_last_sync_at?: string | null;
+          response_payload?: JsonValue;
+          metadata?: JsonValue;
+        };
+        Update: {
+          id?: string;
+          session_id?: string;
+          player_id?: string;
+          game_slug?: string;
+          status?: string;
+          started_at?: string;
+          resolved_at?: string | null;
+          resolution?: string | null;
+          resolution_reason?: string | null;
+          timer_status?: string;
+          timer_duration_seconds?: number | null;
+          timer_remaining_seconds?: number | null;
+          timer_last_started_at?: string | null;
+          timer_last_paused_at?: string | null;
+          timer_last_sync_at?: string | null;
           response_payload?: JsonValue;
           metadata?: JsonValue;
         };
@@ -212,6 +337,7 @@ export interface GamesDatabase {
           round_id?: string | null;
           reason: string;
           delta: number;
+          event_snapshot?: JsonValue;
           metadata?: JsonValue;
           created_at?: string;
         };
@@ -222,6 +348,7 @@ export interface GamesDatabase {
           round_id?: string | null;
           reason?: string;
           delta?: number;
+          event_snapshot?: JsonValue;
           metadata?: JsonValue;
           created_at?: string;
         };
@@ -231,22 +358,34 @@ export interface GamesDatabase {
         Row: ActivityEventRow;
         Insert: {
           id?: string;
+          session_id?: string | null;
           player_id?: string | null;
           game_slug: string;
           round_id?: string | null;
           event_type: string;
           visibility: string;
           payload?: JsonValue;
+          snapshot_name?: string | null;
+          snapshot_avatar_key?: string | null;
+          snapshot_prompt_i18n?: JsonValue;
+          snapshot_answer_text?: string | null;
+          snapshot_xp_delta?: number | null;
           created_at?: string;
         };
         Update: {
           id?: string;
+          session_id?: string | null;
           player_id?: string | null;
           game_slug?: string;
           round_id?: string | null;
           event_type?: string;
           visibility?: string;
           payload?: JsonValue;
+          snapshot_name?: string | null;
+          snapshot_avatar_key?: string | null;
+          snapshot_prompt_i18n?: JsonValue;
+          snapshot_answer_text?: string | null;
+          snapshot_xp_delta?: number | null;
           created_at?: string;
         };
         Relationships: [];
@@ -294,7 +433,14 @@ export interface GamesDatabase {
           base_xp: number;
           promise_xp: number;
           skip_penalty_xp: number;
+          timeout_penalty_xp: number;
           timer_seconds?: number | null;
+          feed_safe?: boolean;
+          requires_other_guest?: boolean;
+          phone_allowed?: boolean;
+          public_speaking?: boolean;
+          physical_contact_level?: string;
+          couple_centric?: boolean;
           is_active?: boolean;
           metadata?: JsonValue;
           created_at?: string;
@@ -315,7 +461,14 @@ export interface GamesDatabase {
           base_xp?: number;
           promise_xp?: number;
           skip_penalty_xp?: number;
+          timeout_penalty_xp?: number;
           timer_seconds?: number | null;
+          feed_safe?: boolean;
+          requires_other_guest?: boolean;
+          phone_allowed?: boolean;
+          public_speaking?: boolean;
+          physical_contact_level?: string;
+          couple_centric?: boolean;
           is_active?: boolean;
           metadata?: JsonValue;
           created_at?: string;
@@ -330,6 +483,8 @@ export interface GamesDatabase {
           category_id: string;
           task_id: string;
           spin_angle: number;
+          cycle_number: number;
+          selection_rank: number;
           created_at?: string;
         };
         Update: {
@@ -337,6 +492,8 @@ export interface GamesDatabase {
           category_id?: string;
           task_id?: string;
           spin_angle?: number;
+          cycle_number?: number;
+          selection_rank?: number;
           created_at?: string;
         };
         Relationships: [];
@@ -344,21 +501,81 @@ export interface GamesDatabase {
       wheel_player_task_history: {
         Row: WheelPlayerTaskHistoryRow;
         Insert: {
+          session_id: string;
           player_id: string;
           task_id: string;
-          first_round_id: string;
-          created_at?: string;
+          round_id: string;
+          cycle_number: number;
+          assigned_at?: string;
         };
         Update: {
+          session_id?: string;
           player_id?: string;
           task_id?: string;
-          first_round_id?: string;
-          created_at?: string;
+          round_id?: string;
+          cycle_number?: number;
+          assigned_at?: string;
         };
         Relationships: [];
       };
     };
     Views: {
+      leaderboard_global_view: {
+        Row: LeaderboardGlobalViewRow;
+        Insert: {
+          player_id?: string;
+          nickname?: string | null;
+          avatar_key?: string;
+          total_points?: number;
+          last_scored_at?: string | null;
+          onboarding_completed?: boolean;
+          created_at?: string;
+          updated_at?: string;
+          last_seen_at?: string;
+          score_reached_at?: string;
+          rank?: number;
+        };
+        Update: {
+          player_id?: string;
+          nickname?: string | null;
+          avatar_key?: string;
+          total_points?: number;
+          last_scored_at?: string | null;
+          onboarding_completed?: boolean;
+          created_at?: string;
+          updated_at?: string;
+          last_seen_at?: string;
+          score_reached_at?: string;
+          rank?: number;
+        };
+        Relationships: [];
+      };
+      leaderboard_game_view: {
+        Row: LeaderboardGameViewRow;
+        Insert: {
+          player_id?: string;
+          game_slug?: string;
+          nickname?: string | null;
+          avatar_key?: string;
+          total_points?: number;
+          last_scored_at?: string | null;
+          onboarding_completed?: boolean;
+          score_reached_at?: string | null;
+          rank?: number;
+        };
+        Update: {
+          player_id?: string;
+          game_slug?: string;
+          nickname?: string | null;
+          avatar_key?: string;
+          total_points?: number;
+          last_scored_at?: string | null;
+          onboarding_completed?: boolean;
+          score_reached_at?: string | null;
+          rank?: number;
+        };
+        Relationships: [];
+      };
       leaderboard_view: {
         Row: LeaderboardViewRow;
         Insert: {
@@ -382,6 +599,44 @@ export interface GamesDatabase {
           created_at?: string;
           updated_at?: string;
           last_seen_at?: string;
+        };
+        Relationships: [];
+      };
+      live_feed_view: {
+        Row: LiveFeedViewRow;
+        Insert: {
+          id?: string;
+          session_id?: string | null;
+          player_id?: string | null;
+          game_slug?: string;
+          round_id?: string | null;
+          event_type?: string;
+          visibility?: string;
+          payload?: JsonValue;
+          snapshot_name?: string | null;
+          snapshot_avatar_key?: string | null;
+          snapshot_prompt_i18n?: JsonValue;
+          snapshot_answer_text?: string | null;
+          snapshot_xp_delta?: number | null;
+          is_hero_event?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          session_id?: string | null;
+          player_id?: string | null;
+          game_slug?: string;
+          round_id?: string | null;
+          event_type?: string;
+          visibility?: string;
+          payload?: JsonValue;
+          snapshot_name?: string | null;
+          snapshot_avatar_key?: string | null;
+          snapshot_prompt_i18n?: JsonValue;
+          snapshot_answer_text?: string | null;
+          snapshot_xp_delta?: number | null;
+          is_hero_event?: boolean;
+          created_at?: string;
         };
         Relationships: [];
       };

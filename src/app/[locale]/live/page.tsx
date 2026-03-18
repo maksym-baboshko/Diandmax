@@ -6,8 +6,7 @@ import {
   type SupportedLocale,
 } from "@/shared/config";
 import { routing, type Locale } from "@/shared/i18n/routing";
-import { GamesShell } from "@/widgets/games-shell";
-import { LivePlaceholderPage } from "@/widgets/live-placeholder";
+import { LiveProjectorPage } from "@/widgets/live-projector";
 
 interface LivePageProps {
   params: Promise<{
@@ -66,9 +65,5 @@ export default async function LivePage({ params }: LivePageProps) {
 
   setRequestLocale(typedLocale);
 
-  return (
-    <GamesShell>
-      <LivePlaceholderPage />
-    </GamesShell>
-  );
+  return <LiveProjectorPage />;
 }

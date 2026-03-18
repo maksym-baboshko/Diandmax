@@ -14,6 +14,12 @@ export type WheelExecutionMode = "instant" | "timed" | "deferred";
 
 export type WheelDifficulty = "gentle" | "warm" | "bold";
 
+export type WheelPhysicalContactLevel =
+  | "none"
+  | "handshake"
+  | "high_five"
+  | "hug";
+
 export interface WheelCategoryDefinition {
   slug: string;
   title: LocalizedGameText;
@@ -32,6 +38,12 @@ export interface WheelTaskDefinition {
   prompt: LocalizedGameText;
   details?: LocalizedGameText;
   timerSeconds?: number;
+  feedSafe: boolean;
+  requiresOtherGuest: boolean;
+  phoneAllowed: boolean;
+  publicSpeaking: boolean;
+  physicalContactLevel: WheelPhysicalContactLevel;
+  coupleCentric: boolean;
 }
 
 const difficultyBaseXp: Record<WheelDifficulty, number> = {
@@ -67,6 +79,12 @@ const skipPenaltyXpByDifficulty: Record<WheelDifficulty, number> = {
   bold: -8,
 };
 
+const timeoutPenaltyXpByDifficulty: Record<WheelDifficulty, number> = {
+  gentle: -4,
+  warm: -4,
+  bold: -6,
+};
+
 export const WHEEL_CONTENT_CATEGORIES =
   categoriesData as readonly WheelCategoryDefinition[];
 
@@ -94,6 +112,7 @@ export function getWheelTaskXpConfig(task: Pick<
       ? promiseXpByExecutionMode[task.executionMode][task.difficulty]
       : 0,
     skipPenaltyXp: skipPenaltyXpByDifficulty[task.difficulty],
+    timeoutPenaltyXp: timeoutPenaltyXpByDifficulty[task.difficulty],
   };
 }
 

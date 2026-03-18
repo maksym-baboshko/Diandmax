@@ -12,15 +12,38 @@ const outputPath = path.join(rootDir, "supabase/seed_wheel_content.sql");
 const categories = JSON.parse(fs.readFileSync(categoriesPath, "utf8"));
 const tasks = JSON.parse(fs.readFileSync(tasksPath, "utf8"));
 
-const expectedInteractionMix = {
-  confirm: 8,
-  text_input: 6,
-  timer: 4,
-  async_task: 2,
+const expectedInteractionTotals = {
+  confirm: 72,
+  text_input: 72,
+  timer: 18,
+  async_task: 18,
 };
+
+const categoriesWithoutTimer = new Set([
+  "kind-speech",
+  "fact-check",
+  "joyful-dilemma",
+  "similarity-test",
+  "genius-or-not",
+  "in-their-style",
+]);
+
+const categoriesWithoutDeferred = new Set([
+  "fact-check",
+  "joyful-dilemma",
+  "similarity-test",
+  "genius-or-not",
+  "in-their-style",
+]);
 
 const supportedResponseModes = new Set(["confirm", "text_input"]);
 const supportedExecutionModes = new Set(["instant", "timed", "deferred"]);
+const supportedPhysicalContactLevels = new Set([
+  "none",
+  "handshake",
+  "high_five",
+  "hug",
+]);
 
 const baseXpByDifficulty = {
   gentle: 12,
@@ -50,6 +73,12 @@ const skipPenaltyXpByDifficulty = {
   gentle: -6,
   warm: -6,
   bold: -8,
+};
+
+const timeoutPenaltyXpByDifficulty = {
+  gentle: -4,
+  warm: -4,
+  bold: -6,
 };
 
 function sqlString(value) {
@@ -85,8 +114,8 @@ function deriveInteractionType(task) {
 function validateContent() {
   assert(Array.isArray(categories), "Categories payload must be an array.");
   assert(Array.isArray(tasks), "Tasks payload must be an array.");
-  assert(categories.length === 10, `Expected 10 categories, got ${categories.length}.`);
-  assert(tasks.length === 200, `Expected 200 tasks, got ${tasks.length}.`);
+  assert(categories.length === 9, `Expected 9 categories, got ${categories.length}.`);
+  assert(tasks.length === 180, `Expected 180 tasks, got ${tasks.length}.`);
 
   const categorySlugs = new Set();
   for (const category of categories) {
@@ -102,7 +131,7 @@ function validateContent() {
     taskKeys.add(task.taskKey);
     assert(categorySlugs.has(task.categorySlug), `Unknown categorySlug: ${task.categorySlug}`);
     assert(
-      Object.hasOwn(expectedInteractionMix, task.interactionType),
+      Object.hasOwn(expectedInteractionTotals, task.interactionType),
       `Unknown interactionType for ${task.taskKey}: ${task.interactionType}`
     );
     assert(
@@ -124,6 +153,30 @@ function validateContent() {
     assert(
       typeof task.allowEarlyCompletion === "boolean",
       `Task ${task.taskKey} must declare allowEarlyCompletion explicitly.`
+    );
+    assert(
+      typeof task.feedSafe === "boolean",
+      `Task ${task.taskKey} must declare feedSafe explicitly.`
+    );
+    assert(
+      typeof task.requiresOtherGuest === "boolean",
+      `Task ${task.taskKey} must declare requiresOtherGuest explicitly.`
+    );
+    assert(
+      typeof task.phoneAllowed === "boolean",
+      `Task ${task.taskKey} must declare phoneAllowed explicitly.`
+    );
+    assert(
+      typeof task.publicSpeaking === "boolean",
+      `Task ${task.taskKey} must declare publicSpeaking explicitly.`
+    );
+    assert(
+      typeof task.coupleCentric === "boolean",
+      `Task ${task.taskKey} must declare coupleCentric explicitly.`
+    );
+    assert(
+      supportedPhysicalContactLevels.has(task.physicalContactLevel),
+      `Task ${task.taskKey} has invalid physicalContactLevel: ${task.physicalContactLevel}`
     );
     assert(
       task.interactionType === deriveInteractionType(task),
@@ -149,7 +202,21 @@ function validateContent() {
         `Non-timed task ${task.taskKey} must not include timerSeconds.`
       );
     }
+
+    if (task.responseMode === "text_input") {
+      assert(
+        task.feedSafe === true,
+        `Text-input task ${task.taskKey} must be feed-safe by design.`
+      );
+    }
   }
+
+  const interactionTotals = {
+    confirm: 0,
+    text_input: 0,
+    timer: 0,
+    async_task: 0,
+  };
 
   for (const category of categories) {
     const categoryTasks = tasks.filter(
@@ -160,25 +227,32 @@ function validateContent() {
       `Category ${category.slug} must have 20 tasks, got ${categoryTasks.length}.`
     );
 
-    const mix = {
-      confirm: 0,
-      text_input: 0,
-      timer: 0,
-      async_task: 0,
-    };
-
     for (const task of categoryTasks) {
-      mix[task.interactionType] += 1;
+      interactionTotals[task.interactionType] += 1;
     }
 
-    for (const [interactionType, expectedCount] of Object.entries(
-      expectedInteractionMix
-    )) {
+    if (categoriesWithoutTimer.has(category.slug)) {
       assert(
-        mix[interactionType] === expectedCount,
-        `Category ${category.slug} must have ${expectedCount} ${interactionType} tasks, got ${mix[interactionType]}.`
+        categoryTasks.every((task) => task.executionMode !== "timed"),
+        `Category ${category.slug} must not contain timed tasks.`
       );
     }
+
+    if (categoriesWithoutDeferred.has(category.slug)) {
+      assert(
+        categoryTasks.every((task) => task.executionMode !== "deferred"),
+        `Category ${category.slug} must not contain deferred tasks.`
+      );
+    }
+  }
+
+  for (const [interactionType, expectedCount] of Object.entries(
+    expectedInteractionTotals
+  )) {
+    assert(
+      interactionTotals[interactionType] === expectedCount,
+      `Expected ${expectedCount} ${interactionType} tasks globally, got ${interactionTotals[interactionType]}.`
+    );
   }
 }
 
@@ -189,6 +263,7 @@ function getTaskXpConfig(task) {
       ? promiseXpByExecutionMode[task.executionMode][task.difficulty]
       : 0,
     skipPenaltyXp: skipPenaltyXpByDifficulty[task.difficulty],
+    timeoutPenaltyXp: timeoutPenaltyXpByDifficulty[task.difficulty],
   };
 }
 
@@ -202,7 +277,25 @@ function buildCategorySeedSql() {
     true
   )`);
 
-  return `insert into public.wheel_categories (
+  const activeCategorySlugs = categories
+    .map((category) => sqlString(category.slug))
+    .join(", ");
+
+  return `with stale_categories as (
+  select
+    id,
+    row_number() over (order by slug asc) as stale_rank
+  from public.wheel_categories
+  where slug not in (${activeCategorySlugs})
+)
+update public.wheel_categories as categories
+set
+  is_active = false,
+  sort_order = 1000 + stale_categories.stale_rank
+from stale_categories
+where categories.id = stale_categories.id;
+
+insert into public.wheel_categories (
   slug,
   sort_order,
   weight,
@@ -219,6 +312,10 @@ set
   title_i18n = excluded.title_i18n,
   description_i18n = excluded.description_i18n,
   is_active = excluded.is_active;
+
+update public.wheel_categories
+set is_active = false
+where slug not in (${activeCategorySlugs});
 `;
 }
 
@@ -243,12 +340,19 @@ function buildTaskSeedSql() {
     ${xp.baseXp},
     ${xp.promiseXp},
     ${xp.skipPenaltyXp},
+    ${xp.timeoutPenaltyXp},
     ${timerSeconds},
+    ${task.feedSafe},
+    ${task.requiresOtherGuest},
+    ${task.phoneAllowed},
+    ${task.publicSpeaking},
+    ${sqlString(task.physicalContactLevel)},
+    ${task.coupleCentric},
     true,
       ${sqlJson({
         categorySlug: task.categorySlug,
         source: "wheel-content-seed",
-        taskContractVersion: 2,
+        taskContractVersion: 3,
       })}
   )`;
   });
@@ -267,7 +371,14 @@ function buildTaskSeedSql() {
   base_xp,
   promise_xp,
   skip_penalty_xp,
+  timeout_penalty_xp,
   timer_seconds,
+  feed_safe,
+  requires_other_guest,
+  phone_allowed,
+  public_speaking,
+  physical_contact_level,
+  couple_centric,
   is_active,
   metadata
 )
@@ -287,9 +398,29 @@ on conflict (task_key) do update
   base_xp = excluded.base_xp,
   promise_xp = excluded.promise_xp,
   skip_penalty_xp = excluded.skip_penalty_xp,
+  timeout_penalty_xp = excluded.timeout_penalty_xp,
   timer_seconds = excluded.timer_seconds,
+  feed_safe = excluded.feed_safe,
+  requires_other_guest = excluded.requires_other_guest,
+  phone_allowed = excluded.phone_allowed,
+  public_speaking = excluded.public_speaking,
+  physical_contact_level = excluded.physical_contact_level,
+  couple_centric = excluded.couple_centric,
   is_active = excluded.is_active,
   metadata = excluded.metadata;
+
+update public.wheel_tasks
+set
+  is_active = false,
+  metadata = jsonb_set(
+    coalesce(metadata, '{}'::jsonb),
+    '{deactivatedBySeedVersion}',
+    '3'::jsonb,
+    true
+  )
+where
+  coalesce(metadata->>'source', 'wheel-content-seed') = 'wheel-content-seed'
+  and task_key not in (${tasks.map((task) => sqlString(task.taskKey)).join(", ")});
 `;
 }
 
