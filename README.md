@@ -110,7 +110,7 @@ Notes:
 - regenerate `supabase/seed_wheel_content.sql` with `pnpm generate:wheel-content-seed` after editing wheel content
 - rerun the full `supabase/games_platform_schema.sql` after schema-level changes; rerun `supabase/seed_wheel_content.sql` after content-only changes
 - mutation routes now use a Supabase-backed fixed-window limiter and may return `429 Too Many Requests` with a `retryAfterSeconds` hint
-- use `supabase/reset_runtime_data.sql` to wipe player/runtime data without touching game content; the script is intentionally guarded and requires either replacing `__CONFIRM_RESET_RUNTIME_DATA__` with `yes` or prepending `set local app.reset_runtime_data_confirm = 'yes';` in the same SQL batch
+- use `supabase/reset_runtime_data.sql` to wipe player/runtime data without touching game content; the script is intentionally guarded and requires replacing `__CONFIRM_RESET_RUNTIME_DATA__` with `yes` before execution
 - Supabase may still label views as `UNRESTRICTED` in the dashboard; that is expected because RLS applies to tables, not views
 - leaderboard/feed views are intentionally server-only; direct client access through `anon` or `authenticated` roles is revoked and the app reads them through Next.js route handlers
 

@@ -1,30 +1,18 @@
 begin;
 
 -- Destructive script.
--- Confirm before running this file in one of two ways:
+-- Confirm before running this file by replacing the confirmation token below:
 --
--- 1. Replace the confirmation token below:
---      __CONFIRM_RESET_RUNTIME_DATA__ -> yes
---
--- 2. Or prepend this in the same SQL batch:
---      set local app.reset_runtime_data_confirm = 'yes';
+--   __CONFIRM_RESET_RUNTIME_DATA__ -> yes
 --
 -- Without that explicit confirmation the script will abort before touching data.
 
 do $$
 begin
-  if current_setting('app.reset_runtime_data_confirm', true) is null then
-    perform set_config(
-      'app.reset_runtime_data_confirm',
-      '__CONFIRM_RESET_RUNTIME_DATA__',
-      true
-    );
-  end if;
-
-  if current_setting('app.reset_runtime_data_confirm', true) is distinct from 'yes' then
+  if '__CONFIRM_RESET_RUNTIME_DATA__' <> 'yes' then
     raise exception using
       errcode = 'P0001',
-      message = 'reset_runtime_data.sql is destructive. Replace `__CONFIRM_RESET_RUNTIME_DATA__` with `yes` or run `set local app.reset_runtime_data_confirm = ''yes'';` in the same query batch to confirm.';
+      message = 'reset_runtime_data.sql is destructive. Replace `__CONFIRM_RESET_RUNTIME_DATA__` with `yes` before running the file.';
   end if;
 end;
 $$;
