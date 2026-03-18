@@ -77,6 +77,15 @@ export type ActivityEventRow = Record<string, unknown> & {
   created_at: string;
 };
 
+export type RealtimeSignalRow = Record<string, unknown> & {
+  id: string;
+  channel: string;
+  game_slug: string | null;
+  signal_type: string;
+  payload: JsonValue;
+  created_at: string;
+};
+
 export type XpTransactionRow = Record<string, unknown> & {
   id: string;
   player_id: string;
@@ -211,6 +220,7 @@ export type WheelRoundPayload = Record<string, JsonValue> & {
   difficulty: WheelDifficulty;
   prompt: string;
   details?: string | null;
+  choiceOptions?: string[] | null;
   timerSeconds?: number | null;
   completionXp: number;
   promiseXp: number;
@@ -386,6 +396,26 @@ export interface GamesDatabase {
           snapshot_prompt_i18n?: JsonValue;
           snapshot_answer_text?: string | null;
           snapshot_xp_delta?: number | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      realtime_signals: {
+        Row: RealtimeSignalRow;
+        Insert: {
+          id?: string;
+          channel: string;
+          game_slug?: string | null;
+          signal_type: string;
+          payload?: JsonValue;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          channel?: string;
+          game_slug?: string | null;
+          signal_type?: string;
+          payload?: JsonValue;
           created_at?: string;
         };
         Relationships: [];

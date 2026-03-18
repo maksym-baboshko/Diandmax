@@ -1,5 +1,6 @@
 import type { LocalizedGameText } from "./games";
 import categoriesData from "./wheel-categories.json";
+import choiceOptionsData from "./wheel-choice-options.json";
 import tasksData from "./wheel-tasks.json";
 
 export type WheelInteractionType =
@@ -8,7 +9,7 @@ export type WheelInteractionType =
   | "timer"
   | "async_task";
 
-export type WheelResponseMode = "confirm" | "text_input";
+export type WheelResponseMode = "confirm" | "text_input" | "choice";
 
 export type WheelExecutionMode = "instant" | "timed" | "deferred";
 
@@ -37,6 +38,7 @@ export interface WheelTaskDefinition {
   difficulty: WheelDifficulty;
   prompt: LocalizedGameText;
   details?: LocalizedGameText;
+  choiceOptions?: readonly LocalizedGameText[];
   timerSeconds?: number;
   feedSafe: boolean;
   requiresOtherGuest: boolean;
@@ -88,7 +90,24 @@ const timeoutPenaltyXpByDifficulty: Record<WheelDifficulty, number> = {
 export const WHEEL_CONTENT_CATEGORIES =
   categoriesData as readonly WheelCategoryDefinition[];
 
-export const WHEEL_CONTENT_TASKS = tasksData as readonly WheelTaskDefinition[];
+const WHEEL_CHOICE_OPTIONS_BY_TASK_KEY = choiceOptionsData as Record<
+  string,
+  readonly LocalizedGameText[]
+>;
+
+export const WHEEL_CONTENT_TASKS = tasksData.map((task) => {
+  const choiceOptions = WHEEL_CHOICE_OPTIONS_BY_TASK_KEY[task.taskKey];
+
+  if (!choiceOptions) {
+    return task;
+  }
+
+  return {
+    ...task,
+    responseMode: "choice" as const,
+    choiceOptions,
+  };
+}) as readonly WheelTaskDefinition[];
 
 export function getWheelContentCategoryBySlug(slug: string) {
   return WHEEL_CONTENT_CATEGORIES.find((category) => category.slug === slug);

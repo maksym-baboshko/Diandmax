@@ -1,0 +1,28 @@
+begin;
+
+-- Preserve platform structure and content:
+-- - public.game_definitions
+-- - public.wheel_categories
+-- - public.wheel_tasks
+-- - all derived leaderboard/feed views
+--
+-- Reset only runtime/user data so the games behave like a fresh event.
+
+truncate table
+  public.realtime_signals,
+  public.activity_events,
+  public.xp_transactions,
+  public.wheel_player_task_history,
+  public.wheel_round_assignments,
+  public.game_rounds,
+  public.game_sessions
+restart identity cascade;
+
+-- Remove all app-level player records.
+delete from public.player_profiles;
+
+-- Remove Supabase Auth anonymous users.
+delete from auth.users
+where is_anonymous is true;
+
+commit;

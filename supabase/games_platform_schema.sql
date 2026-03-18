@@ -88,6 +88,15 @@ create table if not exists public.activity_events (
   created_at timestamptz not null default timezone('utc', now())
 );
 
+create table if not exists public.realtime_signals (
+  id uuid primary key default gen_random_uuid(),
+  channel text not null,
+  game_slug text references public.game_definitions(slug) on delete cascade,
+  signal_type text not null,
+  payload jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default timezone('utc', now())
+);
+
 create table if not exists public.wheel_categories (
   id uuid primary key default gen_random_uuid(),
   slug text not null unique,
@@ -703,6 +712,13 @@ create index if not exists activity_events_created_idx
 create index if not exists activity_events_visibility_created_idx
   on public.activity_events (visibility, created_at desc);
 
+create index if not exists realtime_signals_channel_created_idx
+  on public.realtime_signals (channel, created_at desc);
+
+create index if not exists realtime_signals_game_created_idx
+  on public.realtime_signals (game_slug, created_at desc)
+  where game_slug is not null;
+
 create index if not exists wheel_tasks_category_active_idx
   on public.wheel_tasks (category_id, is_active, created_at desc);
 
@@ -847,6 +863,13 @@ alter table if exists public.activity_events
   add constraint activity_events_visibility_check
   check (visibility in ('private', 'feed'));
 
+alter table if exists public.realtime_signals
+  drop constraint if exists realtime_signals_channel_check;
+
+alter table if exists public.realtime_signals
+  add constraint realtime_signals_channel_check
+  check (channel in ('live-projector', 'game-leaderboard'));
+
 alter table if exists public.wheel_tasks
   drop constraint if exists wheel_tasks_interaction_type_check;
 
@@ -861,7 +884,7 @@ alter table if exists public.wheel_tasks
 
 alter table if exists public.wheel_tasks
   add constraint wheel_tasks_response_mode_check
-  check (response_mode in ('confirm', 'text_input'));
+  check (response_mode in ('confirm', 'text_input', 'choice'));
 
 alter table if exists public.wheel_tasks
   drop constraint if exists wheel_tasks_execution_mode_check;

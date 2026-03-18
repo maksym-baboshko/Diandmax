@@ -51,6 +51,7 @@ export interface GameLeaderboardApiResponse {
 export type LiveFeedEventType =
   | "player.joined"
   | "xp.awarded"
+  | "wheel.round.completed"
   | "wheel.round.promised"
   | "leaderboard.new_top_player";
 
@@ -103,6 +104,7 @@ export interface WheelRoundTaskSnapshot {
   difficulty: WheelDifficulty;
   prompt: string;
   details: string | null;
+  choiceOptions: string[] | null;
   timerSeconds: number | null;
   completionXp: number;
   promiseXp: number;

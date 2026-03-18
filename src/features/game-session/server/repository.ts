@@ -213,6 +213,79 @@ function readOptionalLocalizedTextSnapshot(value: unknown): LocalizedTextSnapsho
   };
 }
 
+function readChoiceOptions(value: unknown, locale: SupportedLocale) {
+  if (!Array.isArray(value)) {
+    return null;
+  }
+
+  const options = value
+    .map((option) => normalizeOptionalResponseText(readLocalizedText(option, locale, "")))
+    .filter((option): option is string => option !== null);
+
+  return options.length >= 2 ? options : null;
+}
+
+function readChoiceOptionVariants(value: unknown) {
+  if (!Array.isArray(value)) {
+    return new Set<string>();
+  }
+
+  const variants = new Set<string>();
+
+  for (const option of value) {
+    const ukOption = normalizeOptionalResponseText(readLocalizedText(option, "uk", ""));
+    const enOption = normalizeOptionalResponseText(readLocalizedText(option, "en", ""));
+
+    if (ukOption) {
+      variants.add(ukOption);
+    }
+
+    if (enOption) {
+      variants.add(enOption);
+    }
+  }
+
+  return variants;
+}
+
+function getTaskChoiceOptions(task: Pick<WheelTaskRow, "metadata">, locale: SupportedLocale) {
+  return readChoiceOptions(asJsonObject(task.metadata).choiceOptions, locale);
+}
+
+function hasValidChoiceResponse(
+  task: Pick<WheelTaskRow, "metadata">,
+  responseText: string | null
+) {
+  if (!responseText) {
+    return false;
+  }
+
+  return readChoiceOptionVariants(asJsonObject(task.metadata).choiceOptions).has(
+    responseText
+  );
+}
+
+function hasDisplaySnapshotName(value: string | null | undefined) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function isRenderableLiveFeedRow(row: LiveFeedViewRow) {
+  switch (row.event_type) {
+    case "player.joined":
+      return hasDisplaySnapshotName(row.snapshot_name);
+    case "xp.awarded":
+      return hasDisplaySnapshotName(row.snapshot_name) && (row.snapshot_xp_delta ?? 0) > 0;
+    case "wheel.round.completed":
+      return hasDisplaySnapshotName(row.snapshot_name);
+    case "wheel.round.promised":
+      return hasDisplaySnapshotName(row.snapshot_name);
+    case "leaderboard.new_top_player":
+      return hasDisplaySnapshotName(row.snapshot_name);
+    default:
+      return false;
+  }
+}
+
 function buildWeightedCategoryPool(categories: readonly WheelCategoryRow[]) {
   return categories.flatMap((category) =>
     Array.from({ length: Math.max(category.weight, 1) }, () => category)
@@ -303,6 +376,8 @@ function getWheelRoundPayload({
   task: WheelTaskRow;
   locale: SupportedLocale;
 }): WheelRoundPayload {
+  const choiceOptions = getTaskChoiceOptions(task, locale);
+
   return {
     sessionId: round.session_id,
     cycleNumber: assignment.cycle_number,
@@ -318,6 +393,7 @@ function getWheelRoundPayload({
     difficulty: task.difficulty,
     prompt: readLocalizedText(task.prompt_i18n, locale, task.task_key),
     details: readLocalizedText(task.details_i18n, locale, ""),
+    choiceOptions,
     timerSeconds: task.timer_seconds,
     completionXp: task.base_xp,
     promiseXp: task.promise_xp,
@@ -356,6 +432,8 @@ function mapWheelRoundSnapshot({
   task: WheelTaskRow;
   locale: SupportedLocale;
 }): WheelRoundSnapshot {
+  const choiceOptions = getTaskChoiceOptions(task, locale);
+
   return {
     roundId: round.id,
     sessionId: round.session_id,
@@ -383,6 +461,7 @@ function mapWheelRoundSnapshot({
       details: normalizeOptionalResponseText(
         readLocalizedText(task.details_i18n, locale, "")
       ),
+      choiceOptions,
       timerSeconds: task.timer_seconds,
       completionXp: task.base_xp,
       promiseXp: task.promise_xp,
@@ -632,13 +711,16 @@ export async function getLivePageSnapshot({
         .from("live_feed_view")
         .select(LIVE_FEED_SELECT)
         .order("created_at", { ascending: false })
-        .limit(feedLimit);
+        .limit(Math.max(feedLimit * 8, 24));
 
       if (error) {
         throw error;
       }
 
-      return ((data ?? []) as LiveFeedViewRow[]).map(mapLiveFeedEntry);
+      return ((data ?? []) as LiveFeedViewRow[])
+        .filter(isRenderableLiveFeedRow)
+        .slice(0, feedLimit)
+        .map(mapLiveFeedEntry);
     })(),
   ]);
 
@@ -957,6 +1039,25 @@ async function logActivityEvent(event: {
   }
 }
 
+async function emitRealtimeSignal(signal: {
+  channel: "live-projector" | "game-leaderboard";
+  gameSlug?: GameSlug | null;
+  signalType: string;
+  payload?: JsonValue;
+}) {
+  const supabase = getSupabaseAdminClient();
+  const { error } = await supabase.from("realtime_signals").insert({
+    channel: signal.channel,
+    game_slug: signal.gameSlug ?? null,
+    signal_type: signal.signalType,
+    payload: signal.payload ?? {},
+  });
+
+  if (error) {
+    console.error("Realtime signal insert failed:", error);
+  }
+}
+
 function buildSelectableTaskGroups({
   categories,
   tasks,
@@ -1142,7 +1243,7 @@ export async function savePlayerProfile({
   }
 
   if (shouldLogJoin) {
-    void logActivityEvent({
+    await logActivityEvent({
       playerId: authUserId,
       eventType: "player.joined",
       visibility: "feed",
@@ -1157,6 +1258,24 @@ export async function savePlayerProfile({
       snapshotXpDelta: null,
     });
   }
+
+  void emitRealtimeSignal({
+    channel: "live-projector",
+    gameSlug: WHEEL_GAME_SLUG,
+    signalType: shouldLogJoin ? "player.joined" : "player.profile.updated",
+    payload: {
+      playerId: authUserId,
+    },
+  });
+
+  void emitRealtimeSignal({
+    channel: "game-leaderboard",
+    gameSlug: WHEEL_GAME_SLUG,
+    signalType: "player.profile.updated",
+    payload: {
+      playerId: authUserId,
+    },
+  });
 
   return playerSnapshot;
 }
@@ -1640,6 +1759,14 @@ export async function resolveWheelRound({
     throw new InvalidWheelRoundResponseError();
   }
 
+  if (
+    resolution === "completed" &&
+    task.response_mode === "choice" &&
+    !hasValidChoiceResponse(task, normalizedResponseText)
+  ) {
+    throw new InvalidWheelRoundResponseError();
+  }
+
   if (resolution === "promised" && !task.allow_promise) {
     throw new InvalidWheelRoundResponseError();
   }
@@ -1743,6 +1870,8 @@ export async function resolveWheelRound({
     responseText: normalizedResponseText,
     xpDelta,
   });
+  const shouldPublishCompletedResponse =
+    resolution === "completed" && normalizedResponseText !== null;
 
   if (xpDelta !== 0) {
     const { error: xpError } = await supabase.from("xp_transactions").insert({
@@ -1790,8 +1919,27 @@ export async function resolveWheelRound({
     ...eventSnapshot,
   });
 
+  if (shouldPublishCompletedResponse) {
+    await logActivityEvent({
+      sessionId: session.id,
+      playerId,
+      roundId,
+      eventType: "wheel.round.completed",
+      visibility: "feed",
+      payload: {
+        ...payload,
+        resolution,
+        resolutionReason,
+        responseText: normalizedResponseText,
+        xpDelta,
+        locale,
+      },
+      ...eventSnapshot,
+    });
+  }
+
   if (resolution === "promised") {
-    void logActivityEvent({
+    await logActivityEvent({
       sessionId: session.id,
       playerId,
       roundId,
@@ -1808,8 +1956,8 @@ export async function resolveWheelRound({
     });
   }
 
-  if (xpDelta > 0) {
-    void logActivityEvent({
+  if (xpDelta > 0 && !shouldPublishCompletedResponse) {
+    await logActivityEvent({
       sessionId: session.id,
       playerId,
       roundId,
@@ -1821,8 +1969,8 @@ export async function resolveWheelRound({
       },
       snapshotName: profile.display_name,
       snapshotAvatarKey: profile.avatar_key,
-      snapshotPromptI18n: {},
-      snapshotAnswerText: null,
+      snapshotPromptI18n: eventSnapshot.snapshotPromptI18n,
+      snapshotAnswerText: eventSnapshot.snapshotAnswerText,
       snapshotXpDelta: xpDelta,
     });
   }
@@ -1834,7 +1982,7 @@ export async function resolveWheelRound({
     playerLeaderboardEntry?.rank === 1 &&
     previousLeaderboardEntry?.rank !== 1
   ) {
-    void logActivityEvent({
+    await logActivityEvent({
       sessionId: session.id,
       playerId,
       roundId,
@@ -1850,6 +1998,34 @@ export async function resolveWheelRound({
       snapshotPromptI18n: {},
       snapshotAnswerText: null,
       snapshotXpDelta: xpDelta,
+    });
+  }
+
+  if (xpDelta !== 0) {
+    void emitRealtimeSignal({
+      channel: "live-projector",
+      gameSlug: WHEEL_GAME_SLUG,
+      signalType: "leaderboard.updated",
+      payload: {
+        playerId,
+        roundId,
+        resolution,
+        resolutionReason,
+        xpDelta,
+      },
+    });
+
+    void emitRealtimeSignal({
+      channel: "game-leaderboard",
+      gameSlug: WHEEL_GAME_SLUG,
+      signalType: "leaderboard.updated",
+      payload: {
+        playerId,
+        roundId,
+        resolution,
+        resolutionReason,
+        xpDelta,
+      },
     });
   }
 

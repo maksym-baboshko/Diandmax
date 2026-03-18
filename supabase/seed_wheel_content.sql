@@ -84,7 +84,7 @@ values
     'genius-or-not',
     8,
     1,
-    '{"uk":"Геніально чи ні","en":"Genius or Not"}'::jsonb,
+    '{"uk":"Геніально, чи да?","en":"Genius, Yeah?"}'::jsonb,
     '{"uk":"Поради, гарячі погляди й іронічні оцінки, чи це блискуча ідея для шлюбу і життя.","en":"Advice, hot takes, and playful verdicts on whether something is brilliant for marriage and life."}'::jsonb,
     true
   ),
@@ -138,8 +138,8 @@ values
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
     'improvisation-01',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -158,13 +158,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
     'improvisation-02',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -183,13 +183,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
     'improvisation-03',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -208,13 +208,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
     'improvisation-04',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -233,13 +233,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
     'improvisation-05',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -258,13 +258,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
     'improvisation-06',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -283,7 +283,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
@@ -308,7 +308,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
@@ -333,7 +333,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
@@ -358,7 +358,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
@@ -383,7 +383,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
@@ -408,7 +408,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
@@ -433,7 +433,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
@@ -458,7 +458,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
@@ -483,7 +483,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
@@ -508,7 +508,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
@@ -533,7 +533,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
@@ -558,7 +558,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
@@ -583,7 +583,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
@@ -608,7 +608,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'improvisation'),
@@ -633,13 +633,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"improvisation","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
     'truth-or-dare-01',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -658,13 +658,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
     'truth-or-dare-02',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -683,13 +683,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
     'truth-or-dare-03',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -708,13 +708,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Тиждень без кави","en":"A week without coffee"},{"uk":"Тиждень без сарказму","en":"A week without sarcasm"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
     'truth-or-dare-04',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -733,13 +733,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
     'truth-or-dare-05',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -758,13 +758,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
     'truth-or-dare-06',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -783,13 +783,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"«Я зараз швиденько»","en":"“I’ll be super quick”"},{"uk":"«Та я пам’ятаю»","en":"“Relax, I remember”"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
     'truth-or-dare-07',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -808,7 +808,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
@@ -833,7 +833,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
@@ -858,7 +858,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
@@ -883,7 +883,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
@@ -908,7 +908,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
@@ -933,13 +933,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
     'truth-or-dare-13',
     'timer',
-    'confirm',
+    'choice',
     'timed',
     false,
     true,
@@ -958,7 +958,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Список справ","en":"A to-do list"},{"uk":"Фраза «потім зроблю»","en":"The phrase “I’ll do it later”"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
@@ -983,7 +983,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
@@ -1008,7 +1008,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
@@ -1033,7 +1033,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
@@ -1058,7 +1058,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
@@ -1083,7 +1083,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
@@ -1108,7 +1108,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'truth-or-dare'),
@@ -1133,13 +1133,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"truth-or-dare","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
     'kind-speech-01',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -1158,13 +1158,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
     'kind-speech-02',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -1183,13 +1183,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
     'kind-speech-03',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -1208,13 +1208,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
     'kind-speech-04',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -1233,13 +1233,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
     'kind-speech-05',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -1258,13 +1258,13 @@ values
     'high_five',
     false,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
     'kind-speech-06',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -1283,13 +1283,13 @@ values
     'handshake',
     false,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
     'kind-speech-07',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -1308,7 +1308,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
@@ -1333,7 +1333,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
@@ -1358,7 +1358,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
@@ -1383,7 +1383,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
@@ -1408,7 +1408,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
@@ -1433,7 +1433,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
@@ -1458,7 +1458,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
@@ -1483,7 +1483,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
@@ -1508,7 +1508,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
@@ -1533,7 +1533,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
@@ -1558,7 +1558,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
@@ -1583,7 +1583,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
@@ -1608,7 +1608,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'kind-speech'),
@@ -1633,13 +1633,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"kind-speech","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
     'fact-check-01',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -1658,13 +1658,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
     'fact-check-02',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -1683,13 +1683,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Спонтанний план","en":"A spontaneous plan"},{"uk":"Красиво складений список","en":"A neatly made list"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
     'fact-check-03',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -1708,18 +1708,18 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
     'fact-check-04',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'warm',
-    '{"uk":"Хто з них швидше запропонує переробити маршрут, навіть якщо все вже вирішили?","en":"Which one would suggest reworking the route even after everything was already decided?"}'::jsonb,
+    '{"uk":"Хто з молодят швидше запропонує переробити маршрут, навіть якщо все вже вирішили?","en":"Which of the newlyweds would suggest reworking the route even after everything was already decided?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     18,
     0,
@@ -1733,13 +1733,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
     'fact-check-05',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -1758,13 +1758,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Гумор","en":"Humor"},{"uk":"Організація","en":"Organization"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
     'fact-check-06',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -1783,13 +1783,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
     'fact-check-07',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -1808,13 +1808,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Тихий вечір удвох","en":"A quiet evening together"},{"uk":"Компанія до ночі","en":"A group hanging out late"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
     'fact-check-08',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -1833,13 +1833,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
     'fact-check-09',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -1858,7 +1858,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Спершу сміються","en":"They laugh first"},{"uk":"Спершу думають","en":"They think first"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
@@ -1883,7 +1883,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
@@ -1908,7 +1908,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
@@ -1933,18 +1933,18 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
     'fact-check-13',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'bold',
-    '{"uk":"Напиши, що в них сильніше: спонтанність чи системність?","en":"Write what feels stronger in them: spontaneity or structure?"}'::jsonb,
+    '{"uk":"Що в молодятах, на твою думку, сильніше: спонтанність чи системність?","en":"What feels stronger in the newlyweds: spontaneity or structure?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     26,
     0,
@@ -1958,7 +1958,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Спонтанність","en":"Spontaneity"},{"uk":"Системність","en":"Structure"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
@@ -1983,18 +1983,18 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
     'fact-check-15',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'warm',
-    '{"uk":"Напиши, хто з молодят швидше сказав би: «я вже майже готовий», і що це означає на практиці.","en":"Write which of the newlyweds would say “I’m almost ready” faster, and what that means in practice."}'::jsonb,
+    '{"uk":"Хто з молодят швидше сказав би: «я вже майже готовий»?","en":"Which of the newlyweds would say “I’m almost ready” faster?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     18,
     0,
@@ -2008,7 +2008,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
@@ -2033,18 +2033,18 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
     'fact-check-17',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'warm',
-    '{"uk":"Напиши коротку здогадку: хто з них швидше перетворить буденний вечір на маленьку подію?","en":"Write a short guess: which of them would turn an ordinary evening into a little event faster?"}'::jsonb,
+    '{"uk":"Хто з молодят швидше перетворить буденний вечір на маленьку подію?","en":"Which of the newlyweds would turn an ordinary evening into a little event faster?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     18,
     0,
@@ -2058,13 +2058,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
     'fact-check-18',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -2083,18 +2083,18 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Порядок","en":"Order"},{"uk":"Затишок","en":"Coziness"},{"uk":"Хороший настрій","en":"A good mood"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
     'fact-check-19',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'gentle',
-    '{"uk":"Напиши свою версію: хто з них краще пам’ятає дрібниці, про які інші забувають?","en":"Write your version: which of them remembers the little things other people forget better?"}'::jsonb,
+    '{"uk":"Хто з молодят краще пам’ятає дрібниці, про які інші забувають?","en":"Which of the newlyweds remembers the little things other people forget better?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     12,
     0,
@@ -2108,7 +2108,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'fact-check'),
@@ -2133,13 +2133,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"fact-check","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-01',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -2158,13 +2158,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Один дуже впертий плед","en":"One very stubborn blanket"},{"uk":"П’ять впертих декоративних подушок","en":"Five stubborn decorative pillows"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-02',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -2183,13 +2183,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Затишний хаос","en":"Cozy chaos"},{"uk":"Організований затишок","en":"Organized coziness"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-03',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -2208,13 +2208,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Сперечатись про маршрут","en":"Argue about the route"},{"uk":"Сперечатись про температуру","en":"Argue about the room temperature"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-04',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -2233,13 +2233,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Спільний календар","en":"A shared calendar"},{"uk":"Віра в пам’ять","en":"Faith in memory"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-05',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -2258,13 +2258,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Список на холодильнику","en":"A list on the fridge"},{"uk":"«Я точно не забуду»","en":"“I definitely won’t forget”"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-06',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -2283,13 +2283,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Зниклий пульт","en":"A missing remote"},{"uk":"Зникла зарядка","en":"A missing charger"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-07',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -2308,13 +2308,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Ідеально продуманий вечір","en":"A perfectly planned evening"},{"uk":"Вечір, який став легендою","en":"An evening that became a legend"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-08',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -2333,13 +2333,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Збирати меблі разом","en":"Assemble furniture together"},{"uk":"Обирати серіал разом","en":"Choose a series together"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-09',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -2358,13 +2358,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Три будильники","en":"Three alarms"},{"uk":"«Я встану з першого»","en":"“I’ll get up on the first one”"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-10',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -2383,18 +2383,18 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Мати бюджет на все","en":"Have a budget for everything"},{"uk":"Надіятись на чудо й кешбек","en":"Hope for a miracle and cashback"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-11',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'warm',
-    '{"uk":"Напиши коротко, що геніальніше для дому: дві ковдри чи одна дипломатична.","en":"Write briefly what is more genius for a home: two blankets or one diplomatic blanket."}'::jsonb,
+    '{"uk":"Що геніальніше для дому: дві ковдри чи одна дипломатична?","en":"What is more genius for a home: two blankets or one diplomatic blanket?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     18,
     0,
@@ -2408,18 +2408,18 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Дві ковдри","en":"Two blankets"},{"uk":"Одна дипломатична ковдра","en":"One diplomatic blanket"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-12',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'gentle',
-    '{"uk":"Поясни одним реченням, що мудріше для миру вдома: сперечатися одразу чи спершу поїсти.","en":"Explain in one sentence what is wiser for peace at home: argue right away or eat first."}'::jsonb,
+    '{"uk":"Що мудріше для миру вдома: сперечатися одразу чи спершу поїсти?","en":"What is wiser for peace at home: argue right away or eat first?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     12,
     0,
@@ -2433,18 +2433,18 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Сперечатися одразу","en":"Argue right away"},{"uk":"Спершу поїсти","en":"Eat first"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-13',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'bold',
-    '{"uk":"Напиши, що серйозніше випробовує характер: ремонт чи спільний похід у магазин у суботу.","en":"Write what tests character more seriously: renovations or a shared Saturday trip to the store."}'::jsonb,
+    '{"uk":"Що серйозніше випробовує характер: ремонт чи спільний похід у магазин у суботу?","en":"What tests character more seriously: renovations or a shared Saturday trip to the store?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     26,
     0,
@@ -2458,7 +2458,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Ремонт","en":"Renovations"},{"uk":"Спільний похід у магазин у суботу","en":"A shared Saturday trip to the store"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
@@ -2483,18 +2483,18 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-15',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'warm',
-    '{"uk":"Напиши, що геніальніше для спільного життя: список правил чи хороше почуття гумору.","en":"Write what is more genius for shared life: a list of rules or a good sense of humor."}'::jsonb,
+    '{"uk":"Що геніальніше для спільного життя: список правил чи хороше почуття гумору?","en":"What is more genius for shared life: a list of rules or a good sense of humor?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     18,
     0,
@@ -2508,18 +2508,18 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Список правил","en":"A list of rules"},{"uk":"Хороше почуття гумору","en":"A good sense of humor"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-16',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'warm',
-    '{"uk":"Поясни коротко, що практичніше: одна велика сумка на все чи п’ять маленьких «для порядку».","en":"Explain briefly what is more practical: one big bag for everything or five small ones “for organization.”"}'::jsonb,
+    '{"uk":"Що практичніше: одна велика сумка на все чи п’ять маленьких «для порядку»?","en":"What is more practical: one big bag for everything or five small ones “for organization”?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     18,
     0,
@@ -2533,18 +2533,18 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Одна велика сумка на все","en":"One big bag for everything"},{"uk":"П’ять маленьких «для порядку»","en":"Five small ones “for organization”"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-17',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'gentle',
-    '{"uk":"Напиши свій вибір для молодят: вечеря вдома чи спонтанний виїзд, і чому.","en":"Write your choice for the newlyweds: dinner at home or a spontaneous outing, and why."}'::jsonb,
+    '{"uk":"Що краще пасує молодятам: вечеря вдома чи спонтанний виїзд?","en":"What suits the newlyweds better: dinner at home or a spontaneous outing?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     12,
     0,
@@ -2558,13 +2558,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Вечеря вдома","en":"Dinner at home"},{"uk":"Спонтанний виїзд","en":"A spontaneous outing"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-18',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -2583,18 +2583,18 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"«Я не торкався цих речей»","en":"“I didn’t touch those things”"},{"uk":"«Я переставив, щоб було краще»","en":"“I moved them to make it better”"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-19',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'warm',
-    '{"uk":"Напиши, що небезпечніше для спокою: фраза «нічого не треба купувати» чи «зайдемо лише подивитись».","en":"Write what is more dangerous for inner peace: “We don’t need to buy anything” or “Let’s just look around.”"}'::jsonb,
+    '{"uk":"Що небезпечніше для спокою: фраза «нічого не треба купувати» чи «зайдемо лише подивитись»?","en":"What is more dangerous for inner peace: “We don’t need to buy anything” or “Let’s just look around.”"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     18,
     0,
@@ -2608,18 +2608,18 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"«Нічого не треба купувати»","en":"“We don’t need to buy anything”"},{"uk":"«Зайдемо лише подивитись»","en":"“Let’s just look around”"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'joyful-dilemma'),
     'joyful-dilemma-20',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'gentle',
-    '{"uk":"Одним реченням скажи, що геніальніше для сімейного життя: план А чи хороший план Б.","en":"In one sentence, say what is more genius for family life: plan A or a really good plan B."}'::jsonb,
+    '{"uk":"Що геніальніше для сімейного життя: план А чи хороший план Б?","en":"What is more genius for family life: plan A or a really good plan B?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     12,
     0,
@@ -2633,13 +2633,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"joyful-dilemma","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"План А","en":"Plan A"},{"uk":"Хороший план Б","en":"A really good plan B"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
     'similarity-test-01',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -2658,18 +2658,18 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
     'similarity-test-02',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'warm',
-    '{"uk":"Хто швидше запропонує ще одне фото, але вже «нормальне»?","en":"Who would suggest one more photo, but this time “a normal one,” faster?"}'::jsonb,
+    '{"uk":"Хто з молодят швидше запропонує ще одне фото, але вже «нормальне»?","en":"Which of the newlyweds would suggest one more photo, but this time “a normal one,” faster?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     18,
     0,
@@ -2683,18 +2683,18 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
     'similarity-test-03',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'gentle',
-    '{"uk":"Як ти думаєш, хто з молодят спершу сміється, а хто спершу уточнює деталі?","en":"Who among the newlyweds laughs first, and who asks for details first?"}'::jsonb,
+    '{"uk":"Хто з молодят швидше почне сміятися, коли щось іде не за планом?","en":"Which of the newlyweds starts laughing faster when something goes off plan?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     12,
     0,
@@ -2708,18 +2708,18 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
     'similarity-test-04',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'warm',
-    '{"uk":"Хто з них швидше скаже: «давай не поспішати», якщо план раптом змінився?","en":"Which one would say “let’s not rush” faster if the plan suddenly changed?"}'::jsonb,
+    '{"uk":"Хто з молодят швидше скаже: «давай не поспішати», якщо план раптом змінився?","en":"Which of the newlyweds would say “let’s not rush” faster if the plan suddenly changed?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     18,
     0,
@@ -2733,18 +2733,18 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
     'similarity-test-05',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'bold',
-    '{"uk":"Хто швидше помітить, що щось стоїть не на своєму місці?","en":"Which one would notice first that something is not in the right place?"}'::jsonb,
+    '{"uk":"Хто з молодят швидше помітить, що щось стоїть не на своєму місці?","en":"Which of the newlyweds would notice first that something is not in the right place?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     26,
     0,
@@ -2758,13 +2758,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
     'similarity-test-06',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -2783,18 +2783,18 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
     'similarity-test-07',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'warm',
-    '{"uk":"Хто з них імовірніше скаже: «я це запишу», а хто: «я це запам’ятаю»?","en":"Who is more likely to say “I’ll write it down,” and who will say “I’ll remember it”?"}'::jsonb,
+    '{"uk":"Хто з молодят імовірніше скаже: «я це запишу»?","en":"Which of the newlyweds is more likely to say “I’ll write it down”?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     18,
     0,
@@ -2808,18 +2808,18 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
     'similarity-test-08',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'bold',
-    '{"uk":"Хто швидше запропонує щось практичне, а хто — щось красиве?","en":"Who would suggest something practical faster, and who would suggest something beautiful?"}'::jsonb,
+    '{"uk":"Хто з молодят швидше запропонує практичне рішення?","en":"Which of the newlyweds would suggest a practical solution faster?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     26,
     0,
@@ -2833,13 +2833,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
     'similarity-test-09',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -2858,18 +2858,18 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
     'similarity-test-10',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'warm',
-    '{"uk":"Хто з них швидше скаже: «ще п’ять хвилин», і це затягнеться надовго?","en":"Which of them would say “five more minutes” faster, and then stretch it for much longer?"}'::jsonb,
+    '{"uk":"Хто з молодят швидше скаже: «ще п’ять хвилин», і це затягнеться надовго?","en":"Which of the newlyweds would say “five more minutes” faster, and then stretch it for much longer?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     18,
     0,
@@ -2883,7 +2883,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
@@ -2908,7 +2908,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
@@ -2933,7 +2933,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
@@ -2958,7 +2958,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
@@ -2983,7 +2983,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
@@ -3008,18 +3008,18 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
     'similarity-test-16',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'bold',
-    '{"uk":"Напиши, хто з молодят швидше сказав би: «та давай спробуємо», а хто — «давай спочатку подумаємо».","en":"Write who would say “let’s just try it” faster, and who would say “let’s think first.”"}'::jsonb,
+    '{"uk":"Хто з молодят швидше сказав би: «та давай спробуємо»?","en":"Which of the newlyweds would say “let’s just try it” faster?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     26,
     0,
@@ -3033,7 +3033,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Наречений","en":"The groom"},{"uk":"Наречена","en":"The bride"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
@@ -3058,18 +3058,18 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
     'similarity-test-18',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'warm',
-    '{"uk":"Напиши, що у них більше схоже: темп життя, почуття гумору чи спосіб домовлятися.","en":"Write what feels more similar between them: pace of life, sense of humor, or the way they reach agreement."}'::jsonb,
+    '{"uk":"Що в молодят, на твою думку, схоже найбільше: темп життя, почуття гумору чи спосіб домовлятися?","en":"What feels most similar between the newlyweds: pace of life, sense of humor, or the way they reach agreement?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     18,
     0,
@@ -3083,7 +3083,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Темп життя","en":"Pace of life"},{"uk":"Почуття гумору","en":"Sense of humor"},{"uk":"Спосіб домовлятися","en":"The way they reach agreement"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
@@ -3108,7 +3108,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'similarity-test'),
@@ -3133,7 +3133,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"similarity-test","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
@@ -3158,13 +3158,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
     'challenge-accepted-02',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -3183,7 +3183,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
@@ -3208,13 +3208,13 @@ values
     'high_five',
     false,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
     'challenge-accepted-04',
-    'confirm',
-    'confirm',
+    'text_input',
+    'text_input',
     'instant',
     false,
     false,
@@ -3233,7 +3233,7 @@ values
     'handshake',
     false,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
@@ -3258,7 +3258,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
@@ -3283,7 +3283,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
@@ -3308,7 +3308,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
@@ -3333,7 +3333,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
@@ -3358,7 +3358,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
@@ -3383,7 +3383,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
@@ -3408,7 +3408,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
@@ -3433,7 +3433,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
@@ -3458,7 +3458,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
@@ -3483,7 +3483,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
@@ -3508,7 +3508,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
@@ -3533,7 +3533,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
@@ -3558,7 +3558,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
@@ -3583,7 +3583,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
@@ -3608,7 +3608,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'challenge-accepted'),
@@ -3633,13 +3633,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"challenge-accepted","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
     'genius-or-not-01',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -3658,13 +3658,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Геніально","en":"Genius"},{"uk":"Не геніально","en":"Not genius"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
     'genius-or-not-02',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -3683,13 +3683,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Геніально","en":"Genius"},{"uk":"Не геніально","en":"Not genius"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
     'genius-or-not-03',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -3708,13 +3708,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Геніально","en":"Genius"},{"uk":"Не геніально","en":"Not genius"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
     'genius-or-not-04',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -3733,13 +3733,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Геніально","en":"Genius"},{"uk":"Не геніально","en":"Not genius"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
     'genius-or-not-05',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -3758,13 +3758,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Геніально","en":"Genius"},{"uk":"Не геніально","en":"Not genius"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
     'genius-or-not-06',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -3783,13 +3783,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Геніально","en":"Genius"},{"uk":"Не геніально","en":"Not genius"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
     'genius-or-not-07',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -3808,13 +3808,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Геніально","en":"Genius"},{"uk":"Не геніально","en":"Not genius"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
     'genius-or-not-08',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -3833,13 +3833,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Геніально","en":"Genius"},{"uk":"Не геніально","en":"Not genius"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
     'genius-or-not-09',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -3858,7 +3858,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Геніально","en":"Genius"},{"uk":"Не геніально","en":"Not genius"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
@@ -3883,7 +3883,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
@@ -3908,18 +3908,18 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
     'genius-or-not-12',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'warm',
-    '{"uk":"Напиши, що мудріше для миру вдома: мовчати п’ять хвилин чи одразу все обговорювати.","en":"Write what is wiser for peace at home: staying quiet for five minutes or discussing everything right away."}'::jsonb,
+    '{"uk":"Що мудріше для миру вдома: мовчати п’ять хвилин чи одразу все обговорювати?","en":"What is wiser for peace at home: staying quiet for five minutes or discussing everything right away?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     18,
     0,
@@ -3933,18 +3933,18 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Мовчати п’ять хвилин","en":"Stay quiet for five minutes"},{"uk":"Одразу все обговорювати","en":"Discuss everything right away"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
     'genius-or-not-13',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'bold',
-    '{"uk":"Скажи коротко, що геніальніше: спільний список покупок чи одна дуже впевнена пам’ять.","en":"Say briefly what is more genius: a shared shopping list or one very confident memory."}'::jsonb,
+    '{"uk":"Що геніальніше: спільний список покупок чи одна дуже впевнена пам’ять?","en":"What is more genius: a shared shopping list or one very confident memory?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     26,
     0,
@@ -3958,7 +3958,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Спільний список покупок","en":"A shared shopping list"},{"uk":"Одна дуже впевнена пам’ять","en":"One very confident memory"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
@@ -3983,18 +3983,18 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
     'genius-or-not-15',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'gentle',
-    '{"uk":"Що, на твою думку, геніальніше для спільного життя: гумор чи дисципліна?","en":"What do you think is more genius for shared life: humor or discipline?"}'::jsonb,
+    '{"uk":"Що геніальніше для спільного життя: гумор чи дисципліна?","en":"What is more genius for shared life: humor or discipline?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     12,
     0,
@@ -4008,18 +4008,18 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Гумор","en":"Humor"},{"uk":"Дисципліна","en":"Discipline"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
     'genius-or-not-16',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'warm',
-    '{"uk":"Напиши свій вердикт: хто сильніший у побуті — план чи адаптація?","en":"Write your verdict: what is stronger in domestic life — planning or adaptability?"}'::jsonb,
+    '{"uk":"Що сильніше в побуті: план чи адаптація?","en":"What is stronger in domestic life: planning or adaptability?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     18,
     0,
@@ -4033,7 +4033,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"План","en":"Planning"},{"uk":"Адаптація","en":"Adaptability"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
@@ -4058,7 +4058,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
@@ -4083,7 +4083,7 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
@@ -4108,18 +4108,18 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'genius-or-not'),
     'genius-or-not-20',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'bold',
-    '{"uk":"Напиши, що мудріше для сім’ї: бути правим чи вчасно усміхнутись.","en":"Write what is wiser for a family: being right or smiling at the right moment."}'::jsonb,
+    '{"uk":"Що мудріше для сім’ї: бути правим чи вчасно усміхнутись?","en":"What is wiser for a family: being right or smiling at the right moment?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     26,
     0,
@@ -4133,13 +4133,13 @@ values
     'none',
     false,
     true,
-      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"genius-or-not","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Бути правим","en":"Being right"},{"uk":"Вчасно усміхнутись","en":"Smiling at the right moment"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
     'in-their-style-01',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -4158,13 +4158,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Тихий вечір удвох","en":"A quiet evening together"},{"uk":"Компанія до ночі","en":"A crowd until late"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
     'in-their-style-02',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -4183,13 +4183,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"План на пів дня","en":"A half-day plan"},{"uk":"Спонтанний виїзд","en":"A spontaneous outing"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
     'in-their-style-03',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -4208,13 +4208,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Красива ідея","en":"A beautiful idea"},{"uk":"Практична геніальність","en":"Practical genius"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
     'in-their-style-04',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -4233,13 +4233,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Порядок","en":"Order"},{"uk":"Легкий творчий хаос","en":"Light creative chaos"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
     'in-their-style-05',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -4258,13 +4258,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Список справ","en":"A to-do list"},{"uk":"«Розберемось по ходу»","en":"“We’ll figure it out as we go”"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
     'in-their-style-06',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -4283,13 +4283,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Серіал","en":"A series"},{"uk":"Прогулянка","en":"A walk"},{"uk":"Гості вдома","en":"Guests at home"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
     'in-their-style-07',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -4308,13 +4308,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Випадковий живий кадр","en":"A candid shot"},{"uk":"Все красиво виставлено","en":"Everything carefully styled"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
     'in-their-style-08',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -4333,13 +4333,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Заздалегідь забронювати","en":"Book it in advance"},{"uk":"Знайти щось в останній момент","en":"Find something last minute"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
     'in-their-style-09',
     'confirm',
-    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -4358,7 +4358,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Спокійно, смачно і без поспіху","en":"Calm, tasty, and unhurried"},{"uk":"Насичено й максимально по-людськи","en":"Packed and as people-filled as possible"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
@@ -4383,7 +4383,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
@@ -4408,7 +4408,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
@@ -4433,7 +4433,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
@@ -4458,13 +4458,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
     'in-their-style-14',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -4483,7 +4483,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Настрій","en":"Mood"},{"uk":"Логістика","en":"Logistics"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
@@ -4508,7 +4508,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
@@ -4533,7 +4533,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
@@ -4558,7 +4558,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
@@ -4583,18 +4583,18 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
     'in-their-style-19',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
     'warm',
-    '{"uk":"Напиши, що наречені, ймовірно, вибрали б для спільного відпочинку: шумний план чи тихий комфорт — і чому.","en":"Write what the bride and groom would probably choose for shared rest: a noisy plan or quiet comfort — and why."}'::jsonb,
+    '{"uk":"Що наречені, ймовірно, вибрали б для спільного відпочинку: шумний план чи тихий комфорт?","en":"What would the bride and groom probably choose for shared rest: a noisy plan or quiet comfort?"}'::jsonb,
     '{"uk":"","en":""}'::jsonb,
     18,
     0,
@@ -4608,13 +4608,13 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Шумний план","en":"A noisy plan"},{"uk":"Тихий комфорт","en":"Quiet comfort"}]}'::jsonb
   ),
   (
     (select id from public.wheel_categories where slug = 'in-their-style'),
     'in-their-style-20',
-    'text_input',
-    'text_input',
+    'confirm',
+    'choice',
     'instant',
     false,
     false,
@@ -4633,7 +4633,7 @@ values
     'none',
     true,
     true,
-      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":3}'::jsonb
+      '{"categorySlug":"in-their-style","source":"wheel-content-seed","taskContractVersion":4,"choiceOptions":[{"uk":"Смішно жити","en":"Living funny"},{"uk":"Зручно жити","en":"Living comfortably"}]}'::jsonb
   )
 on conflict (task_key) do update
   set
@@ -4666,7 +4666,7 @@ set
   metadata = jsonb_set(
     coalesce(metadata, '{}'::jsonb),
     '{deactivatedBySeedVersion}',
-    '3'::jsonb,
+    '4'::jsonb,
     true
   )
 where

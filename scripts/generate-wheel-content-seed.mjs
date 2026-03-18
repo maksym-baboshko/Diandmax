@@ -7,14 +7,34 @@ const categoriesPath = path.join(
   "src/shared/config/wheel-categories.json"
 );
 const tasksPath = path.join(rootDir, "src/shared/config/wheel-tasks.json");
+const choiceOptionsPath = path.join(
+  rootDir,
+  "src/shared/config/wheel-choice-options.json"
+);
 const outputPath = path.join(rootDir, "supabase/seed_wheel_content.sql");
 
 const categories = JSON.parse(fs.readFileSync(categoriesPath, "utf8"));
-const tasks = JSON.parse(fs.readFileSync(tasksPath, "utf8"));
+const tasksSource = JSON.parse(fs.readFileSync(tasksPath, "utf8"));
+const choiceOptionsByTaskKey = JSON.parse(
+  fs.readFileSync(choiceOptionsPath, "utf8")
+);
+const tasks = tasksSource.map((task) => {
+  const choiceOptions = choiceOptionsByTaskKey[task.taskKey];
+
+  if (!choiceOptions) {
+    return task;
+  }
+
+  return {
+    ...task,
+    responseMode: "choice",
+    choiceOptions,
+  };
+});
 
 const expectedInteractionTotals = {
-  confirm: 72,
-  text_input: 72,
+  confirm: 76,
+  text_input: 68,
   timer: 18,
   async_task: 18,
 };
@@ -36,7 +56,7 @@ const categoriesWithoutDeferred = new Set([
   "in-their-style",
 ]);
 
-const supportedResponseModes = new Set(["confirm", "text_input"]);
+const supportedResponseModes = new Set(["confirm", "text_input", "choice"]);
 const supportedExecutionModes = new Set(["instant", "timed", "deferred"]);
 const supportedPhysicalContactLevels = new Set([
   "none",
@@ -209,6 +229,24 @@ function validateContent() {
         `Text-input task ${task.taskKey} must be feed-safe by design.`
       );
     }
+
+    if (task.responseMode === "choice") {
+      assert(
+        Array.isArray(task.choiceOptions) && task.choiceOptions.length >= 2,
+        `Choice task ${task.taskKey} must include at least two choice options.`
+      );
+
+      for (const [choiceIndex, choiceOption] of task.choiceOptions.entries()) {
+        assert(
+          typeof choiceOption?.uk === "string" && choiceOption.uk.trim().length > 0,
+          `Choice option ${choiceIndex + 1} for ${task.taskKey} must include uk text.`
+        );
+        assert(
+          typeof choiceOption?.en === "string" && choiceOption.en.trim().length > 0,
+          `Choice option ${choiceIndex + 1} for ${task.taskKey} must include en text.`
+        );
+      }
+    }
   }
 
   const interactionTotals = {
@@ -352,7 +390,10 @@ function buildTaskSeedSql() {
       ${sqlJson({
         categorySlug: task.categorySlug,
         source: "wheel-content-seed",
-        taskContractVersion: 3,
+        taskContractVersion: 4,
+        ...(task.responseMode === "choice"
+          ? { choiceOptions: task.choiceOptions }
+          : {}),
       })}
   )`;
   });
@@ -415,7 +456,7 @@ set
   metadata = jsonb_set(
     coalesce(metadata, '{}'::jsonb),
     '{deactivatedBySeedVersion}',
-    '3'::jsonb,
+    '4'::jsonb,
     true
   )
 where

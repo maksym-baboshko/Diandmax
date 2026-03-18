@@ -49,6 +49,23 @@ export function getSupabaseBrowserClient() {
   return browserClient;
 }
 
+async function signInAnonymously(supabase: SupabaseClient) {
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.signInAnonymously();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!session?.access_token) {
+    throw new Error("Anonymous auth session is missing.");
+  }
+
+  return session.access_token;
+}
+
 export async function getGameAuthAccessToken() {
   const supabase = getSupabaseBrowserClient();
   const {
@@ -61,23 +78,22 @@ export async function getGameAuthAccessToken() {
   }
 
   if (session?.access_token) {
-    return session.access_token;
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser(session.access_token);
+
+    if (!userError && user) {
+      return session.access_token;
+    }
+
+    const { error: signOutError } = await supabase.auth.signOut({ scope: "local" });
+    if (signOutError) {
+      console.warn("Failed to clear stale Supabase session:", signOutError);
+    }
   }
 
-  const {
-    data: { session: anonymousSession },
-    error: signInError,
-  } = await supabase.auth.signInAnonymously();
-
-  if (signInError) {
-    throw signInError;
-  }
-
-  if (!anonymousSession?.access_token) {
-    throw new Error("Anonymous auth session is missing.");
-  }
-
-  return anonymousSession.access_token;
+  return signInAnonymously(supabase);
 }
 
 export async function signOutGameAuth() {

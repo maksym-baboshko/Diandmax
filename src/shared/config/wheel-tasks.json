@@ -2,8 +2,8 @@
   {
     "taskKey": "improvisation-01",
     "categorySlug": "improvisation",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -22,8 +22,8 @@
   {
     "taskKey": "improvisation-02",
     "categorySlug": "improvisation",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -42,8 +42,8 @@
   {
     "taskKey": "improvisation-03",
     "categorySlug": "improvisation",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -62,8 +62,8 @@
   {
     "taskKey": "improvisation-04",
     "categorySlug": "improvisation",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -82,8 +82,8 @@
   {
     "taskKey": "improvisation-05",
     "categorySlug": "improvisation",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -102,8 +102,8 @@
   {
     "taskKey": "improvisation-06",
     "categorySlug": "improvisation",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -406,8 +406,8 @@
   {
     "taskKey": "truth-or-dare-01",
     "categorySlug": "truth-or-dare",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -426,8 +426,8 @@
   {
     "taskKey": "truth-or-dare-02",
     "categorySlug": "truth-or-dare",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -466,8 +466,8 @@
   {
     "taskKey": "truth-or-dare-04",
     "categorySlug": "truth-or-dare",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -486,8 +486,8 @@
   {
     "taskKey": "truth-or-dare-05",
     "categorySlug": "truth-or-dare",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -526,8 +526,8 @@
   {
     "taskKey": "truth-or-dare-07",
     "categorySlug": "truth-or-dare",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -811,8 +811,8 @@
   {
     "taskKey": "kind-speech-01",
     "categorySlug": "kind-speech",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -831,8 +831,8 @@
   {
     "taskKey": "kind-speech-02",
     "categorySlug": "kind-speech",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -851,8 +851,8 @@
   {
     "taskKey": "kind-speech-03",
     "categorySlug": "kind-speech",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -871,8 +871,8 @@
   {
     "taskKey": "kind-speech-04",
     "categorySlug": "kind-speech",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -891,8 +891,8 @@
   {
     "taskKey": "kind-speech-05",
     "categorySlug": "kind-speech",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -911,8 +911,8 @@
   {
     "taskKey": "kind-speech-06",
     "categorySlug": "kind-speech",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -931,8 +931,8 @@
   {
     "taskKey": "kind-speech-07",
     "categorySlug": "kind-speech",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -1278,8 +1278,8 @@
     "allowEarlyCompletion": false,
     "difficulty": "warm",
     "prompt": {
-      "uk": "Хто з них швидше запропонує переробити маршрут, навіть якщо все вже вирішили?",
-      "en": "Which one would suggest reworking the route even after everything was already decided?"
+      "uk": "Хто з молодят швидше запропонує переробити маршрут, навіть якщо все вже вирішили?",
+      "en": "Which of the newlyweds would suggest reworking the route even after everything was already decided?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -1451,15 +1451,15 @@
   {
     "taskKey": "fact-check-13",
     "categorySlug": "fact-check",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "bold",
     "prompt": {
-      "uk": "Напиши, що в них сильніше: спонтанність чи системність?",
-      "en": "Write what feels stronger in them: spontaneity or structure?"
+      "uk": "Що в молодятах, на твою думку, сильніше: спонтанність чи системність?",
+      "en": "What feels stronger in the newlyweds: spontaneity or structure?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -1491,15 +1491,15 @@
   {
     "taskKey": "fact-check-15",
     "categorySlug": "fact-check",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "warm",
     "prompt": {
-      "uk": "Напиши, хто з молодят швидше сказав би: «я вже майже готовий», і що це означає на практиці.",
-      "en": "Write which of the newlyweds would say “I’m almost ready” faster, and what that means in practice."
+      "uk": "Хто з молодят швидше сказав би: «я вже майже готовий»?",
+      "en": "Which of the newlyweds would say “I’m almost ready” faster?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -1531,15 +1531,15 @@
   {
     "taskKey": "fact-check-17",
     "categorySlug": "fact-check",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "warm",
     "prompt": {
-      "uk": "Напиши коротку здогадку: хто з них швидше перетворить буденний вечір на маленьку подію?",
-      "en": "Write a short guess: which of them would turn an ordinary evening into a little event faster?"
+      "uk": "Хто з молодят швидше перетворить буденний вечір на маленьку подію?",
+      "en": "Which of the newlyweds would turn an ordinary evening into a little event faster?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -1551,8 +1551,8 @@
   {
     "taskKey": "fact-check-18",
     "categorySlug": "fact-check",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -1571,15 +1571,15 @@
   {
     "taskKey": "fact-check-19",
     "categorySlug": "fact-check",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "gentle",
     "prompt": {
-      "uk": "Напиши свою версію: хто з них краще пам’ятає дрібниці, про які інші забувають?",
-      "en": "Write your version: which of them remembers the little things other people forget better?"
+      "uk": "Хто з молодят краще пам’ятає дрібниці, про які інші забувають?",
+      "en": "Which of the newlyweds remembers the little things other people forget better?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -1811,15 +1811,15 @@
   {
     "taskKey": "joyful-dilemma-11",
     "categorySlug": "joyful-dilemma",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "warm",
     "prompt": {
-      "uk": "Напиши коротко, що геніальніше для дому: дві ковдри чи одна дипломатична.",
-      "en": "Write briefly what is more genius for a home: two blankets or one diplomatic blanket."
+      "uk": "Що геніальніше для дому: дві ковдри чи одна дипломатична?",
+      "en": "What is more genius for a home: two blankets or one diplomatic blanket?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -1831,15 +1831,15 @@
   {
     "taskKey": "joyful-dilemma-12",
     "categorySlug": "joyful-dilemma",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "gentle",
     "prompt": {
-      "uk": "Поясни одним реченням, що мудріше для миру вдома: сперечатися одразу чи спершу поїсти.",
-      "en": "Explain in one sentence what is wiser for peace at home: argue right away or eat first."
+      "uk": "Що мудріше для миру вдома: сперечатися одразу чи спершу поїсти?",
+      "en": "What is wiser for peace at home: argue right away or eat first?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -1851,15 +1851,15 @@
   {
     "taskKey": "joyful-dilemma-13",
     "categorySlug": "joyful-dilemma",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "bold",
     "prompt": {
-      "uk": "Напиши, що серйозніше випробовує характер: ремонт чи спільний похід у магазин у суботу.",
-      "en": "Write what tests character more seriously: renovations or a shared Saturday trip to the store."
+      "uk": "Що серйозніше випробовує характер: ремонт чи спільний похід у магазин у суботу?",
+      "en": "What tests character more seriously: renovations or a shared Saturday trip to the store?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -1891,15 +1891,15 @@
   {
     "taskKey": "joyful-dilemma-15",
     "categorySlug": "joyful-dilemma",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "warm",
     "prompt": {
-      "uk": "Напиши, що геніальніше для спільного життя: список правил чи хороше почуття гумору.",
-      "en": "Write what is more genius for shared life: a list of rules or a good sense of humor."
+      "uk": "Що геніальніше для спільного життя: список правил чи хороше почуття гумору?",
+      "en": "What is more genius for shared life: a list of rules or a good sense of humor?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -1911,15 +1911,15 @@
   {
     "taskKey": "joyful-dilemma-16",
     "categorySlug": "joyful-dilemma",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "warm",
     "prompt": {
-      "uk": "Поясни коротко, що практичніше: одна велика сумка на все чи п’ять маленьких «для порядку».",
-      "en": "Explain briefly what is more practical: one big bag for everything or five small ones “for organization.”"
+      "uk": "Що практичніше: одна велика сумка на все чи п’ять маленьких «для порядку»?",
+      "en": "What is more practical: one big bag for everything or five small ones “for organization”?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -1931,15 +1931,15 @@
   {
     "taskKey": "joyful-dilemma-17",
     "categorySlug": "joyful-dilemma",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "gentle",
     "prompt": {
-      "uk": "Напиши свій вибір для молодят: вечеря вдома чи спонтанний виїзд, і чому.",
-      "en": "Write your choice for the newlyweds: dinner at home or a spontaneous outing, and why."
+      "uk": "Що краще пасує молодятам: вечеря вдома чи спонтанний виїзд?",
+      "en": "What suits the newlyweds better: dinner at home or a spontaneous outing?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -1951,8 +1951,8 @@
   {
     "taskKey": "joyful-dilemma-18",
     "categorySlug": "joyful-dilemma",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -1971,15 +1971,15 @@
   {
     "taskKey": "joyful-dilemma-19",
     "categorySlug": "joyful-dilemma",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "warm",
     "prompt": {
-      "uk": "Напиши, що небезпечніше для спокою: фраза «нічого не треба купувати» чи «зайдемо лише подивитись».",
-      "en": "Write what is more dangerous for inner peace: “We don’t need to buy anything” or “Let’s just look around.”"
+      "uk": "Що небезпечніше для спокою: фраза «нічого не треба купувати» чи «зайдемо лише подивитись»?",
+      "en": "What is more dangerous for inner peace: “We don’t need to buy anything” or “Let’s just look around.”"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -1991,15 +1991,15 @@
   {
     "taskKey": "joyful-dilemma-20",
     "categorySlug": "joyful-dilemma",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "gentle",
     "prompt": {
-      "uk": "Одним реченням скажи, що геніальніше для сімейного життя: план А чи хороший план Б.",
-      "en": "In one sentence, say what is more genius for family life: plan A or a really good plan B."
+      "uk": "Що геніальніше для сімейного життя: план А чи хороший план Б?",
+      "en": "What is more genius for family life: plan A or a really good plan B?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -2038,8 +2038,8 @@
     "allowEarlyCompletion": false,
     "difficulty": "warm",
     "prompt": {
-      "uk": "Хто швидше запропонує ще одне фото, але вже «нормальне»?",
-      "en": "Who would suggest one more photo, but this time “a normal one,” faster?"
+      "uk": "Хто з молодят швидше запропонує ще одне фото, але вже «нормальне»?",
+      "en": "Which of the newlyweds would suggest one more photo, but this time “a normal one,” faster?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -2058,8 +2058,8 @@
     "allowEarlyCompletion": false,
     "difficulty": "gentle",
     "prompt": {
-      "uk": "Як ти думаєш, хто з молодят спершу сміється, а хто спершу уточнює деталі?",
-      "en": "Who among the newlyweds laughs first, and who asks for details first?"
+      "uk": "Хто з молодят швидше почне сміятися, коли щось іде не за планом?",
+      "en": "Which of the newlyweds starts laughing faster when something goes off plan?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -2078,8 +2078,8 @@
     "allowEarlyCompletion": false,
     "difficulty": "warm",
     "prompt": {
-      "uk": "Хто з них швидше скаже: «давай не поспішати», якщо план раптом змінився?",
-      "en": "Which one would say “let’s not rush” faster if the plan suddenly changed?"
+      "uk": "Хто з молодят швидше скаже: «давай не поспішати», якщо план раптом змінився?",
+      "en": "Which of the newlyweds would say “let’s not rush” faster if the plan suddenly changed?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -2098,8 +2098,8 @@
     "allowEarlyCompletion": false,
     "difficulty": "bold",
     "prompt": {
-      "uk": "Хто швидше помітить, що щось стоїть не на своєму місці?",
-      "en": "Which one would notice first that something is not in the right place?"
+      "uk": "Хто з молодят швидше помітить, що щось стоїть не на своєму місці?",
+      "en": "Which of the newlyweds would notice first that something is not in the right place?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -2138,8 +2138,8 @@
     "allowEarlyCompletion": false,
     "difficulty": "warm",
     "prompt": {
-      "uk": "Хто з них імовірніше скаже: «я це запишу», а хто: «я це запам’ятаю»?",
-      "en": "Who is more likely to say “I’ll write it down,” and who will say “I’ll remember it”?"
+      "uk": "Хто з молодят імовірніше скаже: «я це запишу»?",
+      "en": "Which of the newlyweds is more likely to say “I’ll write it down”?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -2158,8 +2158,8 @@
     "allowEarlyCompletion": false,
     "difficulty": "bold",
     "prompt": {
-      "uk": "Хто швидше запропонує щось практичне, а хто — щось красиве?",
-      "en": "Who would suggest something practical faster, and who would suggest something beautiful?"
+      "uk": "Хто з молодят швидше запропонує практичне рішення?",
+      "en": "Which of the newlyweds would suggest a practical solution faster?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -2198,8 +2198,8 @@
     "allowEarlyCompletion": false,
     "difficulty": "warm",
     "prompt": {
-      "uk": "Хто з них швидше скаже: «ще п’ять хвилин», і це затягнеться надовго?",
-      "en": "Which of them would say “five more minutes” faster, and then stretch it for much longer?"
+      "uk": "Хто з молодят швидше скаже: «ще п’ять хвилин», і це затягнеться надовго?",
+      "en": "Which of the newlyweds would say “five more minutes” faster, and then stretch it for much longer?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -2311,15 +2311,15 @@
   {
     "taskKey": "similarity-test-16",
     "categorySlug": "similarity-test",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "bold",
     "prompt": {
-      "uk": "Напиши, хто з молодят швидше сказав би: «та давай спробуємо», а хто — «давай спочатку подумаємо».",
-      "en": "Write who would say “let’s just try it” faster, and who would say “let’s think first.”"
+      "uk": "Хто з молодят швидше сказав би: «та давай спробуємо»?",
+      "en": "Which of the newlyweds would say “let’s just try it” faster?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -2351,15 +2351,15 @@
   {
     "taskKey": "similarity-test-18",
     "categorySlug": "similarity-test",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "warm",
     "prompt": {
-      "uk": "Напиши, що у них більше схоже: темп життя, почуття гумору чи спосіб домовлятися.",
-      "en": "Write what feels more similar between them: pace of life, sense of humor, or the way they reach agreement."
+      "uk": "Що в молодят, на твою думку, схоже найбільше: темп життя, почуття гумору чи спосіб домовлятися?",
+      "en": "What feels most similar between the newlyweds: pace of life, sense of humor, or the way they reach agreement?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -2431,8 +2431,8 @@
   {
     "taskKey": "challenge-accepted-02",
     "categorySlug": "challenge-accepted",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -2471,8 +2471,8 @@
   {
     "taskKey": "challenge-accepted-04",
     "categorySlug": "challenge-accepted",
-    "interactionType": "confirm",
-    "responseMode": "confirm",
+    "interactionType": "text_input",
+    "responseMode": "text_input",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -3040,15 +3040,15 @@
   {
     "taskKey": "genius-or-not-12",
     "categorySlug": "genius-or-not",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "warm",
     "prompt": {
-      "uk": "Напиши, що мудріше для миру вдома: мовчати п’ять хвилин чи одразу все обговорювати.",
-      "en": "Write what is wiser for peace at home: staying quiet for five minutes or discussing everything right away."
+      "uk": "Що мудріше для миру вдома: мовчати п’ять хвилин чи одразу все обговорювати?",
+      "en": "What is wiser for peace at home: staying quiet for five minutes or discussing everything right away?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -3060,15 +3060,15 @@
   {
     "taskKey": "genius-or-not-13",
     "categorySlug": "genius-or-not",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "bold",
     "prompt": {
-      "uk": "Скажи коротко, що геніальніше: спільний список покупок чи одна дуже впевнена пам’ять.",
-      "en": "Say briefly what is more genius: a shared shopping list or one very confident memory."
+      "uk": "Що геніальніше: спільний список покупок чи одна дуже впевнена пам’ять?",
+      "en": "What is more genius: a shared shopping list or one very confident memory?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -3100,15 +3100,15 @@
   {
     "taskKey": "genius-or-not-15",
     "categorySlug": "genius-or-not",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "gentle",
     "prompt": {
-      "uk": "Що, на твою думку, геніальніше для спільного життя: гумор чи дисципліна?",
-      "en": "What do you think is more genius for shared life: humor or discipline?"
+      "uk": "Що геніальніше для спільного життя: гумор чи дисципліна?",
+      "en": "What is more genius for shared life: humor or discipline?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -3120,15 +3120,15 @@
   {
     "taskKey": "genius-or-not-16",
     "categorySlug": "genius-or-not",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "warm",
     "prompt": {
-      "uk": "Напиши свій вердикт: хто сильніший у побуті — план чи адаптація?",
-      "en": "Write your verdict: what is stronger in domestic life — planning or adaptability?"
+      "uk": "Що сильніше в побуті: план чи адаптація?",
+      "en": "What is stronger in domestic life: planning or adaptability?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -3200,15 +3200,15 @@
   {
     "taskKey": "genius-or-not-20",
     "categorySlug": "genius-or-not",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "bold",
     "prompt": {
-      "uk": "Напиши, що мудріше для сім’ї: бути правим чи вчасно усміхнутись.",
-      "en": "Write what is wiser for a family: being right or smiling at the right moment."
+      "uk": "Що мудріше для сім’ї: бути правим чи вчасно усміхнутись?",
+      "en": "What is wiser for a family: being right or smiling at the right moment?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -3480,8 +3480,8 @@
   {
     "taskKey": "in-their-style-14",
     "categorySlug": "in-their-style",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
@@ -3580,15 +3580,15 @@
   {
     "taskKey": "in-their-style-19",
     "categorySlug": "in-their-style",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,
     "difficulty": "warm",
     "prompt": {
-      "uk": "Напиши, що наречені, ймовірно, вибрали б для спільного відпочинку: шумний план чи тихий комфорт — і чому.",
-      "en": "Write what the bride and groom would probably choose for shared rest: a noisy plan or quiet comfort — and why."
+      "uk": "Що наречені, ймовірно, вибрали б для спільного відпочинку: шумний план чи тихий комфорт?",
+      "en": "What would the bride and groom probably choose for shared rest: a noisy plan or quiet comfort?"
     },
     "feedSafe": true,
     "requiresOtherGuest": false,
@@ -3600,8 +3600,8 @@
   {
     "taskKey": "in-their-style-20",
     "categorySlug": "in-their-style",
-    "interactionType": "text_input",
-    "responseMode": "text_input",
+    "interactionType": "confirm",
+    "responseMode": "confirm",
     "executionMode": "instant",
     "allowPromise": false,
     "allowEarlyCompletion": false,

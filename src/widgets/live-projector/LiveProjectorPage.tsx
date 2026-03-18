@@ -15,15 +15,18 @@ import type {
   LivePageApiResponse,
 } from "@/features/game-session";
 import { getSupabaseBrowserClient } from "@/features/game-session";
+import { getGameBySlug } from "@/shared/config";
 import type { SupportedLocale } from "@/shared/config";
 import { cn } from "@/shared/lib";
 
 const HERO_EVENT_DURATION_MS = 5000;
-const LIVE_SNAPSHOT_URL = "/api/live?leaderboardLimit=10&feedLimit=5";
+const LIVE_POLL_INTERVAL_MS = 2000;
+const LIVE_SNAPSHOT_URL = "/api/live";
+
+// ─── helpers ────────────────────────────────────────────────────────────────
 
 function getAvatarMonogram(avatarKey: string | null, fallbackName?: string | null) {
   const normalizedKey = avatarKey?.trim();
-
   if (normalizedKey) {
     return normalizedKey
       .split("-")
@@ -31,7 +34,6 @@ function getAvatarMonogram(avatarKey: string | null, fallbackName?: string | nul
       .join("")
       .slice(0, 2);
   }
-
   return fallbackName?.trim().charAt(0).toUpperCase() ?? "•";
 }
 
@@ -42,39 +44,84 @@ function formatEventTime(value: string, locale: SupportedLocale) {
   }).format(new Date(value));
 }
 
-function getEventPrompt(
-  event: LiveFeedEventSnapshot,
-  fallbackLocale: SupportedLocale
-) {
+function formatCurrentTime(locale: SupportedLocale) {
+  return new Intl.DateTimeFormat(locale, {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).format(new Date());
+}
+
+function getEventPrompt(event: LiveFeedEventSnapshot, fallbackLocale: SupportedLocale) {
   const eventLocale = event.locale ?? fallbackLocale;
   return eventLocale === "uk" ? event.promptI18n.uk : event.promptI18n.en;
 }
 
-function getHeroLabelKey(eventType: LiveFeedEventSnapshot["eventType"]) {
+function getGameTitle(gameSlug: LiveFeedEventSnapshot["gameSlug"], locale: SupportedLocale) {
+  const game = getGameBySlug(gameSlug);
+  if (!game) return null;
+  return locale === "uk" ? game.title.uk : game.title.en;
+}
+
+function getHeroLabelKey(eventType: string | null | undefined) {
   switch (eventType) {
-    case "wheel.round.promised":
-      return "hero_promised";
-    case "leaderboard.new_top_player":
-      return "hero_new_top_player";
-    case "player.joined":
-      return "event_player_joined";
-    case "xp.awarded":
-      return "event_xp_awarded";
+    case "wheel.round.completed": return "event_answered";
+    case "wheel.round.promised": return "hero_promised";
+    case "leaderboard.new_top_player": return "hero_new_top_player";
+    case "player.joined": return "event_player_joined";
+    case "xp.awarded": return "event_xp_awarded";
+    default: return "hero_generic";
   }
 }
 
-function getEventLabelKey(eventType: LiveFeedEventSnapshot["eventType"]) {
+function getEventLabelKey(eventType: string | null | undefined) {
   switch (eventType) {
-    case "player.joined":
-      return "event_player_joined";
-    case "xp.awarded":
-      return "event_xp_awarded";
-    case "wheel.round.promised":
-      return "event_promised";
-    case "leaderboard.new_top_player":
-      return "event_new_top_player";
+    case "player.joined": return "event_player_joined";
+    case "xp.awarded": return "event_xp_awarded";
+    case "wheel.round.completed": return "event_answered";
+    case "wheel.round.promised": return "event_promised";
+    case "leaderboard.new_top_player": return "event_new_top_player";
+    default: return "event_generic";
   }
 }
+
+function getEventBarClass(eventType: string | null | undefined) {
+  switch (eventType) {
+    case "leaderboard.new_top_player":
+    case "wheel.round.completed":
+      return "bg-accent";
+    case "xp.awarded":
+      return "bg-accent/75";
+    case "wheel.round.promised":
+      return "bg-accent/45";
+    case "player.joined":
+      return "bg-text-secondary/35";
+    default:
+      return "bg-accent/30";
+  }
+}
+
+// ─── LiveClock ───────────────────────────────────────────────────────────────
+
+function LiveClock({ locale }: { locale: SupportedLocale }) {
+  const [time, setTime] = useState(() => formatCurrentTime(locale));
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setTime(formatCurrentTime(locale));
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [locale]);
+
+  return (
+    <span className="font-cinzel tabular-nums text-2xl text-text-primary/55 md:text-3xl">
+      {time}
+    </span>
+  );
+}
+
+// ─── FeedEventCard ────────────────────────────────────────────────────────────
 
 function FeedEventCard({
   event,
@@ -86,66 +133,91 @@ function FeedEventCard({
   const t = useTranslations("LivePage");
   const prompt = getEventPrompt(event, locale);
   const timestamp = formatEventTime(event.createdAt, locale);
+  const gameTitle = getGameTitle(event.gameSlug, locale);
+  const eventLabelKey = getEventLabelKey(event.eventType);
+  const barClass = getEventBarClass(event.eventType);
+  const hasXp = event.xpDelta != null && event.xpDelta !== 0;
 
   return (
-    <div className="rounded-3xl border border-accent/10 bg-bg-primary/65 p-5 shadow-[0_24px_48px_-36px_rgba(0,0,0,0.6)] backdrop-blur-sm">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-accent/20 bg-accent/10 font-cinzel text-sm tracking-[0.16em] text-accent">
-            {getAvatarMonogram(event.avatarKey, event.playerName)}
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.97 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      className="relative overflow-hidden rounded-3xl border border-accent/10 bg-bg-primary/68 shadow-[0_20px_40px_-28px_rgba(0,0,0,0.5)] backdrop-blur-sm"
+    >
+      {/* Left accent stripe */}
+      <div className={cn("absolute inset-y-0 left-0 w-[3px] rounded-l-3xl", barClass)} />
+
+      <div className="px-6 py-5 pl-8">
+        {/* Header row */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-accent/22 bg-accent/10 font-cinzel text-sm tracking-[0.15em] text-accent">
+              {getAvatarMonogram(event.avatarKey, event.playerName)}
+            </div>
+            <div>
+              <p className="text-lg leading-tight text-text-primary">
+                {event.playerName ?? t("anonymous_player")}
+              </p>
+              <p className="mt-0.5 text-[10px] uppercase tracking-[0.26em] text-accent/80">
+                {t(eventLabelKey)}
+                {gameTitle ? (
+                  <>
+                    <span className="mx-1.5 text-text-secondary/30">·</span>
+                    <span className="text-text-secondary/50">{gameTitle}</span>
+                  </>
+                ) : null}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.26em] text-accent">
-              {t(getEventLabelKey(event.eventType))}
-            </p>
-            <p className="mt-1 text-lg text-text-primary">
-              {event.playerName ?? t("anonymous_player")}
-            </p>
-          </div>
+          <p className="shrink-0 font-cinzel text-sm text-text-secondary/38">
+            {timestamp}
+          </p>
         </div>
-        <p className="text-[10px] uppercase tracking-[0.22em] text-text-secondary/55">
-          {timestamp}
-        </p>
+
+        {/* Body */}
+        {event.eventType === "player.joined" ? (
+          <p className="mt-4 text-base leading-relaxed text-text-secondary">
+            {event.welcomeText ?? t("welcome_default")}
+          </p>
+        ) : null}
+
+        {event.eventType === "leaderboard.new_top_player" ? (
+          <p className="mt-4 text-base leading-relaxed text-text-secondary">
+            {t("new_top_player_note")}
+          </p>
+        ) : null}
+
+        {prompt ? (
+          <p className="heading-serif mt-4 text-2xl leading-snug text-text-primary">
+            {prompt}
+          </p>
+        ) : null}
+
+        {event.answerText ? (
+          <p className="heading-serif-italic mt-2 text-xl leading-snug text-text-primary/82">
+            — {event.answerText}
+          </p>
+        ) : null}
+
+        {hasXp ? (
+          <div className="mt-4 flex items-baseline gap-2">
+            <span className="font-cinzel text-5xl leading-none text-accent">
+              +{event.xpDelta}
+            </span>
+            <span className="text-xs uppercase tracking-[0.24em] text-text-secondary/50">
+              XP
+            </span>
+          </div>
+        ) : null}
       </div>
-
-      {event.eventType === "player.joined" ? (
-        <p className="mt-4 text-base leading-relaxed text-text-secondary">
-          {event.welcomeText ?? t("welcome_default")}
-        </p>
-      ) : null}
-
-      {event.eventType === "xp.awarded" ? (
-        <p className="mt-4 font-cinzel text-4xl text-accent">
-          +{event.xpDelta ?? 0}
-          <span className="ml-2 text-sm uppercase tracking-[0.2em] text-text-secondary/60">
-            XP
-          </span>
-        </p>
-      ) : null}
-
-      {event.eventType === "wheel.round.promised" ? (
-        <div className="mt-4 space-y-3">
-          {prompt ? (
-            <p className="heading-serif text-2xl leading-snug text-text-primary">
-              {prompt}
-            </p>
-          ) : null}
-          {event.answerText ? (
-            <p className="rounded-2xl border border-accent/10 bg-bg-secondary/40 px-4 py-3 text-sm leading-relaxed text-text-secondary">
-              {event.answerText}
-            </p>
-          ) : null}
-        </div>
-      ) : null}
-
-      {event.eventType === "leaderboard.new_top_player" ? (
-        <p className="mt-4 text-base leading-relaxed text-text-secondary">
-          {t("new_top_player_note")}
-        </p>
-      ) : null}
-    </div>
+    </motion.div>
   );
 }
+
+// ─── LeaderboardRow ───────────────────────────────────────────────────────────
 
 function LeaderboardRow({
   entry,
@@ -154,33 +226,65 @@ function LeaderboardRow({
   entry: LeaderboardEntrySnapshot;
   isLeader: boolean;
 }) {
+  if (isLeader) {
+    return (
+      <motion.div
+        layout
+        className="relative overflow-hidden rounded-3xl border border-accent/28 bg-linear-to-br from-accent/14 to-transparent px-5 py-4 shadow-[0_0_40px_-12px_color-mix(in_srgb,var(--accent)_30%,transparent)]"
+      >
+        <div className="flex items-center gap-4">
+          <div className="font-cinzel text-4xl leading-none text-accent">1</div>
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-accent/32 bg-accent/12 font-cinzel text-sm tracking-[0.14em] text-accent">
+            {getAvatarMonogram(entry.avatarKey, entry.nickname)}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="heading-serif truncate text-xl leading-tight text-text-primary">
+              {entry.nickname}
+            </p>
+          </div>
+          <div className="shrink-0 text-right">
+            <p className="font-cinzel text-3xl leading-none text-accent">
+              {entry.totalPoints}
+            </p>
+            <p className="mt-1 text-[9px] uppercase tracking-[0.22em] text-text-secondary/50">
+              XP
+            </p>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
-    <div
+    <motion.div
+      layout
       className={cn(
-        "flex items-center gap-3 rounded-2xl border px-4 py-3 transition-colors duration-200",
-        isLeader
-          ? "border-accent/22 bg-accent/10"
-          : "border-accent/8 bg-bg-primary/55"
+        "flex items-center gap-3 rounded-2xl border px-4 py-3",
+        entry.rank === 2 || entry.rank === 3
+          ? "border-accent/14 bg-accent/5"
+          : "border-accent/8 bg-bg-primary/50"
       )}
     >
-      <div className="w-8 shrink-0 text-center font-cinzel text-lg text-accent">
+      <div className="w-6 shrink-0 text-center font-cinzel text-base text-accent/60">
         {entry.rank}
       </div>
-      <div className="flex h-9 w-9 items-center justify-center rounded-full border border-accent/18 bg-accent/8 font-cinzel text-xs tracking-[0.16em] text-accent">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-accent/16 bg-accent/8 font-cinzel text-xs tracking-[0.14em] text-accent">
         {getAvatarMonogram(entry.avatarKey, entry.nickname)}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm text-text-primary">{entry.nickname}</p>
+        <p className="truncate text-[15px] text-text-primary">{entry.nickname}</p>
       </div>
       <div className="shrink-0 text-right">
-        <p className="font-cinzel text-xl text-text-primary">{entry.totalPoints}</p>
-        <p className="text-[9px] uppercase tracking-[0.2em] text-text-secondary/50">
+        <span className="font-cinzel text-xl text-text-primary">{entry.totalPoints}</span>
+        <span className="ml-1.5 text-[9px] uppercase tracking-[0.2em] text-text-secondary/45">
           XP
-        </p>
+        </span>
       </div>
-    </div>
+    </motion.div>
   );
 }
+
+// ─── LiveProjectorPage ────────────────────────────────────────────────────────
 
 export function LiveProjectorPage() {
   const locale = useLocale() as SupportedLocale;
@@ -190,16 +294,14 @@ export function LiveProjectorPage() {
   const [error, setError] = useState(false);
   const [heroEvent, setHeroEvent] = useState<LiveFeedEventSnapshot | null>(null);
   const heroTimeoutRef = useRef<number | null>(null);
+  const pollIntervalRef = useRef<number | null>(null);
+  const isRefreshingRef = useRef(false);
   const lastSeenFeedIdRef = useRef<string | null>(null);
   const hasLoadedOnceRef = useRef(false);
 
   const queueHeroEvent = useEffectEvent((nextHeroEvent: LiveFeedEventSnapshot) => {
     setHeroEvent(nextHeroEvent);
-
-    if (heroTimeoutRef.current) {
-      window.clearTimeout(heroTimeoutRef.current);
-    }
-
+    if (heroTimeoutRef.current) window.clearTimeout(heroTimeoutRef.current);
     heroTimeoutRef.current = window.setTimeout(() => {
       setHeroEvent(null);
       heroTimeoutRef.current = null;
@@ -207,27 +309,30 @@ export function LiveProjectorPage() {
   });
 
   const loadSnapshot = useEffectEvent(async () => {
+    if (isRefreshingRef.current) return;
+    isRefreshingRef.current = true;
     try {
-      const response = await fetch(LIVE_SNAPSHOT_URL, {
+      const searchParams = new URLSearchParams({
+        leaderboardLimit: "10",
+        feedLimit: "5",
+        ts: Date.now().toString(),
+      });
+      const response = await fetch(`${LIVE_SNAPSHOT_URL}?${searchParams.toString()}`, {
         method: "GET",
         cache: "no-store",
       });
-
       if (!response.ok) {
         setError(true);
         setIsLoading(false);
         return;
       }
-
       const nextSnapshot = (await response.json()) as LivePageApiResponse;
       const latestFeedEvent = nextSnapshot.feed[0] ?? null;
-
       startTransition(() => {
         setSnapshot(nextSnapshot);
         setError(false);
         setIsLoading(false);
       });
-
       if (
         hasLoadedOnceRef.current &&
         latestFeedEvent?.isHeroEvent &&
@@ -235,22 +340,30 @@ export function LiveProjectorPage() {
       ) {
         queueHeroEvent(latestFeedEvent);
       }
-
       lastSeenFeedIdRef.current = latestFeedEvent?.id ?? null;
       hasLoadedOnceRef.current = true;
     } catch {
       setError(true);
       setIsLoading(false);
+    } finally {
+      isRefreshingRef.current = false;
     }
   });
 
   useEffect(() => {
     void loadSnapshot();
-
+    pollIntervalRef.current = window.setInterval(
+      () => void loadSnapshot(),
+      LIVE_POLL_INTERVAL_MS
+    );
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") void loadSnapshot();
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
-      if (heroTimeoutRef.current) {
-        window.clearTimeout(heroTimeoutRef.current);
-      }
+      if (heroTimeoutRef.current) window.clearTimeout(heroTimeoutRef.current);
+      if (pollIntervalRef.current) window.clearInterval(pollIntervalRef.current);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 
@@ -261,27 +374,15 @@ export function LiveProjectorPage() {
         .channel(`live-projector-${locale}`)
         .on(
           "postgres_changes",
-          { event: "*", schema: "public", table: "activity_events" },
-          () => {
-            void loadSnapshot();
-          }
-        )
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "xp_transactions" },
-          () => {
-            void loadSnapshot();
-          }
-        )
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "player_profiles" },
-          () => {
-            void loadSnapshot();
-          }
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "realtime_signals",
+            filter: "channel=eq.live-projector",
+          },
+          () => void loadSnapshot()
         )
         .subscribe();
-
       return () => {
         void supabase.removeChannel(channel);
       };
@@ -292,98 +393,116 @@ export function LiveProjectorPage() {
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-bg-primary text-text-primary">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,color-mix(in_srgb,var(--accent)_12%,transparent),transparent_38%),radial-gradient(circle_at_bottom_right,color-mix(in_srgb,var(--accent)_10%,transparent),transparent_34%)]" />
+      {/* Ambient gradient background */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_55%_at_-5%_-5%,color-mix(in_srgb,var(--accent)_9%,transparent),transparent),radial-gradient(ellipse_65%_50%_at_108%_108%,color-mix(in_srgb,var(--accent)_7%,transparent),transparent)]" />
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-[1600px] flex-col px-4 py-4 md:px-6 md:py-6">
-        <div className="mb-4 flex items-end justify-between gap-6 rounded-4xl border border-accent/10 bg-bg-primary/55 px-6 py-5 shadow-[0_28px_72px_-48px_rgba(0,0,0,0.7)] backdrop-blur-sm">
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.34em] text-accent">
-              {t("eyebrow")}
-            </p>
-            <h1 className="heading-serif mt-3 text-4xl leading-none text-text-primary md:text-5xl">
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-[1600px] flex-col gap-4 px-4 py-4 md:px-6 md:py-6">
+
+        {/* ── Header ──────────────────────────────────────────────────── */}
+        <header className="flex items-center gap-5 rounded-4xl border border-accent/10 bg-bg-primary/55 px-6 py-4 shadow-[0_20px_56px_-36px_rgba(0,0,0,0.6)] backdrop-blur-sm">
+          {/* Pulsing live indicator */}
+          <div className="flex shrink-0 items-center gap-2.5">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-55" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent" />
+            </span>
+            <span className="font-cinzel text-xs uppercase tracking-[0.32em] text-accent">
+              Live
+            </span>
+          </div>
+
+          <div className="h-5 w-px shrink-0 bg-accent/15" />
+
+          {/* Title */}
+          <div className="min-w-0 flex-1">
+            <h1 className="heading-serif text-2xl leading-none text-text-primary md:text-3xl">
               {t("title")}
             </h1>
-            <p className="mt-3 max-w-3xl text-sm leading-relaxed text-text-secondary md:text-base">
-              {t("description")}
-            </p>
           </div>
 
-          <div className="hidden rounded-2xl border border-accent/12 bg-bg-secondary/35 px-4 py-3 text-right lg:block">
-            <p className="text-[10px] uppercase tracking-[0.24em] text-text-secondary/55">
-              {t("leaderboard_label")}
-            </p>
-            <p className="mt-2 font-cinzel text-3xl text-accent">Top 10</p>
-          </div>
-        </div>
+          {/* Live clock */}
+          <LiveClock locale={locale} />
+        </header>
 
-        <div className="grid flex-1 gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(360px,0.9fr)]">
-          <div className="rounded-4xl border border-accent/10 bg-bg-primary/50 p-5 shadow-[0_32px_80px_-56px_rgba(0,0,0,0.75)] backdrop-blur-sm md:p-6">
-            <div className="mb-4 flex items-center gap-4">
-              <p className="text-[10px] uppercase tracking-[0.32em] text-accent">
+        {/* ── Main grid ───────────────────────────────────────────────── */}
+        <div className="grid flex-1 gap-4 lg:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.88fr)]">
+
+          {/* ─ Feed panel ─ */}
+          <div className="flex flex-col rounded-4xl border border-accent/10 bg-bg-primary/45 p-5 shadow-[0_28px_72px_-48px_rgba(0,0,0,0.65)] backdrop-blur-sm md:p-6">
+            <div className="mb-5 flex items-center gap-3">
+              <p className="shrink-0 text-[10px] uppercase tracking-[0.34em] text-accent">
                 {t("feed_label")}
               </p>
-              <span className="h-px flex-1 bg-linear-to-r from-accent/25 to-transparent" />
+              <span className="h-px flex-1 bg-linear-to-r from-accent/22 to-transparent" />
             </div>
 
             {isLoading ? (
               <div className="grid gap-3">
-                {Array.from({ length: 3 }).map((_, index) => (
+                {Array.from({ length: 3 }).map((_, i) => (
                   <div
-                    key={index}
-                    className="h-32 animate-pulse rounded-3xl border border-accent/8 bg-bg-secondary/25"
+                    key={i}
+                    className="h-36 animate-pulse rounded-3xl border border-accent/8 bg-bg-secondary/18"
                   />
                 ))}
               </div>
             ) : error ? (
-              <div className="flex h-full min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/25 px-6 text-center text-base text-text-secondary">
+              <div className="flex h-full min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/22 px-6 text-center text-base text-text-secondary">
                 {t("feed_error")}
               </div>
             ) : snapshot?.feed.length ? (
               <div className="grid gap-3">
-                {snapshot.feed.map((event) => (
-                  <FeedEventCard key={event.id} event={event} locale={locale} />
-                ))}
+                <AnimatePresence mode="popLayout" initial={false}>
+                  {snapshot.feed.map((event) => (
+                    <FeedEventCard key={event.id} event={event} locale={locale} />
+                  ))}
+                </AnimatePresence>
               </div>
             ) : (
-              <div className="flex h-full min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/25 px-6 text-center text-base text-text-secondary">
+              <div className="flex h-full min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/22 px-6 text-center text-base text-text-secondary">
                 {t("feed_empty")}
               </div>
             )}
           </div>
 
-          <div className="rounded-4xl border border-accent/10 bg-bg-primary/50 p-5 shadow-[0_32px_80px_-56px_rgba(0,0,0,0.75)] backdrop-blur-sm md:p-6">
-            <div className="mb-4 flex items-center gap-4">
-              <p className="text-[10px] uppercase tracking-[0.32em] text-accent">
+          {/* ─ Leaderboard panel ─ */}
+          <div className="flex flex-col rounded-4xl border border-accent/10 bg-bg-primary/45 p-5 shadow-[0_28px_72px_-48px_rgba(0,0,0,0.65)] backdrop-blur-sm md:p-6">
+            <div className="mb-5 flex items-center gap-3">
+              <p className="shrink-0 text-[10px] uppercase tracking-[0.34em] text-accent">
                 {t("leaderboard_label")}
               </p>
-              <span className="h-px flex-1 bg-linear-to-r from-accent/25 to-transparent" />
+              <span className="h-px flex-1 bg-linear-to-r from-accent/22 to-transparent" />
             </div>
 
             {isLoading ? (
               <div className="grid gap-3">
-                {Array.from({ length: 5 }).map((_, index) => (
+                {Array.from({ length: 6 }).map((_, i) => (
                   <div
-                    key={index}
-                    className="h-16 animate-pulse rounded-2xl border border-accent/8 bg-bg-secondary/25"
+                    key={i}
+                    className={cn(
+                      "animate-pulse rounded-2xl border border-accent/8 bg-bg-secondary/18",
+                      i === 0 ? "h-20" : "h-14"
+                    )}
                   />
                 ))}
               </div>
             ) : error ? (
-              <div className="flex min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/25 px-6 text-center text-base text-text-secondary">
+              <div className="flex min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/22 px-6 text-center text-base text-text-secondary">
                 {t("leaderboard_error")}
               </div>
             ) : snapshot?.leaderboard.length ? (
               <div className="grid gap-3">
-                {snapshot.leaderboard.map((entry) => (
-                  <LeaderboardRow
-                    key={entry.playerId}
-                    entry={entry}
-                    isLeader={entry.rank === 1}
-                  />
-                ))}
+                <AnimatePresence mode="popLayout" initial={false}>
+                  {snapshot.leaderboard.map((entry) => (
+                    <LeaderboardRow
+                      key={entry.playerId}
+                      entry={entry}
+                      isLeader={entry.rank === 1}
+                    />
+                  ))}
+                </AnimatePresence>
               </div>
             ) : (
-              <div className="flex min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/25 px-6 text-center text-base text-text-secondary">
+              <div className="flex min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/22 px-6 text-center text-base text-text-secondary">
                 {t("leaderboard_empty")}
               </div>
             )}
@@ -391,40 +510,63 @@ export function LiveProjectorPage() {
         </div>
       </div>
 
+      {/* ── Hero event overlay ──────────────────────────────────────────── */}
       <AnimatePresence>
         {heroEvent ? (
           <motion.div
             key={heroEvent.id}
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.01 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute inset-0 z-20 flex items-center justify-center bg-[rgba(9,12,17,0.94)] backdrop-blur-lg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute inset-0 z-20 flex items-center justify-center bg-[rgba(7,9,14,0.96)] backdrop-blur-2xl"
           >
-            <div className="mx-auto max-w-4xl px-6 text-center">
-              <p className="text-[10px] uppercase tracking-[0.38em] text-accent">
+            {/* Central radial glow */}
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_55%_at_50%_50%,color-mix(in_srgb,var(--accent)_14%,transparent),transparent_65%)]" />
+
+            <motion.div
+              initial={{ opacity: 0, y: 36, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.98 }}
+              transition={{ duration: 0.52, ease: [0.22, 1, 0.36, 1], delay: 0.06 }}
+              className="relative mx-auto max-w-4xl px-6 text-center"
+            >
+              <p className="font-cinzel text-[10px] uppercase tracking-[0.48em] text-accent">
                 {t(getHeroLabelKey(heroEvent.eventType))}
               </p>
+
               <div className="mt-8 flex justify-center">
-                <div className="flex h-24 w-24 items-center justify-center rounded-full border border-accent/24 bg-accent/10 font-cinzel text-3xl tracking-[0.16em] text-accent">
+                <div className="flex h-28 w-28 items-center justify-center rounded-full border-2 border-accent/30 bg-accent/12 font-cinzel text-3xl tracking-[0.16em] text-accent shadow-[0_0_60px_-8px_color-mix(in_srgb,var(--accent)_45%,transparent)]">
                   {getAvatarMonogram(heroEvent.avatarKey, heroEvent.playerName)}
                 </div>
               </div>
-              <h2 className="heading-serif mt-8 text-5xl leading-[0.92] text-text-primary md:text-7xl">
+
+              <h2 className="heading-serif mt-8 text-6xl leading-[0.9] text-text-primary md:text-8xl">
                 {heroEvent.playerName ?? t("anonymous_player")}
               </h2>
 
-              {heroEvent.eventType === "wheel.round.promised" ? (
-                <div className="mt-6 space-y-4">
+              {heroEvent.eventType === "wheel.round.promised" ||
+              heroEvent.eventType === "wheel.round.completed" ? (
+                <div className="mt-8 space-y-5">
                   {getEventPrompt(heroEvent, locale) ? (
-                    <p className="text-xl leading-relaxed text-text-primary/95 md:text-2xl">
+                    <p className="text-xl leading-relaxed text-text-primary/90 md:text-2xl">
                       {getEventPrompt(heroEvent, locale)}
                     </p>
                   ) : null}
                   {heroEvent.answerText ? (
-                    <p className="mx-auto max-w-3xl rounded-3xl border border-accent/12 bg-bg-secondary/35 px-5 py-4 text-base leading-relaxed text-text-secondary md:text-lg">
-                      {heroEvent.answerText}
+                    <p className="heading-serif-italic mt-1 text-2xl leading-snug text-text-primary/82 md:text-3xl">
+                      — {heroEvent.answerText}
                     </p>
+                  ) : null}
+                  {heroEvent.xpDelta ? (
+                    <div className="mt-6 flex items-baseline justify-center gap-3">
+                      <span className="font-cinzel text-8xl leading-none text-accent">
+                        +{heroEvent.xpDelta}
+                      </span>
+                      <span className="font-cinzel text-xl uppercase tracking-[0.22em] text-text-secondary/55">
+                        XP
+                      </span>
+                    </div>
                   ) : null}
                 </div>
               ) : null}
@@ -434,7 +576,7 @@ export function LiveProjectorPage() {
                   {t("new_top_player_note")}
                 </p>
               ) : null}
-            </div>
+            </motion.div>
           </motion.div>
         ) : null}
       </AnimatePresence>

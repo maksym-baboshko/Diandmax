@@ -12,7 +12,6 @@ import {
 import {
   WHEEL_CONTENT_CATEGORIES,
   type SupportedLocale,
-  type WheelInteractionType,
 } from "@/shared/config";
 import {
   getSupabaseBrowserClient,
@@ -32,6 +31,7 @@ import { cn } from "@/shared/lib";
 
 const wheelEase = [0.22, 1, 0.36, 1] as const;
 const wheelDurationSeconds = 4.6;
+const WHEEL_VISUAL_SEGMENT_COUNT = WHEEL_CONTENT_CATEGORIES.length + 1;
 
 // Two-tone Art Deco palette: champagne gold ↔ deep bronze
 const SEGMENT_PALETTE = ["#caa76a", "#5c3e22"] as const;
@@ -177,15 +177,25 @@ function WheelLeaderboardCard() {
         .channel("wheel-leaderboard")
         .on(
           "postgres_changes",
-          { event: "*", schema: "public", table: "xp_transactions" },
-          () => {
-            void loadLeaderboard();
-          }
-        )
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "player_profiles" },
-          () => {
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "realtime_signals",
+            filter: "channel=eq.game-leaderboard",
+          },
+          (payload) => {
+            const nextRecord =
+              payload.new && typeof payload.new === "object"
+                ? (payload.new as { game_slug?: string | null })
+                : null;
+
+            if (
+              nextRecord?.game_slug &&
+              nextRecord.game_slug !== "wheel-of-fortune"
+            ) {
+              return;
+            }
+
             void loadLeaderboard();
           }
         )
@@ -331,8 +341,15 @@ function getCategoryColor(categorySlug: string) {
   ];
 }
 
-function getInteractionLabelKey(interactionType: WheelInteractionType) {
-  switch (interactionType) {
+function getInteractionLabelKey(task: Pick<
+  WheelRoundSnapshot["task"],
+  "interactionType" | "responseMode"
+>) {
+  if (task.responseMode === "choice") {
+    return "interaction_choice";
+  }
+
+  switch (task.interactionType) {
     case "confirm":
       return "interaction_confirm";
     case "text_input":
@@ -447,7 +464,7 @@ export function WheelOfFortuneGame({
   const restoreAttemptedRef = useRef(false);
   const accessTokenRef = useRef<string | null>(null);
 
-  const segmentAngle = 360 / WHEEL_CONTENT_CATEGORIES.length;
+  const segmentAngle = 360 / WHEEL_VISUAL_SEGMENT_COUNT;
   const displayRound = getDisplayRound(activeRound, resolvedRound);
   const canSpin =
     !isPreparingRound &&
@@ -670,6 +687,11 @@ export function WheelOfFortuneGame({
         responseText.trim().replace(/\s+/g, " ").length < 10
       ) {
         setValidationMessage(t("overlay_text_input_required"));
+      } else if (
+        nextErrorCode === "INVALID_DATA" &&
+        round.task.responseMode === "choice"
+      ) {
+        setValidationMessage(t("overlay_choice_required"));
       }
 
       return null;
@@ -947,6 +969,15 @@ export function WheelOfFortuneGame({
 
     if (
       resolution === "completed" &&
+      activeRound.task.responseMode === "choice" &&
+      !activeRound.task.choiceOptions?.includes(normalizedResponseText)
+    ) {
+      setValidationMessage(t("overlay_choice_required"));
+      return;
+    }
+
+    if (
+      resolution === "completed" &&
       activeRound.task.executionMode === "timed" &&
       timerStatus === "idle"
     ) {
@@ -1206,7 +1237,11 @@ export function WheelOfFortuneGame({
                       {/* Base */}
                       <circle cx="50" cy="50" r="50" fill="url(#whlBase)" />
 
-                      {WHEEL_CONTENT_CATEGORIES.map((category, index) => {
+                      {Array.from({ length: WHEEL_VISUAL_SEGMENT_COUNT }).map(
+                        (_, index) => {
+                          const visualSegmentKey =
+                            WHEEL_CONTENT_CATEGORIES[index]?.slug ??
+                            `wheel-visual-stub-${index + 1}`;
                         const startAngle = index * segmentAngle;
                         const endAngle = (index + 1) * segmentAngle;
                         const midAngle = startAngle + segmentAngle / 2;
@@ -1216,7 +1251,7 @@ export function WheelOfFortuneGame({
                         const textFill = index % 2 === 0 ? "var(--accent)" : "var(--text-secondary)";
 
                         return (
-                          <g key={category.slug}>
+                          <g key={visualSegmentKey}>
                             <path d={describeSlice(startAngle, endAngle)} fill={segFill} />
                             <line
                               x1="50" y1="50"
@@ -1241,7 +1276,8 @@ export function WheelOfFortuneGame({
                             </text>
                           </g>
                         );
-                      })}
+                        }
+                      )}
 
                       {/* Edge vignette */}
                       <circle cx="50" cy="50" r="50" fill="url(#whlVig)" />
@@ -1407,7 +1443,7 @@ export function WheelOfFortuneGame({
                       {displayRound.category.title}
                     </span>
                     <span className="inline-flex rounded-full border border-text-secondary/20 bg-text-primary/6 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-text-secondary">
-                      {t(getInteractionLabelKey(displayRound.task.interactionType))}
+                      {t(getInteractionLabelKey(displayRound.task))}
                     </span>
                   </div>
 
@@ -1652,7 +1688,7 @@ export function WheelOfFortuneGame({
                     {activeRound.category.title}
                   </span>
                   <span className="rounded-full border border-text-secondary/20 bg-text-primary/6 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-text-secondary">
-                    {t(getInteractionLabelKey(activeRound.task.interactionType))}
+                    {t(getInteractionLabelKey(activeRound.task))}
                   </span>
                 </div>
 
@@ -1672,7 +1708,11 @@ export function WheelOfFortuneGame({
                 >
                   <div className="rounded-2xl border border-accent/10 bg-bg-secondary/40 p-4">
                     <p className="text-[10px] uppercase tracking-[0.24em] text-text-secondary/65">
-                      {t("overlay_complete_note")}
+                      {t(
+                        activeRound.task.responseMode === "choice"
+                          ? "overlay_choice_note"
+                          : "overlay_complete_note"
+                      )}
                     </p>
                     <p className="mt-2 font-cinzel text-2xl text-accent">
                       +{activeRound.task.completionXp}
@@ -1698,7 +1738,38 @@ export function WheelOfFortuneGame({
                   </div>
                 </div>
 
-                {activeRound.task.responseMode === "text_input" ? (
+                {activeRound.task.responseMode === "choice" ? (
+                  <div className="mt-6 space-y-3">
+                    <p className="text-[10px] uppercase tracking-[0.24em] text-text-secondary/65">
+                      {t("overlay_choice_label")}
+                    </p>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {(activeRound.task.choiceOptions ?? []).map((option) => {
+                        const isSelected = responseText === option;
+
+                        return (
+                          <button
+                            key={option}
+                            type="button"
+                            onClick={() => {
+                              setResponseText(option);
+                              setValidationMessage(null);
+                            }}
+                            aria-pressed={isSelected}
+                            className={cn(
+                              "rounded-2xl border px-4 py-3 text-left text-sm transition-colors duration-200",
+                              isSelected
+                                ? "border-accent/38 bg-accent/12 text-text-primary"
+                                : "border-accent/12 bg-bg-secondary/50 text-text-secondary hover:border-accent/24 hover:text-text-primary"
+                            )}
+                          >
+                            {option}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : activeRound.task.responseMode === "text_input" ? (
                   <div className="mt-6 space-y-3">
                     <label
                       htmlFor="wheel-response"
@@ -1791,8 +1862,12 @@ export function WheelOfFortuneGame({
                             ? canFinishTimedRoundEarly
                               ? t("overlay_timer_finish_early_cta")
                               : t("overlay_timer_running_cta")
-                            : t("overlay_complete_cta")
-                        : t("overlay_complete_cta")}
+                            : activeRound.task.responseMode === "choice"
+                              ? t("overlay_choice_cta")
+                              : t("overlay_complete_cta")
+                        : activeRound.task.responseMode === "choice"
+                          ? t("overlay_choice_cta")
+                          : t("overlay_complete_cta")}
                   </button>
                   {canPromiseActiveRound ? (
                     <button
