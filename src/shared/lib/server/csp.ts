@@ -1,6 +1,4 @@
 import type { Locale } from "@/shared/i18n/routing";
-import { getStructuredDataJson } from "@/shared/config";
-import { THEME_INIT_SCRIPT } from "../theme-script";
 
 const isVercelPreview = process.env.VERCEL_ENV === "preview";
 const vercelToolbarScriptSources = "https://vercel.live";
@@ -8,41 +6,9 @@ const vercelToolbarConnectSources = "https://vercel.live wss://ws-us3.pusher.com
 const vercelToolbarImgSources = "https://vercel.live https://vercel.com";
 const vercelToolbarStyleSources = "https://vercel.live";
 const vercelToolbarFrameSources = "https://vercel.live";
-const vercelToolbarFontSources = "https://assets.vercel.com";
+const vercelToolbarFontSources = "https://vercel.live https://assets.vercel.com";
 
-function toBase64(bytes: Uint8Array) {
-  let binary = "";
-
-  bytes.forEach((value) => {
-    binary += String.fromCharCode(value);
-  });
-
-  return btoa(binary);
-}
-
-async function sha256SourceHash(source: string) {
-  const encoded = new TextEncoder().encode(source);
-  const digest = await crypto.subtle.digest("SHA-256", encoded);
-
-  return `'sha256-${toBase64(new Uint8Array(digest))}'`;
-}
-
-const themeScriptHashPromise = sha256SourceHash(THEME_INIT_SCRIPT);
-const structuredDataHashPromises = new Map<Locale, Promise<string>>();
-
-function getStructuredDataHash(locale: Locale) {
-  const existingPromise = structuredDataHashPromises.get(locale);
-
-  if (existingPromise) {
-    return existingPromise;
-  }
-
-  const nextPromise = sha256SourceHash(getStructuredDataJson(locale));
-  structuredDataHashPromises.set(locale, nextPromise);
-  return nextPromise;
-}
-
-export async function buildContentSecurityPolicy(locale: Locale) {
+export async function buildContentSecurityPolicy(_locale: Locale) {
   const previewScriptSources = isVercelPreview
     ? ` ${vercelToolbarScriptSources}`
     : "";
@@ -77,17 +43,13 @@ export async function buildContentSecurityPolicy(locale: Locale) {
       "object-src 'none'",
     ].join("; ");
   }
-
-  const [themeScriptHash, structuredDataHash] = await Promise.all([
-    themeScriptHashPromise,
-    getStructuredDataHash(locale),
-  ]);
-  const scriptSources = `'self' 'unsafe-inline' ${themeScriptHash} ${structuredDataHash} https://va.vercel-scripts.com https://vitals.vercel-insights.com${previewScriptSources}`;
+  const scriptSources = `'self' 'unsafe-inline' https://va.vercel-scripts.com https://vitals.vercel-insights.com${previewScriptSources}`;
 
   return [
     "default-src 'self'",
     // Static App Router pages emit multiple inline hydration scripts at build time.
-    // Allowing inline scripts here keeps prerendered pages compatible with CSP.
+    // Do not mix hashes with 'unsafe-inline' here: browsers ignore 'unsafe-inline'
+    // when a hash or nonce is present in the same source list.
     `script-src ${scriptSources}`,
     `script-src-elem ${scriptSources}`,
     `style-src 'self' 'unsafe-inline' fonts.googleapis.com${previewStyleSources}`,
