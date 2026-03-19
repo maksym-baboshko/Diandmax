@@ -57,7 +57,9 @@ export async function buildContentSecurityPolicy(locale: Locale) {
 
   return [
     "default-src 'self'",
-    `script-src 'self' ${themeScriptHash} ${structuredDataHash} https://va.vercel-scripts.com https://vitals.vercel-insights.com`,
+    // Static App Router pages emit multiple inline hydration scripts at build time.
+    // Allowing inline scripts here keeps prerendered pages compatible with CSP.
+    `script-src 'self' 'unsafe-inline' ${themeScriptHash} ${structuredDataHash} https://va.vercel-scripts.com https://vitals.vercel-insights.com`,
     "style-src 'self' 'unsafe-inline' fonts.googleapis.com",
     "img-src 'self' data: blob: maps.googleapis.com maps.gstatic.com *.gstatic.com",
     "frame-src https://maps.google.com https://www.google.com",
