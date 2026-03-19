@@ -24,22 +24,56 @@ export function useLiveProjectorSnapshot(
   const [error, setError] = useState(false);
   const [heroEvent, setHeroEvent] = useState<LiveFeedEventSnapshot | null>(null);
   const heroTimeoutRef = useRef<number | null>(null);
+  const heroQueueRef = useRef<LiveFeedEventSnapshot[]>([]);
   const pollIntervalRef = useRef<number | null>(null);
   const isRefreshingRef = useRef(false);
-  const lastSeenHeroEventIdRef = useRef<string | null>(null);
+  const activeHeroEventIdRef = useRef<string | null>(null);
+  const seenHeroEventIdsRef = useRef(new Set<string>());
   const hasLoadedOnceRef = useRef(false);
 
-  const queueHeroEvent = useCallback((nextHeroEvent: LiveFeedEventSnapshot) => {
-    setHeroEvent(nextHeroEvent);
+  const showNextHeroEvent = useCallback(() => {
     if (heroTimeoutRef.current) {
       window.clearTimeout(heroTimeoutRef.current);
     }
 
-    heroTimeoutRef.current = window.setTimeout(() => {
-      setHeroEvent(null);
+    const nextHeroEvent = heroQueueRef.current.shift() ?? null;
+    activeHeroEventIdRef.current = nextHeroEvent?.id ?? null;
+    setHeroEvent(nextHeroEvent);
+
+    if (!nextHeroEvent) {
       heroTimeoutRef.current = null;
+      return;
+    }
+
+    heroTimeoutRef.current = window.setTimeout(() => {
+      showNextHeroEvent();
     }, HERO_EVENT_DURATION_MS);
   }, []);
+
+  const queueHeroEvents = useCallback(
+    (nextHeroEvents: LiveFeedEventSnapshot[]) => {
+      if (nextHeroEvents.length === 0) {
+        return;
+      }
+
+      const queuedHeroIds = new Set(heroQueueRef.current.map((event) => event.id));
+      const uniqueHeroEvents = nextHeroEvents.filter(
+        (event) =>
+          event.id !== activeHeroEventIdRef.current && !queuedHeroIds.has(event.id)
+      );
+
+      if (uniqueHeroEvents.length === 0) {
+        return;
+      }
+
+      heroQueueRef.current.push(...uniqueHeroEvents);
+
+      if (!activeHeroEventIdRef.current) {
+        showNextHeroEvent();
+      }
+    },
+    [showNextHeroEvent]
+  );
 
   const loadSnapshot = useCallback(async () => {
     if (isRefreshingRef.current) {
@@ -67,8 +101,7 @@ export function useLiveProjectorSnapshot(
       }
 
       const nextSnapshot = (await response.json()) as LivePageApiResponse;
-      const latestHeroEvent =
-        nextSnapshot.feed.find((event) => event.isHeroEvent) ?? null;
+      const nextHeroEvents = nextSnapshot.feed.filter((event) => event.isHeroEvent);
 
       startTransition(() => {
         setSnapshot(nextSnapshot);
@@ -76,15 +109,23 @@ export function useLiveProjectorSnapshot(
         setIsLoading(false);
       });
 
-      if (
-        hasLoadedOnceRef.current &&
-        latestHeroEvent &&
-        latestHeroEvent.id !== lastSeenHeroEventIdRef.current
-      ) {
-        queueHeroEvent(latestHeroEvent);
+      if (hasLoadedOnceRef.current) {
+        const unseenHeroEvents = nextHeroEvents.filter((event) => {
+          if (seenHeroEventIdsRef.current.has(event.id)) {
+            return false;
+          }
+
+          seenHeroEventIdsRef.current.add(event.id);
+          return true;
+        });
+
+        queueHeroEvents([...unseenHeroEvents].reverse());
+      } else {
+        nextHeroEvents.forEach((event) => {
+          seenHeroEventIdsRef.current.add(event.id);
+        });
       }
 
-      lastSeenHeroEventIdRef.current = latestHeroEvent?.id ?? null;
       hasLoadedOnceRef.current = true;
     } catch {
       setError(true);
@@ -92,7 +133,7 @@ export function useLiveProjectorSnapshot(
     } finally {
       isRefreshingRef.current = false;
     }
-  }, [queueHeroEvent]);
+  }, [queueHeroEvents]);
 
   useEffect(() => {
     void loadSnapshot();
@@ -113,6 +154,8 @@ export function useLiveProjectorSnapshot(
       if (heroTimeoutRef.current) {
         window.clearTimeout(heroTimeoutRef.current);
       }
+
+      heroQueueRef.current = [];
 
       if (pollIntervalRef.current) {
         window.clearInterval(pollIntervalRef.current);
