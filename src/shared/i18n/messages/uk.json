@@ -329,7 +329,7 @@
     "overlay_timer_running_cta": "Таймер іде...",
     "overlay_timer_cta": "Старт",
     "overlay_choice_required": "Для цього завдання обери один із варіантів нижче.",
-    "overlay_text_input_required": "Для цього завдання потрібна змістовна відповідь щонайменше на 10 символів.",
+    "overlay_text_input_required": "Введи хоча б одне коротке слово: мінімум 2 літери.",
     "overlay_resolving": "Фіксуємо...",
     "overlay_complete_cta": "Виконано",
     "overlay_choice_cta": "Підтвердити вибір",

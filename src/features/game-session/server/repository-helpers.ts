@@ -21,8 +21,10 @@ import type {
   WheelRoundPayload,
   WheelTaskRow,
 } from "./types";
-
-const MIN_TEXT_RESPONSE_LENGTH = 10;
+import {
+  hasMeaningfulGameResponseText,
+  normalizeGameResponseText,
+} from "../response-text";
 
 const PLAYER_AVATAR_KEYS = [
   "olive-branch",
@@ -57,19 +59,11 @@ export function normalizeDisplayName(value: string) {
 }
 
 export function normalizeOptionalResponseText(value?: string | null) {
-  const normalized = value?.trim().replace(/\s+/g, " ") ?? "";
-  return normalized.length > 0 ? normalized : null;
+  return normalizeGameResponseText(value);
 }
 
 export function hasMeaningfulTextResponse(value: string | null) {
-  if (!value || value.length < MIN_TEXT_RESPONSE_LENGTH) {
-    return false;
-  }
-
-  const wordMatches = value.match(/\p{L}[\p{L}\p{N}'’-]*/gu) ?? [];
-  const symbolMatches = value.match(/[\p{L}\p{N}]/gu) ?? [];
-
-  return wordMatches.length >= 2 && symbolMatches.length >= MIN_TEXT_RESPONSE_LENGTH;
+  return hasMeaningfulGameResponseText(value);
 }
 
 export function asJsonObject(value: unknown): JsonObject {

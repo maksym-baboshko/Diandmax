@@ -329,7 +329,7 @@
     "overlay_timer_running_cta": "Timer running...",
     "overlay_timer_cta": "Start",
     "overlay_choice_required": "Choose one of the options below to complete this task.",
-    "overlay_text_input_required": "This task needs a meaningful written response with at least 10 characters.",
+    "overlay_text_input_required": "Enter at least one short word with 2 or more letters.",
     "overlay_resolving": "Saving...",
     "overlay_complete_cta": "Completed",
     "overlay_choice_cta": "Confirm choice",

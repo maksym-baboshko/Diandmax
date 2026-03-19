@@ -26,7 +26,7 @@ export function useLiveProjectorSnapshot(
   const heroTimeoutRef = useRef<number | null>(null);
   const pollIntervalRef = useRef<number | null>(null);
   const isRefreshingRef = useRef(false);
-  const lastSeenFeedIdRef = useRef<string | null>(null);
+  const lastSeenHeroEventIdRef = useRef<string | null>(null);
   const hasLoadedOnceRef = useRef(false);
 
   const queueHeroEvent = useCallback((nextHeroEvent: LiveFeedEventSnapshot) => {
@@ -67,7 +67,8 @@ export function useLiveProjectorSnapshot(
       }
 
       const nextSnapshot = (await response.json()) as LivePageApiResponse;
-      const latestFeedEvent = nextSnapshot.feed[0] ?? null;
+      const latestHeroEvent =
+        nextSnapshot.feed.find((event) => event.isHeroEvent) ?? null;
 
       startTransition(() => {
         setSnapshot(nextSnapshot);
@@ -77,13 +78,13 @@ export function useLiveProjectorSnapshot(
 
       if (
         hasLoadedOnceRef.current &&
-        latestFeedEvent?.isHeroEvent &&
-        latestFeedEvent.id !== lastSeenFeedIdRef.current
+        latestHeroEvent &&
+        latestHeroEvent.id !== lastSeenHeroEventIdRef.current
       ) {
-        queueHeroEvent(latestFeedEvent);
+        queueHeroEvent(latestHeroEvent);
       }
 
-      lastSeenFeedIdRef.current = latestFeedEvent?.id ?? null;
+      lastSeenHeroEventIdRef.current = latestHeroEvent?.id ?? null;
       hasLoadedOnceRef.current = true;
     } catch {
       setError(true);

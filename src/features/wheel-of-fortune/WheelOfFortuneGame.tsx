@@ -27,6 +27,7 @@ import {
   type WheelRoundStartApiResponse,
   type WheelRoundTimerStartApiResponse,
 } from "@/features/game-session";
+import { hasMeaningfulGameResponseText, normalizeGameResponseText } from "@/features/game-session/response-text";
 import { cn } from "@/shared/lib";
 
 const wheelEase = [0.22, 1, 0.36, 1] as const;
@@ -663,6 +664,7 @@ export function WheelOfFortuneGame({
     resolution: WheelRoundResolution,
     remainingSeconds?: number | null
   ) {
+    const normalizedResponseText = normalizeGameResponseText(responseText);
     const accessToken = await getGameAuthAccessToken();
     accessTokenRef.current = accessToken;
     const res = await fetch(`/api/games/wheel/${round.roundId}`, {
@@ -681,19 +683,22 @@ export function WheelOfFortuneGame({
 
     if (!res.ok) {
       const nextErrorCode = await readApiErrorCode(res);
-      setErrorCode(nextErrorCode);
 
       if (
         nextErrorCode === "INVALID_DATA" &&
         round.task.responseMode === "text_input" &&
-        responseText.trim().replace(/\s+/g, " ").length < 10
+        !hasMeaningfulGameResponseText(normalizedResponseText)
       ) {
         setValidationMessage(t("overlay_text_input_required"));
+        setErrorCode(null);
       } else if (
         nextErrorCode === "INVALID_DATA" &&
         round.task.responseMode === "choice"
       ) {
         setValidationMessage(t("overlay_choice_required"));
+        setErrorCode(null);
+      } else {
+        setErrorCode(nextErrorCode);
       }
 
       return null;
@@ -958,12 +963,12 @@ export function WheelOfFortuneGame({
       return;
     }
 
-    const normalizedResponseText = responseText.trim().replace(/\s+/g, " ");
+    const normalizedResponseText = normalizeGameResponseText(responseText) ?? "";
 
     if (
       resolution === "completed" &&
       activeRound.task.responseMode === "text_input" &&
-      normalizedResponseText.length < 10
+      !hasMeaningfulGameResponseText(normalizedResponseText)
     ) {
       setValidationMessage(t("overlay_text_input_required"));
       return;

@@ -1,62 +1,110 @@
 import type { Locale } from "@/shared/i18n/routing";
 
 const isVercelPreview = process.env.VERCEL_ENV === "preview";
-const vercelToolbarScriptSources = "https://vercel.live";
-const vercelToolbarConnectSources = "https://vercel.live wss://ws-us3.pusher.com";
-const vercelToolbarImgSources = "https://vercel.live https://vercel.com";
-const vercelToolbarStyleSources = "https://vercel.live";
-const vercelToolbarFrameSources = "https://vercel.live";
-const vercelToolbarFontSources = "https://vercel.live https://assets.vercel.com";
+const BASE_SCRIPT_SOURCES = [
+  "'self'",
+  "'unsafe-inline'",
+  "https://va.vercel-scripts.com",
+  "https://vitals.vercel-insights.com",
+] as const;
+const DEV_ONLY_SCRIPT_SOURCES = ["'unsafe-eval'"] as const;
+const BASE_STYLE_SOURCES = ["'self'", "'unsafe-inline'", "fonts.googleapis.com"] as const;
+const BASE_IMG_SOURCES = [
+  "'self'",
+  "data:",
+  "blob:",
+  "maps.googleapis.com",
+  "maps.gstatic.com",
+  "*.gstatic.com",
+] as const;
+const BASE_FRAME_SOURCES = [
+  "https://maps.google.com",
+  "https://www.google.com",
+] as const;
+const BASE_CONNECT_SOURCES = [
+  "'self'",
+  "https://*.googleapis.com",
+  "https://*.gstatic.com",
+  "https://*.supabase.co",
+  "https://va.vercel-scripts.com",
+  "https://vitals.vercel-insights.com",
+] as const;
+const DEV_ONLY_CONNECT_SOURCES = [
+  "ws://localhost:*",
+  "wss://localhost:*",
+] as const;
+const BASE_FONT_SOURCES = ["'self'", "fonts.gstatic.com", "data:"] as const;
+const PREVIEW_SCRIPT_SOURCES = ["https://vercel.live"] as const;
+const PREVIEW_CONNECT_SOURCES = [
+  "https://vercel.live",
+  "wss://ws-us3.pusher.com",
+] as const;
+const PREVIEW_IMG_SOURCES = ["https://vercel.live", "https://vercel.com"] as const;
+const PREVIEW_STYLE_SOURCES = ["https://vercel.live"] as const;
+const PREVIEW_FRAME_SOURCES = ["https://vercel.live"] as const;
+const PREVIEW_FONT_SOURCES = [
+  "https://vercel.live",
+  "https://assets.vercel.com",
+] as const;
 
-export async function buildContentSecurityPolicy(_locale: Locale) {
-  const previewScriptSources = isVercelPreview
-    ? ` ${vercelToolbarScriptSources}`
-    : "";
-  const previewConnectSources = isVercelPreview
-    ? ` ${vercelToolbarConnectSources}`
-    : "";
-  const previewImgSources = isVercelPreview ? ` ${vercelToolbarImgSources}` : "";
-  const previewStyleSources = isVercelPreview
-    ? ` ${vercelToolbarStyleSources}`
-    : "";
-  const previewFrameSources = isVercelPreview
-    ? ` ${vercelToolbarFrameSources}`
-    : "";
-  const previewFontSources = isVercelPreview
-    ? ` ${vercelToolbarFontSources}`
-    : "";
+// Static App Router pages emit inline hydration scripts in prerendered HTML.
+// Keep script directives on plain 'unsafe-inline' source lists here:
+// if a hash or nonce appears in the same directive, browsers ignore 'unsafe-inline'
+// and hydration breaks again.
+function withPreviewSources(
+  baseSources: readonly string[],
+  previewSources: readonly string[],
+) {
+  return isVercelPreview
+    ? [...baseSources, ...previewSources]
+    : [...baseSources];
+}
 
-  if (process.env.NODE_ENV === "development") {
-    const devScriptSources = `'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com https://vitals.vercel-insights.com${previewScriptSources}`;
+function buildSourceDirective(name: string, sources: readonly string[]) {
+  return `${name} ${sources.join(" ")}`;
+}
 
-    return [
-      "default-src 'self'",
-      `script-src ${devScriptSources}`,
-      `script-src-elem ${devScriptSources}`,
-      `style-src 'self' 'unsafe-inline' fonts.googleapis.com${previewStyleSources}`,
-      `img-src 'self' data: blob: maps.googleapis.com maps.gstatic.com *.gstatic.com${previewImgSources}`,
-      `frame-src https://maps.google.com https://www.google.com${previewFrameSources}`,
-      `connect-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.supabase.co https://va.vercel-scripts.com https://vitals.vercel-insights.com ws://localhost:* wss://localhost:* wss://*.supabase.co${previewConnectSources}`,
-      `font-src 'self' fonts.gstatic.com data:${previewFontSources}`,
-      "worker-src 'self' blob:",
-      "base-uri 'self'",
-      "object-src 'none'",
-    ].join("; ");
-  }
-  const scriptSources = `'self' 'unsafe-inline' https://va.vercel-scripts.com https://vitals.vercel-insights.com${previewScriptSources}`;
+export function buildContentSecurityPolicy(locale: Locale) {
+  void locale;
+
+  const isDevelopment = process.env.NODE_ENV === "development";
+  const scriptSources = withPreviewSources(
+    isDevelopment
+      ? [...BASE_SCRIPT_SOURCES, ...DEV_ONLY_SCRIPT_SOURCES]
+      : BASE_SCRIPT_SOURCES,
+    PREVIEW_SCRIPT_SOURCES,
+  );
+  const styleSources = withPreviewSources(
+    BASE_STYLE_SOURCES,
+    PREVIEW_STYLE_SOURCES,
+  );
+  const imgSources = withPreviewSources(BASE_IMG_SOURCES, PREVIEW_IMG_SOURCES);
+  const frameSources = withPreviewSources(
+    BASE_FRAME_SOURCES,
+    PREVIEW_FRAME_SOURCES,
+  );
+  const connectSources = withPreviewSources(
+    [
+      ...BASE_CONNECT_SOURCES,
+      ...(isDevelopment ? DEV_ONLY_CONNECT_SOURCES : []),
+      "wss://*.supabase.co",
+    ],
+    PREVIEW_CONNECT_SOURCES,
+  );
+  const fontSources = withPreviewSources(
+    BASE_FONT_SOURCES,
+    PREVIEW_FONT_SOURCES,
+  );
 
   return [
     "default-src 'self'",
-    // Static App Router pages emit multiple inline hydration scripts at build time.
-    // Do not mix hashes with 'unsafe-inline' here: browsers ignore 'unsafe-inline'
-    // when a hash or nonce is present in the same source list.
-    `script-src ${scriptSources}`,
-    `script-src-elem ${scriptSources}`,
-    `style-src 'self' 'unsafe-inline' fonts.googleapis.com${previewStyleSources}`,
-    `img-src 'self' data: blob: maps.googleapis.com maps.gstatic.com *.gstatic.com${previewImgSources}`,
-    `frame-src https://maps.google.com https://www.google.com${previewFrameSources}`,
-    `connect-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.supabase.co https://va.vercel-scripts.com https://vitals.vercel-insights.com wss://*.supabase.co${previewConnectSources}`,
-    `font-src 'self' fonts.gstatic.com data:${previewFontSources}`,
+    buildSourceDirective("script-src", scriptSources),
+    buildSourceDirective("script-src-elem", scriptSources),
+    buildSourceDirective("style-src", styleSources),
+    buildSourceDirective("img-src", imgSources),
+    buildSourceDirective("frame-src", frameSources),
+    buildSourceDirective("connect-src", connectSources),
+    buildSourceDirective("font-src", fontSources),
     "worker-src 'self' blob:",
     "base-uri 'self'",
     "object-src 'none'",
