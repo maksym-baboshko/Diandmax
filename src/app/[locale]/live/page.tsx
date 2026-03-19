@@ -5,19 +5,13 @@ import {
   getOpenGraphLocale,
   type SupportedLocale,
 } from "@/shared/config";
-import { routing, type Locale } from "@/shared/i18n/routing";
+import { resolveLocale } from "@/shared/i18n/routing";
 import { LiveProjectorPage } from "@/widgets/live-projector";
 
 interface LivePageProps {
   params: Promise<{
     locale: string;
   }>;
-}
-
-function resolveLocale(locale: string): Locale {
-  return routing.locales.includes(locale as Locale)
-    ? (locale as Locale)
-    : routing.defaultLocale;
 }
 
 export async function generateMetadata({

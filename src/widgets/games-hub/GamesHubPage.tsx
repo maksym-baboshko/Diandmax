@@ -13,26 +13,27 @@ import { GamesHeroSection } from "@/widgets/games-hero";
 import { AnimatedReveal, Button } from "@/shared/ui";
 
 /* ═══════════════════════════════════════════════════
-   Coming-soon game card
+   Game card (live or coming-soon)
    ═══════════════════════════════════════════════════ */
 
-function ComingSoonCard({
+function GameCard({
   game,
   index,
   locale,
+  status,
 }: {
   game: GameCatalogItem;
   index: number;
   locale: SupportedLocale;
+  status: "live" | "comingSoon";
 }) {
   const tCommon = useTranslations("GamesCommon");
   const num = (index + 1).toString().padStart(2, "0");
+  const isLive = status === "live";
 
   return (
     <AnimatedReveal direction="up" delay={Math.min(index * 0.07, 0.28)}>
-      <div
-        className="group relative flex h-full flex-col overflow-hidden rounded-4xl border border-accent/10 bg-linear-to-br from-accent/5 via-transparent to-accent/4 p-6 backdrop-blur-sm transition-all duration-500 hover:-translate-y-2 hover:border-accent/22 hover:shadow-[0_32px_80px_-36px_rgba(0,0,0,0.35)] md:p-7"
-      >
+      <div className="group relative flex h-full flex-col overflow-hidden rounded-4xl border border-accent/10 bg-linear-to-br from-accent/5 via-transparent to-accent/4 p-6 backdrop-blur-sm transition-all duration-500 hover:-translate-y-2 hover:border-accent/22 hover:shadow-[0_32px_80px_-36px_rgba(0,0,0,0.35)] md:p-7">
         {/* Giant watermark number */}
         <span
           className="pointer-events-none absolute -right-2 -top-5 select-none font-cinzel text-[7.5rem] leading-none text-accent/5 transition-colors duration-700 group-hover:text-accent/10 md:text-[9rem]"
@@ -41,88 +42,48 @@ function ComingSoonCard({
           {num}
         </span>
 
-        {/* Hover glow orb */}
-        <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-accent/0 blur-3xl transition-all duration-700 group-hover:bg-accent/6" />
+        {/* Hover glow orb (coming-soon only) */}
+        {!isLive && (
+          <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-accent/0 blur-3xl transition-all duration-700 group-hover:bg-accent/6" />
+        )}
 
         <div className="relative z-10 flex flex-1 flex-col">
           <div className="flex items-center gap-3">
             <span className="font-cinzel text-sm tracking-wider text-accent/35">
               {num}
             </span>
-            <span className="rounded-full border border-accent/14 bg-accent/8 px-2.5 py-0.5 text-[9px] uppercase tracking-[0.28em] text-accent">
-              {tCommon("coming_soon_badge")}
-            </span>
-          </div>
-
-          <h3 className="heading-serif mt-5 text-xl text-text-primary md:text-2xl">
-            {game.title[locale]}
-          </h3>
-          <p className="mt-3 flex-1 text-sm leading-relaxed text-text-secondary">
-            {game.description[locale]}
-          </p>
-
-          <div className="mt-5">
-            <span className="text-[10px] uppercase tracking-[0.24em] text-text-secondary/50">
-              {tCommon("coming_soon_cta")}
-            </span>
-          </div>
-        </div>
-      </div>
-    </AnimatedReveal>
-  );
-}
-
-/* ═══════════════════════════════════════════════════
-   Live game card (for extra live games beyond featured)
-   ═══════════════════════════════════════════════════ */
-
-function LiveGameCard({
-  game,
-  index,
-  locale,
-}: {
-  game: GameCatalogItem;
-  index: number;
-  locale: SupportedLocale;
-}) {
-  const tCommon = useTranslations("GamesCommon");
-  const num = (index + 1).toString().padStart(2, "0");
-
-  return (
-    <AnimatedReveal direction="up" delay={Math.min(index * 0.07, 0.28)}>
-      <div className="group relative flex h-full flex-col overflow-hidden rounded-4xl border border-accent/10 bg-linear-to-br from-accent/5 via-transparent to-accent/4 p-6 backdrop-blur-sm transition-all duration-500 hover:-translate-y-2 hover:border-accent/22 hover:shadow-[0_32px_80px_-36px_rgba(0,0,0,0.35)] md:p-7">
-        <span
-          className="pointer-events-none absolute -right-2 -top-5 select-none font-cinzel text-[7.5rem] leading-none text-accent/5 transition-colors duration-700 group-hover:text-accent/10 md:text-[9rem]"
-          aria-hidden="true"
-        >
-          {num}
-        </span>
-
-        <div className="relative z-10 flex flex-1 flex-col">
-          <div className="flex items-center gap-3">
-            <span className="font-cinzel text-sm tracking-wider text-accent/35">
-              {num}
-            </span>
-            <span className="rounded-full border border-accent/16 bg-accent/8 px-2.5 py-0.5 text-[9px] uppercase tracking-[0.28em] text-accent">
-              {tCommon("live_badge")}
-            </span>
-          </div>
-
-          <h3 className="heading-serif mt-5 text-2xl text-text-primary md:text-3xl">
-            {game.title[locale]}
-          </h3>
-          <p className="mt-3 flex-1 text-sm leading-relaxed text-text-secondary md:text-base">
-            {game.description[locale]}
-          </p>
-
-          <div className="mt-6">
-            <Button
-              as={Link}
-              href={`/games/${game.slug}`}
-              className="w-full md:w-auto"
+            <span
+              className={`rounded-full border bg-accent/8 px-2.5 py-0.5 text-[9px] uppercase tracking-[0.28em] text-accent ${isLive ? "border-accent/16" : "border-accent/14"}`}
             >
-              {tCommon("play_cta")}
-            </Button>
+              {tCommon(isLive ? "live_badge" : "coming_soon_badge")}
+            </span>
+          </div>
+
+          <h3
+            className={`heading-serif mt-5 text-text-primary ${isLive ? "text-2xl md:text-3xl" : "text-xl md:text-2xl"}`}
+          >
+            {game.title[locale]}
+          </h3>
+          <p
+            className={`mt-3 flex-1 text-sm leading-relaxed text-text-secondary ${isLive ? "md:text-base" : ""}`}
+          >
+            {game.description[locale]}
+          </p>
+
+          <div className={isLive ? "mt-6" : "mt-5"}>
+            {isLive ? (
+              <Button
+                as={Link}
+                href={`/games/${game.slug}`}
+                className="w-full md:w-auto"
+              >
+                {tCommon("play_cta")}
+              </Button>
+            ) : (
+              <span className="text-[10px] uppercase tracking-[0.24em] text-text-secondary/50">
+                {tCommon("coming_soon_cta")}
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -186,19 +147,21 @@ export function GamesHubPage() {
 
         <div className="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {playableGames.map((game, i) => (
-            <LiveGameCard
+            <GameCard
               key={game.slug}
               game={game}
               index={i}
               locale={locale}
+              status="live"
             />
           ))}
           {upcomingGames.map((game, i) => (
-            <ComingSoonCard
+            <GameCard
               key={game.slug}
               game={game}
               index={i + playableGames.length}
               locale={locale}
+              status="comingSoon"
             />
           ))}
         </div>

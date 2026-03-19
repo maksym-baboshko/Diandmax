@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { PREVIEW_IMAGE, getAllGuestSlugs, getGuestBySlug } from "@/shared/config";
-import { routing, type Locale } from "@/shared/i18n/routing";
+import { resolveLocale } from "@/shared/i18n/routing";
 import { InvitationPage } from "@/widgets/invitation-page";
 
 interface InvitePageProps {
@@ -13,12 +13,6 @@ interface InvitePageProps {
 }
 
 export const dynamicParams = false;
-
-function resolveLocale(locale: string): Locale {
-  return routing.locales.includes(locale as Locale)
-    ? (locale as Locale)
-    : routing.defaultLocale;
-}
 
 export function generateStaticParams() {
   return getAllGuestSlugs().map((slug) => ({ slug }));
