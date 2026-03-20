@@ -3,7 +3,7 @@
 import { motion, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { SectionWrapper, SectionHeading, AnimatedReveal, Ornament } from "@/shared/ui";
-import { cn, useLiteMotion } from "@/shared/lib";
+import { cn, MOTION_EASE, useLiteMotion } from "@/shared/lib";
 
 type TimelineEvent = {
   id: string;
@@ -12,7 +12,7 @@ type TimelineEvent = {
   description: string;
 };
 
-const ease = [0.22, 1, 0.36, 1] as const;
+const ease = MOTION_EASE;
 const mobileTimelineMarkerVariants: Variants = {
   hidden: {
     opacity: 0.001,

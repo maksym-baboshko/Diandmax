@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useInView, type Variant } from "framer-motion";
-import { cn, useLiteMotion } from "@/shared/lib";
+import { cn, MOTION_EASE, useLiteMotion } from "@/shared/lib";
 
 type Direction = "up" | "down" | "left" | "right" | "up-left" | "up-right" | "down-left" | "down-right";
 
@@ -86,7 +86,7 @@ export function AnimatedReveal({
       transition={{
         duration: transitionDuration,
         delay: transitionDelay,
-        ease: [0.22, 1, 0.36, 1],
+        ease: MOTION_EASE,
       }}
     >
       {children}

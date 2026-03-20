@@ -178,6 +178,7 @@ src/
 ## Project rules
 
 - Do not hardcode the wedding date. Import `WEDDING_DATE` from `@/shared/config`.
+- Do not hardcode the default motion curve `[0.22, 1, 0.36, 1]` inline. Import `MOTION_EASE` from `@/shared/lib`.
 - Keep `src/shared/i18n/messages/uk.json` and `en.json` in sync.
 - Prefer CSS variable-based Tailwind classes instead of hardcoded component colors.
 - Use barrel exports where they already exist.

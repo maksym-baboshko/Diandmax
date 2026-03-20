@@ -4,10 +4,10 @@ import { motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Ornament } from "@/shared/ui";
 import { VENUE, WEDDING_DATE } from "@/shared/config";
-import { useLiteMotion } from "@/shared/lib";
+import { MOTION_EASE, useLiteMotion } from "@/shared/lib";
 
 const romanDate = "XXVIII · VI · MMXXVI";
-const ease = [0.22, 1, 0.36, 1] as const;
+const ease = MOTION_EASE;
 
 export function Footer() {
   const t = useTranslations("Footer");

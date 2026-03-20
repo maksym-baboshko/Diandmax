@@ -3,9 +3,9 @@
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { SectionWrapper, SectionHeading, Ornament } from "@/shared/ui";
-import { cn, useLiteMotion } from "@/shared/lib";
+import { cn, MOTION_EASE, useLiteMotion } from "@/shared/lib";
 
-const ease = [0.22, 1, 0.36, 1] as const;
+const ease = MOTION_EASE;
 const giftCards = [
   { currency: "nok", amount: "1300", label: "NOK" },
   { currency: "eur", amount: "120", label: "EUR" },

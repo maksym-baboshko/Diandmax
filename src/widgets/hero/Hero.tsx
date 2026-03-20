@@ -4,9 +4,9 @@ import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { SectionWrapper, AnimatedReveal, Ornament } from "@/shared/ui";
 import { Countdown } from "@/features/countdown/Countdown";
-import { useLiteMotion } from "@/shared/lib";
+import { MOTION_EASE, useLiteMotion } from "@/shared/lib";
 
-const ease = [0.22, 1, 0.36, 1] as const;
+const ease = MOTION_EASE;
 const mobileHeroVariants: Variants = {
   hidden: {},
   visible: {

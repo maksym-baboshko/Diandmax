@@ -1,6 +1,7 @@
 import type { LiveFeedEventSnapshot } from "@/features/game-session";
 import { getGameBySlug } from "@/shared/config";
 import type { SupportedLocale } from "@/shared/config";
+import { MOTION_EASE } from "@/shared/lib";
 
 export function getAvatarMonogram(avatarKey: string | null, fallbackName?: string | null) {
   const normalizedKey = avatarKey?.trim();
@@ -79,4 +80,4 @@ export function getEventBarClass(eventType: string | null | undefined) {
   }
 }
 
-export const EASE = [0.22, 1, 0.36, 1] as const;
+export const EASE = MOTION_EASE;

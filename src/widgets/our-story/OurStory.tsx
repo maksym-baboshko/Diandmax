@@ -4,9 +4,9 @@ import { motion, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { SectionWrapper, SectionHeading, AnimatedReveal, Ornament } from "@/shared/ui";
-import { useLiteMotion } from "@/shared/lib";
+import { MOTION_EASE, useLiteMotion } from "@/shared/lib";
 
-const ease = [0.22, 1, 0.36, 1] as const;
+const ease = MOTION_EASE;
 
 const mobilePortraitVariants: Variants = {
   hidden: (direction: "left" | "right") => ({

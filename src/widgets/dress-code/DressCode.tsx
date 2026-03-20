@@ -4,9 +4,9 @@ import { motion, type Variants } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
 import { SectionWrapper, SectionHeading, Ornament } from "@/shared/ui";
 import { DRESS_CODE } from "@/shared/config";
-import { useLiteMotion } from "@/shared/lib";
+import { MOTION_EASE, useLiteMotion } from "@/shared/lib";
 
-const ease = [0.22, 1, 0.36, 1] as const;
+const ease = MOTION_EASE;
 const swatchGridVariants: Variants = {
   hidden: {},
   visible: {

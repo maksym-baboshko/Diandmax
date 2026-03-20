@@ -1,4 +1,5 @@
 import { WHEEL_CONTENT_CATEGORIES } from "@/shared/config";
+import { MOTION_EASE } from "@/shared/lib";
 import type {
   GameApiErrorCode,
   WheelRoundResolution,
@@ -6,7 +7,7 @@ import type {
   WheelRoundSnapshot,
 } from "@/features/game-session";
 
-export const wheelEase = [0.22, 1, 0.36, 1] as const;
+export const wheelEase = MOTION_EASE;
 export const WHEEL_VISUAL_SEGMENT_COUNT = WHEEL_CONTENT_CATEGORIES.length + 1;
 export const SEGMENT_PALETTE = ["#caa76a", "#5c3e22"] as const;
 

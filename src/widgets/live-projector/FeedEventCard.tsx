@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import type { LiveFeedEventSnapshot } from "@/features/game-session";
 import type { SupportedLocale } from "@/shared/config";
-import { cn } from "@/shared/lib";
+import { cn, MOTION_EASE } from "@/shared/lib";
 import {
   formatEventTime,
   getAvatarMonogram,
@@ -35,7 +35,7 @@ export function FeedEventCard({
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97 }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.4, ease: MOTION_EASE }}
       className="relative overflow-hidden rounded-3xl border border-accent/10 bg-bg-primary/68 shadow-[0_20px_40px_-28px_rgba(0,0,0,0.5)] backdrop-blur-sm"
     >
       {/* Left accent stripe */}

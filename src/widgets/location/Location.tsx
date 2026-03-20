@@ -5,13 +5,13 @@ import { useTranslations } from "next-intl";
 import { MapPin, ArrowUpRight } from "lucide-react";
 import { SectionWrapper, SectionHeading, AnimatedReveal, Button, Ornament } from "@/shared/ui";
 import { VENUE } from "@/shared/config";
-import { cn, useLiteMotion } from "@/shared/lib";
+import { cn, MOTION_EASE, useLiteMotion } from "@/shared/lib";
 
 const chips = [
   { icon: "\u{1F3DB}\u{FE0F}", key: "chip_history" },
   { icon: "\u{1F4CD}", key: "chip_location" },
 ] as const;
-const ease = [0.22, 1, 0.36, 1] as const;
+const ease = MOTION_EASE;
 const mobilePinHaloTransition = {
   duration: 4.2,
   repeat: Infinity,

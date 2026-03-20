@@ -6,10 +6,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { LanguageSwitcher } from "@/features/language-switcher";
 import { ThemeSwitcher } from "@/features/theme-switcher";
 import { Link } from "@/shared/i18n/navigation";
-import { cn, useLiteMotion } from "@/shared/lib";
+import { cn, MOTION_EASE, useLiteMotion } from "@/shared/lib";
 import { Ornament } from "@/shared/ui";
 
-const ease = [0.22, 1, 0.36, 1] as const;
+const ease = MOTION_EASE;
 const desktopMediaQuery = "(min-width: 1024px)";
 const focusRingClass =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary";

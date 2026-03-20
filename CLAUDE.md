@@ -71,6 +71,7 @@ src/
 │   ├── config/                   # wedding data, guests, game catalog, wheel content, metadata helpers
 │   ├── i18n/
 │   ├── lib/
+│   │   ├── motion.ts             # MOTION_EASE — canonical default animation curve
 │   │   └── server/               # server-only utilities
 │   │       ├── deferred.ts       # after() + runDeferredTasks for Vercel serverless
 │   │       ├── game-api-error-handler.ts  # centralized error → HTTP response mapping
@@ -167,7 +168,7 @@ Styling rules:
 - avoid hardcoded colors in components except intentional config/email/SVG cases
 - headings use `heading-serif` or `heading-serif-italic`
 - numerals and formal labels use `font-cinzel`
-- default motion curve is `[0.22, 1, 0.36, 1]`
+- default motion curve is `[0.22, 1, 0.36, 1]`; import `MOTION_EASE` from `@/shared/lib` — do not hardcode the array inline
 
 ---
 
@@ -268,6 +269,7 @@ Game API routes use `handleGameApiError()` from `@/shared/lib/server` instead of
 ## Key Rules
 
 - Never hardcode the wedding date; import `WEDDING_DATE`
+- Never hardcode the default motion curve `[0.22, 1, 0.36, 1]` inline; import `MOTION_EASE` from `@/shared/lib`
 - Keep locale message files in sync
 - Prefer server components by default
 - Keep invite and games route metadata localized
