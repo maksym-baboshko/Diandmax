@@ -567,27 +567,11 @@ async function logActivityEvent(event: {
   }
 }
 
-async function emitRealtimeSignal(signal: {
-  channel: "live-projector" | "game-leaderboard";
-  gameSlug?: GameSlug | null;
-  signalType: string;
-  payload?: JsonValue;
-}) {
-  const supabase = getSupabaseAdminClient();
-  const { error } = await supabase.from("realtime_signals").insert({
-    channel: signal.channel,
-    game_slug: signal.gameSlug ?? null,
-    signal_type: signal.signalType,
-    payload: signal.payload ?? {},
-  });
-
-  if (error) {
-    console.error("Realtime signal insert failed:", error);
-  }
-}
-
 const LIVE_PROJECTOR_BROADCAST_CHANNEL = "live-projector-broadcast";
 const LIVE_PROJECTOR_BROADCAST_EVENT = "snapshot";
+
+const WHEEL_LEADERBOARD_BROADCAST_CHANNEL = "wheel-leaderboard-broadcast";
+const WHEEL_LEADERBOARD_BROADCAST_EVENT = "updated";
 
 let broadcastChannel: ReturnType<
   ReturnType<typeof getSupabaseAdminClient>["channel"]
@@ -611,6 +595,30 @@ async function broadcastLiveSnapshot() {
     }
   } catch (error) {
     console.error("Live snapshot broadcast failed:", error);
+  }
+}
+
+let leaderboardBroadcastChannel: ReturnType<
+  ReturnType<typeof getSupabaseAdminClient>["channel"]
+> | null = null;
+
+function getLeaderboardBroadcastChannel() {
+  if (!leaderboardBroadcastChannel) {
+    const supabase = getSupabaseAdminClient();
+    leaderboardBroadcastChannel = supabase.channel(WHEEL_LEADERBOARD_BROADCAST_CHANNEL);
+  }
+  return leaderboardBroadcastChannel;
+}
+
+async function broadcastLeaderboardSignal(gameSlug: GameSlug) {
+  try {
+    const channel = getLeaderboardBroadcastChannel();
+    const result = await channel.httpSend(WHEEL_LEADERBOARD_BROADCAST_EVENT, { gameSlug });
+    if (!result.success) {
+      console.error("Leaderboard broadcast failed:", result.error);
+    }
+  } catch (error) {
+    console.error("Leaderboard broadcast failed:", error);
   }
 }
 
@@ -816,15 +824,7 @@ export async function savePlayerProfile({
   }
 
   const deferredTasks: DeferredTask[] = [
-    () =>
-      emitRealtimeSignal({
-        channel: "game-leaderboard",
-        gameSlug: WHEEL_GAME_SLUG,
-        signalType: "player.profile.updated",
-        payload: {
-          playerId: authUserId,
-        },
-      }),
+    () => broadcastLeaderboardSignal(WHEEL_GAME_SLUG),
     () => broadcastLiveSnapshot(),
   ];
 
@@ -1474,19 +1474,7 @@ export async function resolveWheelRound({
 
   if (xpDelta !== 0) {
     deferredTasks.push(
-      () =>
-        emitRealtimeSignal({
-          channel: "game-leaderboard",
-          gameSlug: WHEEL_GAME_SLUG,
-          signalType: "leaderboard.updated",
-          payload: {
-            playerId,
-            roundId,
-            resolution,
-            resolutionReason,
-            xpDelta,
-          },
-        }),
+      () => broadcastLeaderboardSignal(WHEEL_GAME_SLUG),
       () => broadcastLiveSnapshot()
     );
   }

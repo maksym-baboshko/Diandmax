@@ -60,31 +60,10 @@ export function WheelLeaderboardCard() {
     try {
       const supabase = getSupabaseBrowserClient();
       const channel = supabase
-        .channel("wheel-leaderboard")
-        .on(
-          "postgres_changes",
-          {
-            event: "INSERT",
-            schema: "public",
-            table: "realtime_signals",
-            filter: "channel=eq.game-leaderboard",
-          },
-          (payload) => {
-            const nextRecord =
-              payload.new && typeof payload.new === "object"
-                ? (payload.new as { game_slug?: string | null })
-                : null;
-
-            if (
-              nextRecord?.game_slug &&
-              nextRecord.game_slug !== "wheel-of-fortune"
-            ) {
-              return;
-            }
-
-            void loadLeaderboard();
-          }
-        )
+        .channel("wheel-leaderboard-broadcast")
+        .on("broadcast", { event: "updated" }, () => {
+          void loadLeaderboard();
+        })
         .subscribe();
 
       return () => {
