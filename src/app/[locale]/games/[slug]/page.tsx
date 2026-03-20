@@ -9,7 +9,7 @@ import {
   isGamePlayable,
   type SupportedLocale,
 } from "@/shared/config";
-import { routing, type Locale } from "@/shared/i18n/routing";
+import { resolveLocale } from "@/shared/i18n/routing";
 import { GamesWheelPage } from "@/widgets/games-wheel-page";
 
 interface GameDetailPageProps {
@@ -20,12 +20,6 @@ interface GameDetailPageProps {
 }
 
 export const dynamicParams = false;
-
-function resolveLocale(locale: string): Locale {
-  return routing.locales.includes(locale as Locale)
-    ? (locale as Locale)
-    : routing.defaultLocale;
-}
 
 export function generateStaticParams() {
   return getPlayableGameSlugs().map((slug) => ({ slug }));

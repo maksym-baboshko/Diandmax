@@ -597,7 +597,7 @@ export function WheelOfFortuneGame({
                         <span
                           className={cn(
                             "shrink-0 text-xs font-semibold",
-                            result.xpDelta >= 0 ? "text-accent" : "text-rose-300"
+                            result.xpDelta >= 0 ? "text-accent" : "text-error"
                           )}
                         >
                           {result.xpDelta > 0 ? "+" : ""}

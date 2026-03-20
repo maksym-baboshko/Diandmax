@@ -9,6 +9,8 @@
   --accent-hover: #734F31;
   --accent-soft: #B79A79;
   --accent-rgb: 142, 104, 66;
+  --error: #b84040;
+  --ease-default: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .dark {
@@ -20,6 +22,7 @@
   --accent-hover: #A87C56;
   --accent-soft: #3d352c;
   --accent-rgb: 191, 149, 112;
+  --error: #e07070;
 }
 
 @theme inline {
@@ -29,6 +32,7 @@
   --color-text-secondary: var(--text-secondary);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
+  --color-error: var(--error);
 
   --font-playfair: var(--font-playfair);
   --font-inter: var(--font-inter);

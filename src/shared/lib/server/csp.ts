@@ -1,5 +1,3 @@
-import type { Locale } from "@/shared/i18n/routing";
-
 const isVercelPreview = process.env.VERCEL_ENV === "preview";
 const BASE_SCRIPT_SOURCES = [
   "'self'",
@@ -64,9 +62,7 @@ function buildSourceDirective(name: string, sources: readonly string[]) {
   return `${name} ${sources.join(" ")}`;
 }
 
-export function buildContentSecurityPolicy(locale: Locale) {
-  void locale;
-
+export function buildContentSecurityPolicy() {
   const isDevelopment = process.env.NODE_ENV === "development";
   const scriptSources = withPreviewSources(
     isDevelopment

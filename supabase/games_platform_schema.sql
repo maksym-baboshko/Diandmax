@@ -1041,6 +1041,7 @@ returns table (
   rate_limit_window_started_at timestamptz
 )
 language plpgsql
+set search_path = public
 as $$
 declare
   v_now timestamptz := coalesce(p_now, timezone('utc', now()));
@@ -1128,6 +1129,7 @@ create or replace function public.start_wheel_round_atomic(
 )
 returns uuid
 language plpgsql
+set search_path = public, extensions
 as $$
 declare
   v_round_id uuid := gen_random_uuid();
@@ -1274,6 +1276,7 @@ create or replace function public.resolve_wheel_round_atomic(
 )
 returns uuid
 language plpgsql
+set search_path = public
 as $$
 declare
   v_session_id uuid;
@@ -1473,6 +1476,7 @@ $$;
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
+set search_path = public
 as $$
 begin
   new.updated_at = timezone('utc', now());

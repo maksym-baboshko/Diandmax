@@ -16,17 +16,11 @@ import {
 } from "@/shared/config";
 import { playfair, inter, cinzel, vibes, THEME_INIT_SCRIPT } from "@/shared/lib";
 import { ThemeProvider } from "@/features/theme-switcher";
-import { routing, type Locale } from "@/shared/i18n/routing";
+import { routing, resolveLocale, type Locale } from "@/shared/i18n/routing";
 import "../globals.css";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
-}
-
-function resolveLocale(locale: string): Locale {
-  return routing.locales.includes(locale as Locale)
-    ? (locale as Locale)
-    : routing.defaultLocale;
 }
 
 export async function generateMetadata({

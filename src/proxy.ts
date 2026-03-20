@@ -1,18 +1,11 @@
 import createMiddleware from "next-intl/middleware";
 import { NextRequest } from "next/server";
 import { buildContentSecurityPolicy } from "./shared/lib/server";
-import type { Locale } from "./shared/i18n/routing";
 import { routing } from "./shared/i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
 
-function getRequestLocale(pathname: string): Locale {
-  return pathname === "/en" || pathname.startsWith("/en/")
-    ? "en"
-    : routing.defaultLocale;
-}
-
-export default async function proxy(request: NextRequest) {
+export default function proxy(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
 
   if (!request.cookies.has("NEXT_LOCALE")) {
@@ -24,8 +17,7 @@ export default async function proxy(request: NextRequest) {
   });
 
   const response = intlMiddleware(requestWithHeaders);
-  const locale = getRequestLocale(request.nextUrl.pathname);
-  const contentSecurityPolicy = await buildContentSecurityPolicy(locale);
+  const contentSecurityPolicy = buildContentSecurityPolicy();
   response.headers.set("Content-Security-Policy", contentSecurityPolicy);
 
   return response;

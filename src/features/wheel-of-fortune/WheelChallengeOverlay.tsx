@@ -125,7 +125,7 @@ export function WheelChallengeOverlay({
                   <p className="text-[10px] uppercase tracking-[0.24em] text-text-secondary/65">
                     {t("overlay_skip_note")}
                   </p>
-                  <p className="mt-2 font-cinzel text-2xl text-rose-300">
+                  <p className="mt-2 font-cinzel text-2xl text-error">
                     {activeRound.task.skipPenaltyXp}
                   </p>
                 </div>

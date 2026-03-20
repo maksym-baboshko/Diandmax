@@ -531,7 +531,7 @@ export function RSVP({ guest }: RSVPProps) {
                             {...register(`guestNames.${index}`)}
                           />
                           {fieldError && (
-                            <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-red-500/85">
+                            <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-error/85">
                               {t("name_min")}
                             </p>
                           )}
@@ -545,7 +545,7 @@ export function RSVP({ guest }: RSVPProps) {
                     </p>
                   )}
                   {errors.guestNames && !Array.isArray(errors.guestNames) && (
-                    <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-red-500/85">
+                    <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-error/85">
                       {t("guest_names_required")}
                     </p>
                   )}
@@ -625,7 +625,7 @@ export function RSVP({ guest }: RSVPProps) {
 
                   </div>
                   {errors.attending && (
-                    <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-red-500/85">{t("attendance_required")}</p>
+                    <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-error/85">{t("attendance_required")}</p>
                   )}
                 </motion.div>
 
@@ -634,7 +634,7 @@ export function RSVP({ guest }: RSVPProps) {
                   style={{
                     display: "grid",
                     gridTemplateRows: isAttendingYes ? "1fr" : "0fr",
-                    transition: "grid-template-rows 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
+                    transition: "grid-template-rows 0.5s var(--ease-default)",
                   }}
                   aria-hidden={!isAttendingYes}
                   inert={!isAttendingYes}
@@ -646,7 +646,7 @@ export function RSVP({ guest }: RSVPProps) {
                     )}
                     style={{
                       opacity: isAttendingYes ? 1 : 0,
-                      transition: `opacity ${isAttendingYes ? "0.4s 0.08s" : "0.25s 0s"} cubic-bezier(0.22, 1, 0.36, 1)`,
+                      transition: `opacity ${isAttendingYes ? "0.4s 0.08s" : "0.25s 0s"} var(--ease-default)`,
                     }}
                   >
                     <div className="space-y-7 md:space-y-9">
@@ -730,7 +730,7 @@ export function RSVP({ guest }: RSVPProps) {
                 {/* ── Submit ── */}
                 <motion.div variants={formField} className="pt-1">
                   {submitError && (
-                    <p className="mb-3 text-center text-[10px] uppercase tracking-[0.13em] text-red-500/90">
+                    <p className="mb-3 text-center text-[10px] uppercase tracking-[0.13em] text-error/90">
                       {submitError}
                     </p>
                   )}
