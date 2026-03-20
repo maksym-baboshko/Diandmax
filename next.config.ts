@@ -7,28 +7,6 @@ const nextConfig: NextConfig = {
   experimental: {
     globalNotFound: true,
   },
-  async headers() {
-    return [
-      {
-        source: "/(.*)",
-        headers: [
-          {
-            key: "Content-Security-Policy",
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-              "style-src 'self' 'unsafe-inline' fonts.googleapis.com",
-              "img-src 'self' data: blob: maps.googleapis.com maps.gstatic.com *.gstatic.com",
-              "frame-src https://maps.google.com https://www.google.com",
-              "connect-src 'self' https://*.googleapis.com https://*.gstatic.com ws://localhost:* wss://localhost:*",
-              "font-src 'self' fonts.gstatic.com data:",
-              "worker-src 'self' blob:",
-            ].join("; "),
-          },
-        ],
-      },
-    ];
-  },
 };
 
 export default withNextIntl(nextConfig);

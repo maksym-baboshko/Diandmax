@@ -1,6 +1,20 @@
-# Big Day — Wedding Invitation Site
+# Big Day — Wedding Invitation + Games Site
 
-Wedding invitation website for Maksym & Diana. June 28, 2026, Grand Hotel Terminus, Bergen, Norway.
+Wedding website for Maksym & Diana.
+Date: June 28, 2026.
+Venue: Grand Hotel Terminus, Bergen, Norway.
+
+> Keep `AGENTS.md` and `CLAUDE.md` aligned.
+> If a local `GEMINI.md` exists, keep that one aligned too.
+
+This repository contains:
+
+- the invitation site at `/` and `/en`
+- personalized invite pages at `/invite/[slug]`
+- the games hub at `/games`
+- the live wheel game at `/games/wheel-of-fortune`
+- the projector/live feed page at `/live`
+- server APIs for RSVP, games, and live snapshots
 
 ---
 
@@ -14,154 +28,269 @@ Wedding invitation website for Maksym & Diana. June 28, 2026, Grand Hotel Termin
 | Animation | Framer Motion 12 |
 | i18n | next-intl 4 |
 | Forms | react-hook-form + zod + @hookform/resolvers |
-| Icons | lucide-react (available but barely used) |
+| Backend services | Supabase + Resend |
 | Utilities | clsx + tailwind-merge via `cn()` |
 
 ---
 
 ## Project Structure
 
-FSD-inspired architecture:
+FSD-inspired, with route composition in `app/`, interactive flows in `features/`, shared primitives in `shared/`, and page/section composition in `widgets/`.
 
-```
+```text
 src/
 ├── app/
-│   ├── [locale]/         # Next.js App Router — layout + main page
-│   └── api/rsvp/         # RSVP API route handler
-├── features/             # Self-contained interactive features
-│   ├── countdown/        # Live countdown timer (useSyncExternalStore singleton)
-│   ├── language-switcher/ # uk/en toggle (useTransition + hydration-safe)
-│   └── theme-switcher/   # Dark/light mode (Context + localStorage + system pref)
+│   ├── [locale]/                 # invitation, invite, games, live pages
+│   └── api/                      # rsvp, live, games APIs
+├── features/
+│   ├── countdown/
+│   ├── game-session/             # auth, local cache, shared contracts, server repositories
+│   │   └── server/
+│   │       ├── wheel-round-repository.ts   # open/start/timer/resolve round
+│   │       ├── player-repository.ts        # profile bootstrap & save
+│   │       ├── leaderboard-repository.ts   # leaderboard + live snapshot
+│   │       ├── broadcast-repository.ts     # Supabase Broadcast signals
+│   │       ├── activity-repository.ts      # live feed activity log
+│   │       ├── wheel-session-repository.ts # session + cycle management
+│   │       ├── wheel-content-repository.ts # categories, tasks, history
+│   │       ├── repository-helpers.ts       # pure helpers, server-side timer
+│   │       ├── auth.ts                     # requireAuthenticatedGameUser
+│   │       ├── errors.ts                   # domain error classes
+│   │       ├── queries.ts                  # shared select strings
+│   │       └── index.ts                    # barrel
+│   ├── language-switcher/
+│   ├── theme-switcher/
+│   └── wheel-of-fortune/         # WheelOfFortuneGame + hook + extracted subcomponents
+│       ├── WheelOfFortuneGame.tsx  # animation + JSX only
+│       ├── useWheelGame.ts         # all state, API calls, timer, restore logic
+│       ├── WheelChallengeOverlay.tsx
+│       ├── WheelLeaderboardCard.tsx
+│       ├── ConfettiPop.tsx
+│       └── wheel-helpers.ts      # shared constants, types, pure helpers
 ├── shared/
-│   ├── config/           # All wedding data (dates, venue, couple, dress code, guests)
-│   ├── i18n/             # next-intl setup + messages/uk.json + messages/en.json
-│   ├── lib/              # cn(), fonts
-│   └── ui/               # Reusable primitive components
-└── widgets/              # Full page sections (one per page block)
-    ├── splash/            # Animated envelope intro screen
-    ├── navbar/            # Sticky nav with language + theme toggles
-    ├── hero/              # Names + countdown
-    ├── our-story/         # Couple portraits + narrative
-    ├── timeline/          # Day schedule
-    ├── location/          # Venue info + Google Maps embed
-    ├── dress-code/        # Color palettes for guests
-    ├── gifts/             # Gift registry info
-    ├── rsvp/              # RSVP form (react-hook-form + zod)
-    └── footer/            # Copyright + back-to-top
+│   ├── config/                   # wedding data, guests, game catalog, wheel content, metadata helpers
+│   ├── i18n/
+│   ├── lib/
+│   │   └── server/               # server-only utilities
+│   │       ├── deferred.ts       # after() + runDeferredTasks for Vercel serverless
+│   │       ├── game-api-error-handler.ts  # centralized error → HTTP response mapping
+│   │       ├── csp.ts
+│   │       └── rate-limit.ts
+│   └── ui/
+└── widgets/
+    ├── invitation-page/
+    ├── personal-invitation/
+    ├── games-hub/
+    ├── games-hero/
+    ├── games-shell/
+    ├── games-wheel-page/
+    ├── live-projector/            # decomposed projector page
+    │   ├── LiveProjectorPage.tsx  # composition root
+    │   ├── LiveClock.tsx
+    │   ├── FeedEventCard.tsx
+    │   ├── LeaderboardRow.tsx
+    │   ├── HeroEventOverlay.tsx
+    │   ├── live-projector-helpers.ts
+    │   └── useLiveProjectorSnapshot.ts
+    ├── navbar/
+    ├── not-found-page/
+    └── invitation sections
 ```
 
-> **No `entities/` layer** — intentionally absent. This project has no domain models that need cross-feature sharing. Trigger to add it: dynamic guest invite pages (`/[locale]/invite/[slug]`), backend RSVP persistence, or shared data-transformation logic.
+There is still no dedicated `entities/` layer. Keep the current structure unless a change clearly needs a reusable domain module rather than a feature- or shared-level abstraction.
 
-All layers use barrel `index.ts` exports — always import from the barrel, never from the file directly.
-
----
-
-## Shared UI Components (`@/shared/ui`)
-
-| Component | Purpose |
-|---|---|
-| `SectionWrapper` | Layout container with padding, optional alternate bg, `id` anchor |
-| `SectionHeading` | Heading + italic subtitle + gold rule divider |
-| `AnimatedReveal` | Framer Motion scroll-reveal wrapper. Directions: `up/down/left/right/up-left/up-right/down-left/down-right`. Has `blur` prop (expensive — use only when justified) |
-| `Ornament` | Decorative SVG botanical corner element (`top-left/top-right/bottom-left/bottom-right`, sizes `sm/md/lg`) |
-| `Button` | Polymorphic button. Variants: `primary/secondary/outline/ghost`. Sizes: `sm/md/lg` |
-| `Input` | Styled input with `error?: boolean` prop |
-| `Textarea` | Same as Input |
-| `Label` | Form label with optional `required` prop (adds asterisk) |
+Barrel exports are already used across the repo. Prefer importing from the barrel when one exists.
 
 ---
 
-## Styling Conventions
+## Product Notes
 
-### Design tokens (CSS variables in `globals.css`)
+### Invitation and RSVP
 
-All colors go through CSS variables — never hardcode hex in components.
+- `/` and `/en` render the full invitation page
+- `/invite/[slug]` renders guest-specific copy and seat count
+- personalized invite pages prefill RSVP defaults from the guest entry
+- `src/app/api/rsvp/route.ts` is implemented and uses `rsvpSchema`
+- the RSVP API rate-limits submissions, uses a honeypot `website` field, and sends via Resend or `mock` mode
 
-**Light mode (`:root`):** `--bg-primary`, `--bg-secondary`, `--text-primary`, `--text-secondary`, `--accent`, `--accent-hover`, `--accent-soft`
+Current RSVP payload shape:
 
-**Dark mode (`.dark`):** same names, different values
+- `guestNames: string[]`
+- `attending: "yes" | "no"`
+- `guests: number`
+- `dietary?: string`
+- `message?: string`
+- `website?: string`
 
-Tailwind consumes them via `@theme inline` — use classes like `bg-bg-primary`, `text-accent`, `border-accent/20`.
+### Games platform
 
-### Typography
+- `/games` is the public hub
+- only `wheel-of-fortune` is currently playable
+- other games remain catalog entries with `comingSoon` status in `src/shared/config/games.ts`
+- browser auth/session bootstrap lives in `src/features/game-session/auth-client.ts`
+- backend state remains authoritative; game logic and persistence live in `src/features/game-session/server` (split across domain-scoped repository files)
+- timer remaining seconds are computed server-side in `repository-helpers.ts` — clients cannot influence resolution outcome
+- post-response work (broadcast, logging, realtime signals) uses deferred tasks via Next.js `after()` to guarantee execution on Vercel serverless
+- all game API routes use a centralized error handler (`handleGameApiError`) for consistent error → HTTP response mapping
+- all game API endpoints (GET and POST) are rate-limited per authenticated user via `enforceRateLimit()`
 
-- Headings: `className="heading-serif"` or `"heading-serif-italic"` (Playfair Display)
-- Cinzel numerals/time: `className="font-cinzel"` (Tailwind v4 canonical)
-- Script accents: `font-[family-name:var(--font-vibes)]`
-- Body: Inter (default, set on `<body>`)
+### Live projector
 
-### House easing curve
+- `/live` reads from `/api/live`
+- the client receives live updates via Supabase Broadcast (WebSocket) with 30s polling as fallback in `widgets/live-projector/useLiveProjectorSnapshot.ts`
+- hero event deduplication uses a sliding window (200 IDs) to prevent unbounded memory growth during long sessions
+- the page is intended for projector/live usage and is marked `noindex`
 
-`[0.22, 1, 0.36, 1]` — use this for all Framer Motion transitions unless there's a specific reason not to.
+---
+
+## Shared Config, UI, and Styling
+
+`@/shared/config` is the source of truth for wedding data, guest data, game catalog, wheel content, and metadata helpers.
+
+- always import `WEDDING_DATE` from `@/shared/config`
+- do not duplicate `VENUE`, `COUPLE`, `DRESS_CODE`, guests, or metadata data in route files or widgets
+
+Current reusable UI primitives in `src/shared/ui`:
+
+- `SectionWrapper`
+- `SectionHeading`
+- `AnimatedReveal`
+- `Ornament`
+- `Button`
+- `Input`
+- `Textarea`
+
+Styling rules:
+
+- colors should go through CSS variables defined in `src/app/globals.css`
+- prefer Tailwind classes backed by those variables such as `bg-bg-primary`, `text-text-primary`, `text-accent`
+- avoid hardcoded colors in components except intentional config/email/SVG cases
+- headings use `heading-serif` or `heading-serif-italic`
+- numerals and formal labels use `font-cinzel`
+- default motion curve is `[0.22, 1, 0.36, 1]`
 
 ---
 
 ## Internationalization
 
-- **Default locale:** Ukrainian (`uk`), no URL prefix (`/`)
-- **English:** `/en` prefix
-- **Messages:** `src/shared/i18n/messages/uk.json` and `en.json` — must always be in sync (same keys)
-- **Client navigation:** use `Link`, `useRouter`, `usePathname` from `@/shared/i18n/navigation` (not from `next/navigation`)
-- **Translations in components:** `useTranslations("SectionName")` → `t("key")`
+- default locale is `uk`
+- English uses `/en`
+- messages live in `src/shared/i18n/messages/uk.json` and `en.json`
+- client navigation must use `@/shared/i18n/navigation`
+- new message keys must be added to both locale files with identical structure
 
 ---
 
-## Wedding Data (`@/shared/config`)
+## Hydration-Sensitive Code
 
-Single source of truth for all static data.
+Do not casually refactor these pieces:
 
-- `WEDDING_DATE` — `new Date("2026-06-28T12:00:00+02:00")`. Always import this when you need the date/time — never hardcode it elsewhere.
-- `VENUE` — name, address, Google Maps embed URL, coordinates
-- `COUPLE` — groom/bride names in `{ uk, en }` format
-- `DRESS_CODE` — color palettes for ladies and gentlemen with hex + bilingual names
-- `guests` array in `guests.ts` — guest list with Ukrainian vocative case, seat count, slug. `getGuestBySlug()` and `getAllGuestSlugs()` are ready for future guest-specific pages
+- `features/countdown/Countdown.tsx`
+- `widgets/splash/Splash.tsx`
+- `features/language-switcher/LanguageSwitcher.tsx`
+- `features/theme-switcher/ThemeProvider.tsx`
+- `widgets/live-projector/useLiveProjectorSnapshot.ts`
+- `features/wheel-of-fortune/useWheelGame.ts`
 
----
-
-## Theme System
-
-- `ThemeProvider` wraps the entire app in `layout.tsx`
-- `useTheme()` hook from `@/features/theme-switcher/ThemeProvider`
-- Theme class applied to `document.documentElement` (`.dark`)
-- Anti-FOUC inline script in `<head>` reads `localStorage` before first paint
-- Dark mode in Tailwind: standard `dark:` variant
+These pieces intentionally use hydration-safe patterns such as `useSyncExternalStore`, staged mount logic, mixed polling/realtime invalidation, and `useEffectEvent` for stable auto-timeout callbacks.
 
 ---
 
-## Hydration Patterns
+## Supabase and Migrations
 
-Several components handle SSR/client carefully — don't break these:
+Required runtime env vars:
 
-- **Countdown:** Uses `useSyncExternalStore` with `getServerSnapshot` returning zeros. A global singleton `setInterval` runs once in the browser. Don't refactor to `useEffect`/`useState` — it will cause hydration mismatch.
-- **Splash:** Uses `useSyncExternalStore` to detect client mount, then checks `sessionStorage`. Shows once per session.
-- **LanguageSwitcher:** Uses `useSyncExternalStore` for mount detection to avoid hydration diff on the locale label.
-- **ThemeProvider:** Uses `queueMicrotask` to defer state updates, avoiding React 19 warnings.
+```bash
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_SECRET_KEY=
+```
+
+Supported fallbacks still exist in code for older setups:
+
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_URL`
+
+Supabase CLI workflow on this machine:
+
+```bash
+SUPABASE_DB_PASSWORD=
+```
+
+`SUPABASE_DB_PASSWORD` is local-only. Do not commit it.
+
+Useful Supabase files:
+
+- `supabase/games_platform_schema.sql`
+- `supabase/migrations/*.sql`
+- `supabase/config.toml`
+- `supabase/seed_wheel_content.sql`
+- `supabase/reset_runtime_data.sql`
+- `supabase/verify_games_platform_setup.sql`
+- `supabase/games_hub_schema.sql` is legacy and should not be applied to the current setup
+
+Migration rules:
+
+- `supabase/games_platform_schema.sql` is the baseline schema snapshot
+- incremental database changes go into `supabase/migrations/*.sql`
+- when schema changes, update both the baseline snapshot and add a new migration in the same change
+- applied migrations stay committed in the repo; do not delete them after pushing
+- prefer the repo-local CLI via `pnpm exec supabase` or the `pnpm supabase:*` scripts
+- if Supabase CLI is authenticated and local `SUPABASE_DB_PASSWORD` is set, the agent may link the project and run remote migration commands without extra product-level setup
+- if CLI auth expires or the database password changes, re-auth/link may be needed
 
 ---
 
-## RSVP Form
+## Server Patterns
 
-Built with `react-hook-form` + `zod`. Schema is defined at module level (`schema` const). Fields: `name` (min 2 chars), `attending` (enum `"yes"/"no"`), `guests` (number, coerced), `dietary` (optional), `message` (optional).
+### Deferred tasks
 
-The `attending` field uses custom buttons — set its value via `setValue("attending", "yes/no", { shouldValidate: true })`, not via `register()`.
+On Vercel serverless, the runtime may shut down immediately after the response is sent. Fire-and-forget (`void asyncFn()`) is unreliable. All post-response work must go through the deferred tasks pattern:
 
-**Backend not yet implemented.** `onSubmit` currently only sets `submitted: true`. When connecting to an API, replace the body of `onSubmit` — the form structure is ready.
+1. Repository methods return `{ data, deferredTasks: DeferredTask[] }`
+2. Route handlers call `after(() => runDeferredTasks(tasks))` after sending the response
+3. `runDeferredTasks` uses `Promise.allSettled` so one failure does not block others
 
----
+This applies to: broadcast signals, activity logging, leaderboard notifications, and live snapshot pushes.
 
-## What's Not Built Yet
+### Centralized error handling
 
-- **RSVP API endpoint** — form collects and validates data but doesn't persist it (`src/app/api/rsvp/route.ts` is a stub)
-- **Guest-specific pages** — `getGuestBySlug()` / `getAllGuestSlugs()` exist in config and are ready for dynamic routes like `/[locale]/invite/[slug]`
+Game API routes use `handleGameApiError()` from `@/shared/lib/server` instead of per-route `instanceof` chains. When adding a new error class, register it in `game-api-error-handler.ts` once.
+
+### Server-side timer computation
+
+`computeServerRemainingSeconds()` in `repository-helpers.ts` calculates the remaining time from `timer_last_started_at` and `timer_remaining_seconds`. Clients never submit remaining seconds for round resolution.
 
 ---
 
 ## Key Rules
 
-- **Never hardcode the wedding date** — always import `WEDDING_DATE` from `@/shared/config`
-- **Never hardcode colors** — use CSS variable-based Tailwind classes (`bg-accent`, `text-text-primary`, etc.)
-- **All new text must be in both `uk.json` and `en.json`** — keys must be identical
-- **Tailwind v4 canonical classes** — prefer `bg-linear-to-b` over `bg-gradient-to-b`, `font-cinzel` over `font-[family-name:var(--font-cinzel)]`, etc.
-- **`"use client"` only when necessary** — default to server components, add directive only for interactivity/hooks
-- **Images:** always include `sizes` prop when using `fill` layout
-- **Decorative images:** use `alt=""` (empty string), not descriptive text
+- Never hardcode the wedding date; import `WEDDING_DATE`
+- Keep locale message files in sync
+- Prefer server components by default
+- Keep invite and games route metadata localized
+- Use existing barrel exports when they exist
+- Treat `/invite/[slug]` and `/live` as intentionally non-indexed surfaces
+- Do not remove the current hydration-safe patterns in countdown, splash, language switcher, theme provider, or live snapshot refresh
+- Do not replace the server-authoritative wheel flow with client-side randomness or client-side score authority
+- Use the deferred tasks pattern for any post-response async work in API routes — never `void asyncFn()`
+- Register new game error types in `game-api-error-handler.ts` rather than adding `instanceof` checks in route files
+
+---
+
+## Useful Commands
+
+```bash
+pnpm dev
+pnpm build
+pnpm lint
+pnpm smoke:games
+pnpm generate:wheel-content-seed
+pnpm supabase:login
+pnpm supabase:link
+pnpm supabase:db:push
+pnpm supabase:migration:new
+pnpm exec supabase db push --linked --dry-run
+```

@@ -1,0 +1,1 @@
+export { GamesWheelPage } from "./GamesWheelPage";
