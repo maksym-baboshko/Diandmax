@@ -44,11 +44,25 @@ src/
 │   └── api/                      # rsvp, live, games APIs
 ├── features/
 │   ├── countdown/
-│   ├── game-session/             # auth, local cache, shared contracts, server repository
+│   ├── game-session/             # auth, local cache, shared contracts, server repositories
+│   │   └── server/
+│   │       ├── wheel-round-repository.ts   # open/start/timer/resolve round
+│   │       ├── player-repository.ts        # profile bootstrap & save
+│   │       ├── leaderboard-repository.ts   # leaderboard + live snapshot
+│   │       ├── broadcast-repository.ts     # Supabase Broadcast signals
+│   │       ├── activity-repository.ts      # live feed activity log
+│   │       ├── wheel-session-repository.ts # session + cycle management
+│   │       ├── wheel-content-repository.ts # categories, tasks, history
+│   │       ├── repository-helpers.ts       # pure helpers, server-side timer
+│   │       ├── auth.ts                     # requireAuthenticatedGameUser
+│   │       ├── errors.ts                   # domain error classes
+│   │       ├── queries.ts                  # shared select strings
+│   │       └── index.ts                    # barrel
 │   ├── language-switcher/
 │   ├── theme-switcher/
-│   └── wheel-of-fortune/         # WheelOfFortuneGame + extracted subcomponents
-│       ├── WheelOfFortuneGame.tsx
+│   └── wheel-of-fortune/         # WheelOfFortuneGame + hook + extracted subcomponents
+│       ├── WheelOfFortuneGame.tsx  # animation + JSX only
+│       ├── useWheelGame.ts         # all state, API calls, timer, restore logic
 │       ├── WheelChallengeOverlay.tsx
 │       ├── WheelLeaderboardCard.tsx
 │       ├── ConfettiPop.tsx
@@ -114,10 +128,11 @@ Current RSVP payload shape:
 - only `wheel-of-fortune` is currently playable
 - other games remain catalog entries with `comingSoon` status in `src/shared/config/games.ts`
 - browser auth/session bootstrap lives in `src/features/game-session/auth-client.ts`
-- backend state remains authoritative; game logic and persistence live in `src/features/game-session/server`
+- backend state remains authoritative; game logic and persistence live in `src/features/game-session/server` (split across domain-scoped repository files)
 - timer remaining seconds are computed server-side in `repository-helpers.ts` — clients cannot influence resolution outcome
 - post-response work (broadcast, logging, realtime signals) uses deferred tasks via Next.js `after()` to guarantee execution on Vercel serverless
 - all game API routes use a centralized error handler (`handleGameApiError`) for consistent error → HTTP response mapping
+- all game API endpoints (GET and POST) are rate-limited per authenticated user via `enforceRateLimit()`
 
 ### Live projector
 
@@ -175,8 +190,9 @@ Do not casually refactor these pieces:
 - `features/language-switcher/LanguageSwitcher.tsx`
 - `features/theme-switcher/ThemeProvider.tsx`
 - `widgets/live-projector/useLiveProjectorSnapshot.ts`
+- `features/wheel-of-fortune/useWheelGame.ts`
 
-These pieces intentionally use hydration-safe patterns such as `useSyncExternalStore`, staged mount logic, and mixed polling/realtime invalidation.
+These pieces intentionally use hydration-safe patterns such as `useSyncExternalStore`, staged mount logic, mixed polling/realtime invalidation, and `useEffectEvent` for stable auto-timeout callbacks.
 
 ---
 
