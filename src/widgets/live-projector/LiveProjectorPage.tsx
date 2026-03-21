@@ -29,7 +29,7 @@ export function LiveProjectorPage() {
 
         {/* ── Header ──────────────────────────────────────────────────── */}
         <header className="relative flex items-center rounded-4xl border border-accent/10 bg-bg-primary/55 px-6 py-4 shadow-[0_20px_56px_-36px_rgba(0,0,0,0.6)] backdrop-blur-sm">
-          {/* Left: live indicator + separator + title (title hidden on mobile) */}
+          {/* Left: live indicator */}
           <div className="flex shrink-0 items-center gap-4">
             <div className="flex items-center gap-2.5">
               <span className="relative flex h-2.5 w-2.5">
@@ -40,10 +40,6 @@ export function LiveProjectorPage() {
                 Live
               </span>
             </div>
-            <div className="hidden h-5 w-px bg-accent/15 lg:block" />
-            <h1 className="hidden text-[10px] uppercase tracking-[0.34em] text-accent lg:block">
-              {t("feed_label")}
-            </h1>
           </div>
 
           {/* Center: clock — strictly centered, hidden on mobile */}
@@ -51,12 +47,8 @@ export function LiveProjectorPage() {
             <LiveClock locale={locale} />
           </div>
 
-          {/* Right desktop: leaderboard label + games link + separator + theme + language */}
+          {/* Right desktop: games link + separator + theme + language */}
           <div className="ml-auto hidden shrink-0 items-center gap-8 lg:flex">
-            <span className="text-[10px] uppercase tracking-[0.34em] text-accent">
-              {t("leaderboard_label")}
-            </span>
-            <div aria-hidden="true" className="mx-2 h-4 w-px bg-accent/30" />
             <Link
               href="/games"
               className="group flex items-center gap-2 rounded-sm px-1 py-2 text-xs font-medium uppercase tracking-widest text-text-secondary/70 transition-colors hover:text-accent"
@@ -115,8 +107,8 @@ export function LiveProjectorPage() {
 
           {/* ─ Feed panel ─ */}
           <div className="flex flex-col gap-3">
-            {/* Title card */}
-            <div className="flex items-center gap-3 rounded-4xl border border-accent/10 bg-bg-primary/55 px-6 py-4 shadow-[0_20px_56px_-36px_rgba(0,0,0,0.6)] backdrop-blur-sm">
+            {/* Title card — visible on mobile only; desktop label lives in the navbar */}
+            <div className="flex items-center gap-3 rounded-4xl border border-accent/10 bg-bg-primary/55 px-6 py-4 shadow-[0_20px_56px_-36px_rgba(0,0,0,0.6)] backdrop-blur-sm lg:hidden">
               <p className="shrink-0 text-[10px] uppercase tracking-[0.34em] text-accent">
                 {t("feed_label")}
               </p>
@@ -168,8 +160,8 @@ export function LiveProjectorPage() {
 
           {/* ─ Leaderboard panel ─ */}
           <div className="flex flex-col gap-3">
-            {/* Title card */}
-            <div className="flex items-center gap-3 rounded-4xl border border-accent/10 bg-bg-primary/55 px-6 py-4 shadow-[0_20px_56px_-36px_rgba(0,0,0,0.6)] backdrop-blur-sm">
+            {/* Title card — visible on mobile only; desktop label lives in the navbar */}
+            <div className="flex items-center gap-3 rounded-4xl border border-accent/10 bg-bg-primary/55 px-6 py-4 shadow-[0_20px_56px_-36px_rgba(0,0,0,0.6)] backdrop-blur-sm lg:hidden">
               <p className="shrink-0 text-[10px] uppercase tracking-[0.34em] text-accent">
                 {t("leaderboard_label")}
               </p>
