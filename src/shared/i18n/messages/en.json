@@ -365,6 +365,7 @@
     "hero_generic": "New event",
     "welcome_default": "A new player joined the evening.",
     "anonymous_player": "Guest",
-    "new_top_player_note": "Moved into first place on the global leaderboard."
+    "new_top_player_note": "Moved into first place on the global leaderboard.",
+    "feed_load_more": "More moments"
   }
 }

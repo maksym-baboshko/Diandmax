@@ -5,6 +5,8 @@ import { MOTION_EASE } from "@/shared/lib";
 
 export const HERO_EVENT_DURATION_MS = 5000;
 export const LIVE_POLL_INTERVAL_MS = 30_000;
+export const FEED_INITIAL_VISIBLE = 16;
+export const FEED_LOAD_MORE_STEP = 4;
 export const LIVE_REALTIME_RETRY_BASE_MS = 2_000;
 export const LIVE_REALTIME_RETRY_MAX_MS = 30_000;
 export const SEEN_HERO_IDS_MAX = 200;

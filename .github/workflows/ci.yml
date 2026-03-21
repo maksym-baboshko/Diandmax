@@ -36,9 +36,6 @@ jobs:
       - name: Test coverage
         run: pnpm test:coverage
 
-      - name: Build
-        run: pnpm build
-
       - name: Start local Supabase
         run: pnpm exec supabase start --yes
 
@@ -50,13 +47,35 @@ jobs:
 
       - name: Export local Supabase env
         run: |
-          pnpm exec supabase status -o env \
-            --override-name api.url=NEXT_PUBLIC_SUPABASE_URL \
-            --override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY \
-            --override-name auth.service_role_key=SUPABASE_SECRET_KEY >> "$GITHUB_ENV"
+          env_output="$(
+            pnpm exec supabase status -o env \
+              --override-name api.url=NEXT_PUBLIC_SUPABASE_URL \
+              --override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY \
+              --override-name auth.service_role_key=SUPABASE_SECRET_KEY
+          )"
+
+          while IFS= read -r line; do
+            case "$line" in
+              NEXT_PUBLIC_SUPABASE_URL=*|NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=*|SUPABASE_SECRET_KEY=*)
+                key="${line%%=*}"
+                value="${line#*=}"
+
+                if [[ "$value" == \"*\" && "$value" == *\" ]]; then
+                  value="${value:1:${#value}-2}"
+                elif [[ "$value" == \'*\' && "$value" == *\' ]]; then
+                  value="${value:1:${#value}-2}"
+                fi
+
+                printf '%s=%s\n' "$key" "$value" >> "$GITHUB_ENV"
+                ;;
+            esac
+          done <<< "$env_output"
 
       - name: Verify smoke env
         run: pnpm verify:env
+
+      - name: Build
+        run: pnpm build
 
       - name: Browser E2E
         run: pnpm exec playwright test

@@ -33,8 +33,8 @@ export async function GET(request: Request) {
     }
 
     const snapshot = await getLivePageSnapshot({
-      leaderboardLimit: result.data.leaderboardLimit ?? 10,
-      feedLimit: result.data.feedLimit ?? 5,
+      leaderboardLimit: result.data.leaderboardLimit ?? 30,
+      feedLimit: result.data.feedLimit ?? 20,
     });
 
     return NextResponse.json(snapshot, {

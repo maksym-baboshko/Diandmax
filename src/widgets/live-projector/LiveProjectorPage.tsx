@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { MOTION_EASE } from "@/shared/lib";
 import { useLocale, useTranslations } from "next-intl";
@@ -12,6 +13,7 @@ import { FeedEventCard } from "./FeedEventCard";
 import { HeroEventOverlay } from "./HeroEventOverlay";
 import { LeaderboardRow } from "./LeaderboardRow";
 import { LiveClock } from "./LiveClock";
+import { FEED_INITIAL_VISIBLE, FEED_LOAD_MORE_STEP } from "./live-projector-helpers";
 import { useLiveProjectorSnapshot } from "./useLiveProjectorSnapshot";
 
 export function LiveProjectorPage() {
@@ -19,6 +21,35 @@ export function LiveProjectorPage() {
   const t = useTranslations("LivePage");
   const tGames = useTranslations("GamesCommon");
   const { snapshot, isLoading, error, heroEvent } = useLiveProjectorSnapshot();
+
+  const [visibleCount, setVisibleCount] = useState(FEED_INITIAL_VISIBLE);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  const hasMoreFeed = (snapshot?.feed.length ?? 0) > visibleCount;
+  const visibleFeed = snapshot?.feed.slice(0, visibleCount) ?? [];
+
+  const handleLoadMore = useCallback(() => {
+    setVisibleCount((prev) => prev + FEED_LOAD_MORE_STEP);
+  }, []);
+
+  // Callback ref: called by React exactly when the sentinel mounts or unmounts —
+  // no race condition between ref assignment and effect scheduling.
+  const sentinelRef = useCallback((node: HTMLDivElement | null) => {
+    observerRef.current?.disconnect();
+    observerRef.current = null;
+
+    if (!node) return;
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setVisibleCount((prev) => prev + FEED_LOAD_MORE_STEP);
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    observerRef.current.observe(node);
+  }, []);
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-bg-primary text-text-primary">
@@ -129,28 +160,45 @@ export function LiveProjectorPage() {
                 {t("feed_error")}
               </div>
             ) : snapshot?.feed.length ? (
-              <div className="flex flex-col gap-3 sm:flex-row">
-                {[
-                  snapshot.feed.filter((_, i) => i % 2 === 0),
-                  snapshot.feed.filter((_, i) => i % 2 !== 0),
-                ].map((colEvents, colIdx) => (
-                  <div key={colIdx} className="flex flex-1 flex-col gap-3">
-                    <AnimatePresence mode="popLayout" initial={false}>
-                      {colEvents.map((event) => (
-                        <motion.div
-                          key={event.id}
-                          initial={{ opacity: 0, y: -16 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0.97 }}
-                          transition={{ duration: 0.4, ease: MOTION_EASE }}
-                        >
-                          <FeedEventCard event={event} locale={locale} />
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
-                  </div>
-                ))}
-              </div>
+              <>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  {[
+                    visibleFeed.filter((_, i) => i % 2 === 0),
+                    visibleFeed.filter((_, i) => i % 2 !== 0),
+                  ].map((colEvents, colIdx) => (
+                    <div key={colIdx} className="flex flex-1 flex-col gap-3">
+                      <AnimatePresence mode="popLayout" initial={false}>
+                        {colEvents.map((event) => (
+                          <motion.div
+                            key={event.id}
+                            initial={{ opacity: 0, y: -16 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.97 }}
+                            transition={{ duration: 0.4, ease: MOTION_EASE }}
+                          >
+                            <FeedEventCard event={event} locale={locale} />
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop infinite scroll sentinel — hidden on mobile, observer won't fire */}
+                {hasMoreFeed && (
+                  <div ref={sentinelRef} className="hidden h-1 lg:block" aria-hidden="true" />
+                )}
+
+                {/* Mobile load-more button */}
+                {hasMoreFeed && (
+                  <button
+                    onClick={handleLoadMore}
+                    className="mt-1 w-full rounded-3xl border border-accent/15 bg-bg-primary/55 py-4 text-[11px] uppercase tracking-[0.28em] text-text-secondary/60 backdrop-blur-sm transition-colors hover:border-accent/30 hover:text-accent lg:hidden"
+                  >
+                    {t("feed_load_more")}
+                  </button>
+                )}
+              </>
             ) : (
               <div className="flex min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/22 px-6 text-center text-base text-text-secondary">
                 {t("feed_empty")}

@@ -41,7 +41,7 @@ function getLeaderboardChannel() {
 export async function broadcastLiveSnapshot() {
   let snapshot;
   try {
-    snapshot = await getLivePageSnapshot({ leaderboardLimit: 10, feedLimit: 5 });
+    snapshot = await getLivePageSnapshot({ leaderboardLimit: 30, feedLimit: 20 });
   } catch (error) {
     logServerError({
       scope: "broadcast-repository",

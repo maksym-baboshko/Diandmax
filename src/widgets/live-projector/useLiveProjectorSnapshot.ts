@@ -16,8 +16,8 @@ const LIVE_SNAPSHOT_URL = "/api/live";
 const LIVE_PROJECTOR_BROADCAST_CHANNEL = "live-projector-broadcast";
 const LIVE_PROJECTOR_BROADCAST_EVENT = "snapshot";
 
-const FEED_LIMIT = 16;
-const LEADERBOARD_LIMIT = 15;
+const FEED_LIMIT = 20;
+const LEADERBOARD_LIMIT = 30;
 
 interface UseLiveProjectorSnapshotResult {
   snapshot: LivePageApiResponse | null;
@@ -208,8 +208,8 @@ export function useLiveProjectorSnapshot(): UseLiveProjectorSnapshotResult {
         .on(
           "broadcast",
           { event: LIVE_PROJECTOR_BROADCAST_EVENT },
-          () => {
-            void loadSnapshot();
+          (message: { payload: LivePageApiResponse }) => {
+            applySnapshot(message.payload);
           }
         )
         .subscribe((status) => {
@@ -232,7 +232,7 @@ export function useLiveProjectorSnapshot(): UseLiveProjectorSnapshotResult {
     } catch {
       scheduleRealtimeRetry();
     }
-  }, [clearRealtimeRetry, loadSnapshot, removeRealtimeChannel, scheduleRealtimeRetry]);
+  }, [applySnapshot, clearRealtimeRetry, loadSnapshot, removeRealtimeChannel, scheduleRealtimeRetry]);
 
   subscribeToRealtimeRef.current = subscribeToRealtime;
 

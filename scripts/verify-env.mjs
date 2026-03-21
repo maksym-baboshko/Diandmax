@@ -59,6 +59,15 @@ function readFirstEnv(keys) {
   return null;
 }
 
+function isValidHttpUrl(value) {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 function readConfiguredSeedPaths(configText) {
   const match = configText.match(/^\s*sql_paths\s*=\s*\[(.*)\]\s*$/m);
 
@@ -89,11 +98,18 @@ function fail(message) {
 }
 
 if (shouldCheckSmoke) {
-  for (const keys of requiredGamesEnv) {
+  for (const [index, keys] of requiredGamesEnv.entries()) {
     const envValue = readFirstEnv(keys);
 
     if (!envValue) {
       fail(`Missing required games env. Set one of: ${keys.join(", ")}`);
+      continue;
+    }
+
+    if (index === 0 && !isValidHttpUrl(envValue.value)) {
+      fail(
+        `Games Supabase URL from ${envValue.key} must be a valid HTTP or HTTPS URL.`
+      );
       continue;
     }
 
