@@ -41,8 +41,8 @@ export function LiveProjectorPage() {
               </span>
             </div>
             <div className="hidden h-5 w-px bg-accent/15 lg:block" />
-            <h1 className="hidden font-medium uppercase leading-none tracking-widest text-text-secondary/70 lg:block lg:text-xs">
-              {t("title")}
+            <h1 className="hidden text-[10px] uppercase tracking-[0.34em] text-accent lg:block">
+              {t("feed_label")}
             </h1>
           </div>
 
@@ -51,8 +51,12 @@ export function LiveProjectorPage() {
             <LiveClock locale={locale} />
           </div>
 
-          {/* Right desktop: games link + separator + theme + language */}
+          {/* Right desktop: leaderboard label + games link + separator + theme + language */}
           <div className="ml-auto hidden shrink-0 items-center gap-8 lg:flex">
+            <span className="text-[10px] uppercase tracking-[0.34em] text-accent">
+              {t("leaderboard_label")}
+            </span>
+            <div aria-hidden="true" className="mx-2 h-4 w-px bg-accent/30" />
             <Link
               href="/games"
               className="group flex items-center gap-2 rounded-sm px-1 py-2 text-xs font-medium uppercase tracking-widest text-text-secondary/70 transition-colors hover:text-accent"
@@ -133,7 +137,7 @@ export function LiveProjectorPage() {
                 {t("feed_error")}
               </div>
             ) : snapshot?.feed.length ? (
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 {[
                   snapshot.feed.filter((_, i) => i % 2 === 0),
                   snapshot.feed.filter((_, i) => i % 2 !== 0),

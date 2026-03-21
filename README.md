@@ -173,7 +173,7 @@ pnpm build
 pnpm smoke:games
 ```
 
-CI additionally runs `pnpm test:coverage` to enforce coverage thresholds on the current safety-net surface, `pnpm exec playwright test` after a separate `pnpm build` step for Chromium browser coverage, and `pnpm supabase:types:check -- --verify-output --local` to verify the committed types still match the migrated schema.
+CI additionally runs `pnpm test:coverage` to enforce coverage thresholds on the current safety-net surface, `pnpm exec playwright test` after a separate `pnpm build` step for Chromium browser coverage, and `pnpm supabase:types:check` after resetting local Supabase to catch schema fingerprint drift.
 
 ## API contracts and observability
 

@@ -320,7 +320,7 @@ Run `pnpm verify:env` before smoke-related work to validate the required Supabas
 `pnpm smoke:games` reports named steps and, on failure, includes the failing step, the last successful step, relevant HTTP status/payload context, and recent managed-server logs when available.
 CI additionally runs `pnpm test:coverage` to enforce coverage thresholds on the current safety-net surface.
 CI also runs `pnpm exec playwright test` after a separate build step for browser-level RSVP, games, wheel, and live-feed verification.
-CI also runs `pnpm supabase:types:check -- --verify-output --local` after resetting local Supabase to catch DB type drift.
+CI also runs `pnpm supabase:types:check` after resetting local Supabase to catch DB type drift.
 
 ---
 
