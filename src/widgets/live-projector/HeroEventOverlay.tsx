@@ -75,8 +75,7 @@ export function HeroEventOverlay({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.4, ease: EASE }}
-      className="fixed inset-0 z-20 flex flex-col overflow-hidden"
-      style={{ backgroundColor: "rgba(5, 7, 12, 0.91)" }}
+      className="fixed inset-0 z-20 flex flex-col overflow-hidden bg-bg-primary/[0.93]"
     >
       {/* Breathing ambient glow */}
       <motion.div

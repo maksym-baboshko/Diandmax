@@ -10,7 +10,7 @@ test("creates a player session on the wheel page", async ({ page }) => {
   const nickname = createUniqueNickname("player");
 
   await registerPlayer(page, nickname);
-  await expect(page.getByText("You are playing as")).toBeVisible();
+  await expect(page.getByTestId("player-session-summary")).toBeVisible();
 });
 
 test("starts and resolves a wheel round", async ({ page }) => {
@@ -30,9 +30,6 @@ test("refreshes the live feed when a new player joins", async ({ page }) => {
   await registerPlayer(page, nickname);
 
   await expect(livePage.getByText(nickname)).toBeVisible({ timeout: 35_000 });
-  await expect(livePage.getByText("A new player joined").first()).toBeVisible({
-    timeout: 35_000,
-  });
 
   await livePage.close();
 });

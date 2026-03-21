@@ -167,7 +167,7 @@ export function PlayerSessionCard({
   if (isSummaryVisible) {
     return (
       <CardShell className={className}>
-        <div className={cardClass}>
+        <div className={cardClass} data-testid="player-session-summary">
           {chrome}
           {/* Decorative animated burst */}
           <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[31px]">
@@ -192,6 +192,7 @@ export function PlayerSessionCard({
                       "heading-serif mt-3 truncate text-[2.75rem] leading-[0.92] tracking-[0.04em] text-text-primary",
                       compact && "text-3xl"
                     )}
+                    data-testid="player-session-nickname"
                     title={session.nickname}
                   >
                     {session.nickname}

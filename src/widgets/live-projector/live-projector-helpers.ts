@@ -5,8 +5,10 @@ import { MOTION_EASE } from "@/shared/lib";
 
 export const HERO_EVENT_DURATION_MS = 5000;
 export const LIVE_POLL_INTERVAL_MS = 30_000;
-export const FEED_INITIAL_VISIBLE = 16;
-export const FEED_LOAD_MORE_STEP = 4;
+export const MOBILE_FEED_INITIAL_VISIBLE = 8;
+export const MOBILE_FEED_LOAD_MORE_STEP = 8;
+export const DESKTOP_FEED_INITIAL_VISIBLE = 30;
+export const DESKTOP_FEED_LOAD_MORE_STEP = 10;
 export const LIVE_REALTIME_RETRY_BASE_MS = 2_000;
 export const LIVE_REALTIME_RETRY_MAX_MS = 30_000;
 export const SEEN_HERO_IDS_MAX = 200;
@@ -78,20 +80,8 @@ export function getEventLabelKey(eventType: string | null | undefined) {
   }
 }
 
-export function getEventBarClass(eventType: string | null | undefined) {
-  switch (eventType) {
-    case "leaderboard.new_top_player":
-    case "wheel.round.completed":
-      return "bg-accent";
-    case "xp.awarded":
-      return "bg-accent/75";
-    case "wheel.round.promised":
-      return "bg-accent/45";
-    case "player.joined":
-      return "bg-text-secondary/35";
-    default:
-      return "bg-accent/30";
-  }
+export function getEventBarClass(_eventType: string | null | undefined) {
+  return "bg-accent/50";
 }
 
 export function computeLiveProjectorLimits(viewportHeight: number) {

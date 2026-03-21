@@ -23,8 +23,14 @@ export async function registerPlayer(
 
   await page.getByRole("button", { name: "Start playing" }).click();
 
-  await expect(page.getByRole("heading", { name: nickname })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Edit name" })).toBeVisible();
+  const sessionSummary = page.getByTestId("player-session-summary");
+  await expect(sessionSummary).toBeVisible();
+  await expect(sessionSummary.getByTestId("player-session-nickname")).toHaveText(
+    nickname
+  );
+  await expect(
+    sessionSummary.getByRole("button", { name: "Edit name" })
+  ).toBeVisible();
 }
 
 export async function resolveWheelRound(
@@ -97,6 +103,6 @@ export async function resolveWheelRound(
 export async function openLivePage(page: Page): Promise<Page> {
   const livePage = await page.context().newPage();
   await livePage.goto(LIVE_PAGE_PATH);
-  await expect(livePage.getByText("Live feed")).toBeVisible();
+  await expect(livePage.getByTestId("live-projector-page")).toBeVisible();
   return livePage;
 }

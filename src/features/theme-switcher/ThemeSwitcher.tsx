@@ -5,7 +5,11 @@ import { useTheme } from "./ThemeProvider";
 import { useSyncExternalStore } from "react";
 import { cn } from "@/shared/lib";
 
-export function ThemeSwitcher() {
+interface ThemeSwitcherProps {
+  className?: string;
+}
+
+export function ThemeSwitcher({ className }: ThemeSwitcherProps) {
   const { theme, toggleTheme } = useTheme();
   const t = useTranslations("Accessibility");
   
@@ -28,7 +32,8 @@ export function ThemeSwitcher() {
       className={cn(
         "flex items-center justify-center w-10 h-10 rounded-full border border-accent text-accent transition-all duration-300 cursor-pointer select-none",
         "bg-bg-primary hover:bg-accent hover:text-white",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary",
+        className
       )}
       aria-label={theme === "light" ? t("switch_to_dark_theme") : t("switch_to_light_theme")}
     >
