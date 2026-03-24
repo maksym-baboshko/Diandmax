@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import type { LiveFeedEventSnapshot } from "./types";
 import type { SupportedLocale } from "@/shared/config";
-import { EASE, getAvatarMonogram, getEventPrompt, getHeroLabelKey } from "./live-projector-helpers";
+import { MOTION_EASE } from "@/shared/lib";
+import { getAvatarMonogram, getEventPrompt, getHeroLabelKey } from "./live-projector-helpers";
 
 function SonarRing({ delay, finalScale }: { delay: number; finalScale: number }) {
   return (
@@ -74,7 +75,7 @@ export function HeroEventOverlay({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.4, ease: EASE }}
+      transition={{ duration: 0.4, ease: MOTION_EASE }}
       className="fixed inset-0 z-20 flex flex-col overflow-hidden bg-bg-primary/[0.93]"
     >
       {/* Breathing ambient glow */}
@@ -141,7 +142,7 @@ export function HeroEventOverlay({
         <motion.h2
           initial={{ opacity: 0, scale: 1.14, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.22, ease: EASE }}
+          transition={{ duration: 0.9, delay: 0.22, ease: MOTION_EASE }}
           className="heading-serif text-center leading-[0.88] text-text-primary"
           style={{ fontSize: "clamp(3rem, min(14vw, 13vh), 9.5rem)" }}
         >
@@ -153,7 +154,7 @@ export function HeroEventOverlay({
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.75, delay: 0.52, ease: EASE }}
+            transition={{ duration: 0.75, delay: 0.52, ease: MOTION_EASE }}
             className="flex flex-col items-center text-center"
             style={{ gap: "3vh" }}
           >
@@ -165,7 +166,7 @@ export function HeroEventOverlay({
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.72, ease: EASE }}
+                transition={{ duration: 0.7, delay: 0.72, ease: MOTION_EASE }}
                 className="flex items-baseline gap-5"
               >
                 <span
@@ -187,7 +188,7 @@ export function HeroEventOverlay({
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.75, delay: 0.52, ease: EASE }}
+            transition={{ duration: 0.75, delay: 0.52, ease: MOTION_EASE }}
             className="flex flex-col items-center text-center"
             style={{ gap: "2vh" }}
           >
@@ -205,7 +206,7 @@ export function HeroEventOverlay({
               <motion.div
                 initial={{ opacity: 0, scale: 0.82, y: 10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.74, ease: EASE }}
+                transition={{ duration: 0.6, delay: 0.74, ease: MOTION_EASE }}
                 className="flex items-center gap-3 rounded-full border border-accent/28 bg-accent/8 px-8 py-3"
               >
                 <span className="font-cinzel text-xl text-accent">
@@ -223,7 +224,7 @@ export function HeroEventOverlay({
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.65, ease: EASE }}
+          transition={{ duration: 1, delay: 0.65, ease: MOTION_EASE }}
           className="absolute font-cinzel text-xs uppercase tracking-[0.45em] text-accent/60"
           style={{ bottom: "3vh" }}
         >

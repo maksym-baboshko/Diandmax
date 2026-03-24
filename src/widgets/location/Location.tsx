@@ -59,8 +59,7 @@ export function Location() {
   const t = useTranslations("Location");
   const liteMotion = useLiteMotion();
 
-  const googleMapsUrl =
-    "https://www.google.com/maps/dir/?api=1&destination=Grand+Hotel+Terminus+Bergen";
+  const googleMapsUrl = VENUE.directionsUrl;
 
   return (
     <SectionWrapper id="location" className="relative overflow-hidden py-24">

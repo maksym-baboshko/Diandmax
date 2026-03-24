@@ -1,6 +1,5 @@
 import type { LiveFeedEventSnapshot } from "./types";
 import type { SupportedLocale } from "@/shared/config";
-import { MOTION_EASE } from "@/shared/lib";
 
 export const MOBILE_FEED_INITIAL_VISIBLE = 8;
 export const MOBILE_FEED_LOAD_MORE_STEP = 8;
@@ -80,4 +79,3 @@ export function computeLiveProjectorLimits(viewportHeight: number) {
   };
 }
 
-export const EASE = MOTION_EASE;

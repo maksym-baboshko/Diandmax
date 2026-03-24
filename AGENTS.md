@@ -26,8 +26,8 @@ This repository contains:
 | Animation | Framer Motion 12 |
 | i18n | next-intl 4 |
 | Forms | react-hook-form + zod + @hookform/resolvers |
-| Testing | Vitest + React Testing Library |
-| Backend services | Supabase (rate-limit RPC) + Resend |
+| Testing | — (to be added in a future phase) |
+| Backend services | Resend (email delivery) |
 | Utilities | clsx + tailwind-merge via `cn()` |
 
 ---
@@ -53,8 +53,6 @@ src/
 │   │   ├── motion.ts             # MOTION_EASE — canonical default animation curve
 │   │   └── server/               # server-only utilities
 │   │       ├── deferred.ts       # after() + runDeferredTasks for Vercel serverless
-│   │       ├── supabase.ts       # Supabase admin client singleton
-│   │       ├── rate-limit.ts     # enforceRateLimit via Supabase RPC
 │   │       ├── api-error-response.ts
 │   │       ├── logger.ts
 │   │       ├── csp.ts
@@ -93,8 +91,7 @@ Barrel exports are already used across the repo. Prefer importing from the barre
 - `/invite/[slug]` renders guest-specific copy and seat count
 - personalized invite pages prefill RSVP defaults from the guest entry
 - `src/app/api/rsvp/route.ts` is implemented and uses `rsvpSchema`
-- the RSVP API rate-limits submissions, uses a honeypot `website` field that short-circuits bot-like submissions, and sends via Resend or `mock` mode
-- rate-limiting fails gracefully (skipped with a log entry) if Supabase is not configured
+- the RSVP API uses a honeypot `website` field that short-circuits bot-like submissions and sends via Resend or `mock` mode
 
 Current RSVP payload shape:
 
@@ -118,7 +115,8 @@ Current RSVP payload shape:
 
 `@/shared/config` is the source of truth for wedding data, guest data, and metadata helpers.
 
-- always import `WEDDING_DATE` from `@/shared/config`
+- always import `WEDDING_DATE` and `WEDDING_DATE_ROMAN` from `@/shared/config`
+- always import `VENUE` (including `VENUE.locationShort` and `VENUE.directionsUrl`) from `@/shared/config`
 - do not duplicate `VENUE`, `COUPLE`, `DRESS_CODE`, guests, or metadata data in route files or widgets
 
 Current reusable UI primitives in `src/shared/ui`:
@@ -134,7 +132,7 @@ Current reusable UI primitives in `src/shared/ui`:
 Styling rules:
 
 - colors should go through CSS variables defined in `src/app/globals.css`
-- prefer Tailwind classes backed by those variables such as `bg-bg-primary`, `text-text-primary`, `text-accent`
+- prefer Tailwind classes backed by those variables such as `bg-bg-primary`, `text-text-primary`, `text-accent`, `text-error`
 - avoid hardcoded colors in components except intentional config/email/SVG cases
 - headings use `heading-serif` or `heading-serif-italic`
 - numerals and formal labels use `font-cinzel`
@@ -162,29 +160,6 @@ Do not casually refactor these pieces:
 - `features/theme-switcher/ThemeProvider.tsx`
 
 These pieces intentionally use hydration-safe patterns such as `useSyncExternalStore` and staged mount logic.
-
----
-
-## Supabase
-
-Supabase is currently used only for RSVP rate-limiting via a `consume_rate_limit_window` RPC function.
-A full games backend will be built in a future phase using Supabase migrations.
-
-If `NEXT_PUBLIC_SUPABASE_URL` or `SUPABASE_SECRET_KEY` are not set, `enforceRateLimit` skips silently — requests go through without rate-limiting.
-
-Required runtime env vars:
-
-```bash
-NEXT_PUBLIC_SUPABASE_URL=
-SUPABASE_SECRET_KEY=
-```
-
-Supported fallbacks:
-
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
-
-Supabase CLI (`supabase` devDependency) is available for future migration work. When starting a new games backend phase, run `pnpm exec supabase init` to reinitialize the local project directory.
 
 ---
 
@@ -224,17 +199,16 @@ Minimum local verification before considering the repo ready:
 
 ```bash
 pnpm lint
-pnpm test
 pnpm build
 ```
-
-CI runs `pnpm test:coverage` to enforce coverage thresholds on the current safety-net surface.
 
 ---
 
 ## Key Rules
 
-- Never hardcode the wedding date; import `WEDDING_DATE`
+- Never hardcode the wedding date; import `WEDDING_DATE` from `@/shared/config`
+- Never hardcode the Roman numeral date; import `WEDDING_DATE_ROMAN` from `@/shared/config`
+- Never hardcode venue strings; import `VENUE` from `@/shared/config` (`VENUE.locationShort`, `VENUE.directionsUrl`, etc.)
 - Never hardcode the default motion curve `[0.22, 1, 0.36, 1]` inline; import `MOTION_EASE` from `@/shared/lib`
 - Keep locale message files in sync
 - Prefer server components by default
@@ -250,9 +224,6 @@ CI runs `pnpm test:coverage` to enforce coverage thresholds on the current safet
 
 ```bash
 pnpm dev
-pnpm test
-pnpm test:coverage
 pnpm lint
 pnpm build
-pnpm supabase:login
 ```

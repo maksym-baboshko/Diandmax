@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { cookies } from "next/headers";
 import { playfair, inter, cinzel, vibes, THEME_INIT_SCRIPT } from "@/shared/lib";
+import { WEDDING_DATE_ROMAN } from "@/shared/config";
 import { Button, Ornament } from "@/shared/ui";
 import ukMessages from "@/shared/i18n/messages/uk.json";
 import enMessages from "@/shared/i18n/messages/en.json";
@@ -32,7 +33,6 @@ export default async function GlobalNotFound() {
   const cookieStore = await cookies();
   const locale = cookieStore.get("NEXT_LOCALE")?.value === "en" ? "en" : "uk";
   const t = globalMessages[locale];
-  const secondaryCta = locale === "uk" ? "Перейти до RSVP" : "Go to RSVP";
 
   return (
     <html
@@ -68,7 +68,7 @@ export default async function GlobalNotFound() {
               </a>
 
               <p className="font-cinzel text-[10px] uppercase tracking-[0.34em] text-text-secondary/90 md:text-xs">
-                XXVIII · VI · MMXXVI
+                {WEDDING_DATE_ROMAN}
               </p>
             </div>
 
@@ -140,7 +140,7 @@ export default async function GlobalNotFound() {
                         size="lg"
                         className="min-w-55 border-accent/30 text-bg-primary hover:bg-bg-primary/10 hover:text-bg-primary dark:text-text-primary dark:hover:bg-accent/12 dark:hover:text-text-primary"
                       >
-                        {secondaryCta}
+                        {t.rsvp_cta}
                       </Button>
                     </div>
                   </div>

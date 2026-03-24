@@ -1,4 +1,4 @@
-export { WEDDING_DATE, VENUE, COUPLE, DRESS_CODE } from "./wedding";
+export { WEDDING_DATE, WEDDING_DATE_ROMAN, VENUE, COUPLE, DRESS_CODE } from "./wedding";
 export {
   SITE_NAME,
   SITE_ALTERNATE_NAME,

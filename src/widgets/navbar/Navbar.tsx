@@ -3,6 +3,7 @@
 import type { MouseEvent } from "react";
 import { useTranslations } from "next-intl";
 import { useReducedMotion } from "framer-motion";
+import { VENUE, WEDDING_DATE_ROMAN } from "@/shared/config";
 import { HeaderFrame, type HeaderNavItem } from "./HeaderFrame";
 
 const NAV_LINKS = [
@@ -52,8 +53,8 @@ export function Navbar() {
       openMenuLabel={tA11y("open_menu")}
       closeMenuLabel={tA11y("close_menu")}
       mobileMeta={{
-        left: "Bergen · Norway",
-        right: "XXVIII · VI · MMXXVI",
+        left: VENUE.locationShort,
+        right: WEDDING_DATE_ROMAN,
       }}
       showSkipLink
       skipLinkLabel={tA11y("skip_to_content")}

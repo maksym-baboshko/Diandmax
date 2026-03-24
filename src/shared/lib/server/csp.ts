@@ -23,7 +23,6 @@ const BASE_CONNECT_SOURCES = [
   "'self'",
   "https://*.googleapis.com",
   "https://*.gstatic.com",
-  "https://*.supabase.co",
   "https://va.vercel-scripts.com",
   "https://vitals.vercel-insights.com",
 ] as const;
@@ -83,7 +82,6 @@ export function buildContentSecurityPolicy() {
     [
       ...BASE_CONNECT_SOURCES,
       ...(isDevelopment ? DEV_ONLY_CONNECT_SOURCES : []),
-      "wss://*.supabase.co",
     ],
     PREVIEW_CONNECT_SOURCES,
   );

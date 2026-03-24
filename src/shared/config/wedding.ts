@@ -1,10 +1,14 @@
 export const WEDDING_DATE = new Date("2026-06-28T12:00:00+02:00");
+export const WEDDING_DATE_ROMAN = "XXVIII · VI · MMXXVI";
 
 export const VENUE = {
   name: "Grand Hotel Terminus",
   address: "Zander Kaaes gate 6, Bergen, Norway",
+  locationShort: "Bergen · Norway",
   mapsUrl:
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7885.211927431506!2d5.3317077777744!3d60.39067347514558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x463cfeaee5dd6657%3A0xc2191cbcc53f2cb4!2sGrand%20Hotel%20Terminus!5e0!3m2!1sen!2sus!4v1773371922926!5m2!1sen!2sus",
+  directionsUrl:
+    "https://www.google.com/maps/dir/?api=1&destination=Grand+Hotel+Terminus+Bergen",
   coordinates: {
     lat: 60.39067347514558,
     lng: 5.3317077777744,

@@ -2,11 +2,8 @@ import { NextResponse } from "next/server";
 import {
   createApiErrorResponse,
   createInvalidDataErrorResponse,
-  enforceRateLimit,
-  getRateLimitErrorPayload,
   getRequestId,
   logServerError,
-  RateLimitExceededError,
 } from "@/shared/lib/server";
 import { rsvpSubmissionPayloadSchema } from "@/widgets/rsvp/model/api-contracts";
 import { getRsvpEmailConfig, sendRsvpNotification } from "@/widgets/rsvp/server";
@@ -17,13 +14,6 @@ export async function POST(request: Request) {
   const requestId = getRequestId(request);
 
   try {
-    await enforceRateLimit({
-      request,
-      scope: "rsvp.submit",
-      limit: 6,
-      windowSeconds: 15 * 60,
-    });
-
     const body = await request.json().catch(() => null);
     const result = rsvpSubmissionPayloadSchema.safeParse(body);
 
@@ -61,13 +51,6 @@ export async function POST(request: Request) {
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Internal Server Error";
-
-    if (error instanceof RateLimitExceededError) {
-      return createApiErrorResponse({
-        status: 429,
-        ...getRateLimitErrorPayload(error.retryAfterSeconds, requestId),
-      });
-    }
 
     logServerError({
       scope: "api.rsvp.submit",
