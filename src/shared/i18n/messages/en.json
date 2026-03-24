@@ -85,7 +85,8 @@
     "description": "A historic hotel in the heart of Bergen, where timeless elegance meets modern comfort.",
     "cta": "Open in Maps",
     "chip_history": "Historic since 1928",
-    "chip_location": "Bergen City Centre"
+    "chip_location": "Bergen City Centre",
+    "map_title": "Map of Grand Hotel Terminus location"
   },
   "DressCode": {
     "title": "Dress Code",
@@ -143,7 +144,8 @@
     "name_min": "Please enter at least 2 characters",
     "delivery_note": "✦ Your response will be emailed to us right away",
     "submit_loading_note": "✦ Sending your response",
-    "error_generic": "Something went wrong. Please try again later."
+    "error_generic": "Something went wrong. Please try again later.",
+    "error_network": "No internet connection. Please check your network and try again."
   },
   "Gifts": {
     "title": "Gifts",

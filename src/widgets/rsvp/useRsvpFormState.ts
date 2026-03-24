@@ -163,11 +163,15 @@ export function useRsvpFormState(guest?: Guest) {
       if (process.env.NODE_ENV !== "production") {
         console.warn("RSVP submit error:", error);
       }
-      setSubmitError(
-        process.env.NODE_ENV === "development" && error instanceof Error
-          ? error.message
-          : t("error_generic")
-      );
+      if (error instanceof TypeError) {
+        setSubmitError(t("error_network"));
+      } else {
+        setSubmitError(
+          process.env.NODE_ENV === "development" && error instanceof Error
+            ? error.message
+            : t("error_generic")
+        );
+      }
     }
   };
 

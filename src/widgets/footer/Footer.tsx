@@ -3,10 +3,9 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Ornament } from "@/shared/ui";
-import { VENUE, WEDDING_DATE } from "@/shared/config";
+import { VENUE, WEDDING_DATE, WEDDING_DATE_ROMAN } from "@/shared/config";
 import { MOTION_EASE, useLiteMotion } from "@/shared/lib";
 
-const romanDate = "XXVIII · VI · MMXXVI";
 const ease = MOTION_EASE;
 
 export function Footer() {
@@ -69,7 +68,7 @@ export function Footer() {
         <div className="flex items-center gap-3">
           <span className="block h-px w-10 bg-linear-to-r from-transparent to-accent/35" />
           <span className="text-[9px] tracking-[0.35em] uppercase text-text-secondary/90 font-medium">
-            Bergen · Norway
+            {VENUE.locationShort}
           </span>
           <span className="block h-px w-10 bg-linear-to-l from-transparent to-accent/35" />
         </div>
@@ -85,7 +84,7 @@ export function Footer() {
           </h2>
 
           <p className="mt-1 font-cinzel text-[0.6rem] uppercase tracking-[0.45em] text-text-secondary/90 md:text-[0.7rem]">
-            {romanDate}
+            {WEDDING_DATE_ROMAN}
           </p>
 
           <p className="mt-0.5 text-xs tracking-wider text-text-secondary/90">

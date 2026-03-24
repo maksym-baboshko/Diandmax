@@ -162,6 +162,7 @@ export function Location() {
             >
               <iframe
                 src={VENUE.mapsUrl}
+                title={t("map_title")}
                 width="100%"
                 height="100%"
                 style={{ border: 0, position: "absolute", inset: 0 }}
@@ -232,6 +233,7 @@ export function Location() {
               <div className="relative min-h-75 border-t border-accent/16 lg:min-h-0 lg:w-1/2 lg:border-t-0 lg:border-l lg:border-accent/16">
                 <iframe
                   src={VENUE.mapsUrl}
+                  title={t("map_title")}
                   width="100%"
                   height="100%"
                   style={{ border: 0, position: "absolute", inset: 0 }}

@@ -24,7 +24,7 @@ export default function LocaleError({
         <p className="heading-serif mb-1 text-lg text-text-secondary italic">
           Something went wrong
         </p>
-        {error.digest && (
+        {process.env.NODE_ENV !== "production" && error.digest && (
           <p className="mt-2 font-mono text-xs text-text-secondary/60">
             {error.digest}
           </p>

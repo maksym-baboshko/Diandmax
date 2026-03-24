@@ -37,7 +37,7 @@ function StarDivider() {
   return (
     <div className="flex items-center justify-center gap-3 my-10 md:my-12">
       <div className="w-10 md:w-14 h-px bg-accent/25" />
-      <svg width="12" height="12" viewBox="0 0 12 12" className="text-accent/45 shrink-0" fill="currentColor">
+      <svg width="12" height="12" viewBox="0 0 12 12" className="text-accent/45 shrink-0" fill="currentColor" aria-hidden="true">
         <path d="M6 0L7.2 4.8L12 6L7.2 7.2L6 12L4.8 7.2L0 6L4.8 4.8L6 0Z" />
       </svg>
       <div className="w-10 md:w-14 h-px bg-accent/25" />
@@ -150,7 +150,7 @@ export function OurStory() {
             <div className="flex items-center justify-center gap-5 mb-12 md:mb-16">
               <div className="flex-1 h-px bg-accent/30" />
               <div className="text-accent/70 shrink-0 drop-shadow-[0_0_6px_color-mix(in_srgb,var(--accent)_50%,transparent)]">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="0.5">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="0.5" aria-hidden="true">
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                 </svg>
               </div>
@@ -184,7 +184,7 @@ export function OurStory() {
             <div className="relative w-full aspect-square md:aspect-4/3 rounded-2xl overflow-hidden mt-10 md:mt-12 group">
               <Image
                 src="/images/story/our_first_photo.jpg"
-                alt=""
+                alt={t("photo_caption_first")}
                 fill
                 sizes="(max-width: 768px) 100vw, 672px"
                 className="object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105"
@@ -289,7 +289,7 @@ export function OurStory() {
               {/* Decorative bottom rule */}
               <div className="flex items-center justify-center gap-3 mt-12 md:mt-14">
                 <div className="w-20 md:w-28 h-px bg-accent/20" />
-                <svg width="16" height="16" viewBox="0 0 16 16" className="text-accent/40 shrink-0" fill="currentColor">
+                <svg width="16" height="16" viewBox="0 0 16 16" className="text-accent/40 shrink-0" fill="currentColor" aria-hidden="true">
                   <path d="M8 0L9.6 6.4L16 8L9.6 9.6L8 16L6.4 9.6L0 8L6.4 6.4L8 0Z" />
                 </svg>
                 <div className="w-20 md:w-28 h-px bg-accent/20" />
