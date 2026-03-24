@@ -41,22 +41,22 @@
   --accent-rgb: 191, 149, 112;
   --error: #e07070;
 
-  /* ── Splash envelope & card (dark parchment palette) ── */
-  --splash-env-outer: #2a2219;
-  --splash-card-bg: #1c1710;
-  --splash-card-border: #3a2e20;
-  --splash-card-text: #f0e8de;
-  --splash-card-subtext: #9e8876;
-  --splash-flap-triangle: #242018;
-  --splash-flap-back: #3d3020;
-  --splash-flap-left-a: #2f2619;
-  --splash-flap-left-b: #251d12;
-  --splash-flap-right-a: #2c2318;
-  --splash-flap-right-b: #221a10;
-  --splash-flap-bottom-a: #2a2115;
-  --splash-flap-bottom-b: #201a10;
-  --splash-flap-top-a: #2d2419;
-  --splash-flap-top-b: #231c12;
+  /* ── Splash envelope & card (dark kraft palette) ── */
+  --splash-env-outer: #5c4530;
+  --splash-card-bg: #352818;
+  --splash-card-border: #7a5e3e;
+  --splash-card-text: #f2ebe0;
+  --splash-card-subtext: #b89e82;
+  --splash-flap-triangle: #3e3020;
+  --splash-flap-back: #6a5035;
+  --splash-flap-left-a: #634e33;
+  --splash-flap-left-b: #553f27;
+  --splash-flap-right-a: #604b30;
+  --splash-flap-right-b: #503d26;
+  --splash-flap-bottom-a: #5e4a2f;
+  --splash-flap-bottom-b: #4e3b22;
+  --splash-flap-top-a: #674e34;
+  --splash-flap-top-b: #57412a;
 }
 
 @theme inline {
