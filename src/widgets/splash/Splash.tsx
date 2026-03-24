@@ -61,7 +61,7 @@ export function Splash() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             style={{ perspective: "900px" }}
           >
-            <div className="absolute inset-0 bg-[#EAE0CE] rounded-sm shadow-xl z-0" />
+            <div className="absolute inset-0 bg-splash-env-outer rounded-sm shadow-xl z-0" />
 
             <div className="absolute inset-0 z-5 pointer-events-none overflow-hidden">
               <svg className="w-full h-full" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -82,7 +82,7 @@ export function Splash() {
             </div>
 
             <motion.div
-              className="absolute w-[92%] h-[85%] bg-[#FAF6F0] rounded-sm shadow-md flex flex-col items-center justify-center text-center p-6 border border-[#E6D5C3] z-20"
+              className="absolute w-[92%] h-[85%] bg-splash-card-bg rounded-sm shadow-md flex flex-col items-center justify-center text-center p-6 border border-splash-card-border z-20"
               initial={{ y: 0, scale: 0.98 }}
               animate={{ y: "-65%", scale: 1 }}
               transition={{
@@ -109,7 +109,7 @@ export function Splash() {
                 </svg>
               </div>
 
-              <h1 className="heading-serif text-3xl md:text-5xl text-[#3A3530] mb-3">
+              <h1 className="heading-serif text-3xl md:text-5xl text-splash-card-text mb-3">
                 {t("title")}
               </h1>
               <div className="flex items-center justify-center my-3">
@@ -118,13 +118,13 @@ export function Splash() {
                   <circle cx="24" cy="9" r="8" stroke="#C4A07A" strokeWidth="1.3" fill="none" opacity="0.58" />
                 </svg>
               </div>
-              <p className="heading-serif-italic text-[#A08875] text-sm md:text-base">
+              <p className="heading-serif-italic text-splash-card-subtext text-sm md:text-base">
                 {t("subtitle")}
               </p>
             </motion.div>
 
             <motion.div
-              className="absolute top-0 inset-x-0 h-1/2 bg-[#F6ECE2] z-35 pointer-events-none"
+              className="absolute top-0 inset-x-0 h-1/2 bg-splash-flap-triangle z-35 pointer-events-none"
               style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
               initial={{ opacity: 1 }}
               animate={{ opacity: 0 }}
@@ -141,16 +141,16 @@ export function Splash() {
               >
                 <defs>
                   <linearGradient id="leftFlap" x1="0" y1="0.5" x2="1" y2="0.5">
-                    <stop offset="0%" stopColor="#EEE0CC" />
-                    <stop offset="100%" stopColor="#E0CEB8" />
+                    <stop offset="0%" style={{ stopColor: "var(--splash-flap-left-a)" }} />
+                    <stop offset="100%" style={{ stopColor: "var(--splash-flap-left-b)" }} />
                   </linearGradient>
                   <linearGradient id="rightFlap" x1="1" y1="0.5" x2="0" y2="0.5">
-                    <stop offset="0%" stopColor="#ECDdC8" />
-                    <stop offset="100%" stopColor="#DECBB5" />
+                    <stop offset="0%" style={{ stopColor: "var(--splash-flap-right-a)" }} />
+                    <stop offset="100%" style={{ stopColor: "var(--splash-flap-right-b)" }} />
                   </linearGradient>
                   <linearGradient id="bottomFlap" x1="0.5" y1="1" x2="0.5" y2="0">
-                    <stop offset="0%" stopColor="#E6D8C4" />
-                    <stop offset="100%" stopColor="#DDD0BC" />
+                    <stop offset="0%" style={{ stopColor: "var(--splash-flap-bottom-a)" }} />
+                    <stop offset="100%" style={{ stopColor: "var(--splash-flap-bottom-b)" }} />
                   </linearGradient>
                 </defs>
                 <path d="M0 0 L200 150 L0 300 Z" fill="url(#leftFlap)" />
@@ -170,8 +170,8 @@ export function Splash() {
                 <svg className="w-full h-full" viewBox="0 0 400 300" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <defs>
                     <linearGradient id="topFlapGrad" x1="0.5" y1="0" x2="0.5" y2="1">
-                      <stop offset="0%" stopColor="#F8F0E8" />
-                      <stop offset="100%" stopColor="#EDE2D4" />
+                      <stop offset="0%" style={{ stopColor: "var(--splash-flap-top-a)" }} />
+                      <stop offset="100%" style={{ stopColor: "var(--splash-flap-top-b)" }} />
                     </linearGradient>
                   </defs>
                   <path d="M0 0 L200 155 L400 0 Z" fill="url(#topFlapGrad)" filter="drop-shadow(0px 4px 5px rgba(0,0,0,0.07))" />
@@ -184,7 +184,7 @@ export function Splash() {
                   backfaceVisibility: "hidden",
                   transform: "rotateX(180deg)",
                   clipPath: "polygon(0% 100%, 50% 48.3%, 100% 100%)",
-                  backgroundColor: "#C8B89E",
+                  backgroundColor: "var(--splash-flap-back)",
                   backgroundImage: [
                     "repeating-linear-gradient(45deg,  rgba(255,245,220,0.13) 0px, rgba(255,245,220,0.13) 1px, transparent 1px, transparent 14px)",
                     "repeating-linear-gradient(-45deg, rgba(255,245,220,0.13) 0px, rgba(255,245,220,0.13) 1px, transparent 1px, transparent 14px)",
