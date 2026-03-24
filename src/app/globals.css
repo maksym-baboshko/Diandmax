@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/* ─── CSS tokens will be added in PR 6 (Design System) ─── */
+:root {
+  --bg-primary: #faf6f0;
+  --bg-secondary: #f5ede0;
+  --text-primary: #1a1614;
+  --text-secondary: #4a3e35;
+  --accent: #8e6842;
+  --error: #c0392b;
+}
+
+.dark {
+  --bg-primary: #1a1614;
+  --bg-secondary: #231e1a;
+  --text-primary: #f5ede0;
+  --text-secondary: #c4a882;
+  --accent: #c4a882;
+  --error: #e74c3c;
+}
+
+@theme inline {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-accent: var(--accent);
+  --color-error: var(--error);
+}
