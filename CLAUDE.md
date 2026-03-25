@@ -85,10 +85,12 @@ src/
 │   │   ├── page.tsx                  # invitation page
 │   │   ├── layout.tsx
 │   │   ├── error.tsx                 # locale-level error boundary
-│   │   ├── live/page.tsx             # live projector (noindex)
-│   │   └── invite/[slug]/page.tsx    # personalized invite
+│   │   ├── not-found.tsx             # locale-level 404
+│   │   ├── live/page.tsx             # activity feed (noindex)
+│   │   └── invite/[slug]/page.tsx    # personalized invite (noindex)
 │   ├── api/
 │   │   └── rsvp/route.ts
+│   ├── global-not-found.tsx          # fallback 404 (globalNotFound)
 │   ├── globals.css
 │   └── layout.tsx
 ├── features/
@@ -102,9 +104,7 @@ src/
 │       └── schema/
 ├── entities/
 │   ├── guest/
-│   │   ├── model/
-│   │   ├── queries/
-│   │   └── types.ts
+│   │   └── queries/                  # fetchGuestBySlug, fetchGuests
 │   └── event/                        # game hub (future)
 │       └── types.ts
 ├── shared/
@@ -129,20 +129,20 @@ src/
 │   │       └── request-id.ts
 │   └── ui/                           # shadcn/ui + custom primitives
 ├── widgets/
-│   ├── invitation-page/
+│   ├── invitation/
 │   ├── personal-invitation/
-│   ├── live-projector/
-│   │   ├── LiveProjectorPage.tsx
+│   ├── activity-feed/
+│   │   ├── ActivityFeedPage.tsx
 │   │   ├── LiveClock.tsx
 │   │   ├── FeedEventCard.tsx
 │   │   ├── LeaderboardRow.tsx
 │   │   ├── HeroEventOverlay.tsx
 │   │   ├── FeedEmptyState.tsx
 │   │   ├── LeaderboardEmptyState.tsx
-│   │   ├── live-projector-helpers.ts
+│   │   ├── activity-feed-helpers.ts
 │   │   └── types.ts
 │   ├── navbar/
-│   ├── not-found-page/
+│   ├── not-found/
 │   ├── footer/
 │   ├── splash/
 │   ├── hero/
@@ -184,12 +184,12 @@ RSVP payload shape:
 - `message?: string`
 - `website?: string`
 
-### Live projector
+### Activity feed (/live)
 
-- `/live` is the projector/live feed page, marked `noindex`
+- `/live` is the activity feed / live projector page, marked `noindex`
 - renders with stub data until the games backend is built
-- type contracts: `LiveSnapshot`, `LiveFeedEventSnapshot`, `LeaderboardEntrySnapshot` in `src/widgets/live-projector/types.ts`
-- connecting real data means wiring `LiveProjectorPage.tsx` to a new `/api/live` endpoint
+- type contracts: `LiveSnapshot`, `LiveFeedEventSnapshot`, `LeaderboardEntrySnapshot` in `src/widgets/activity-feed/types.ts`
+- connecting real data means wiring `ActivityFeedPage.tsx` to a new `/api/live` endpoint
 
 ---
 
@@ -282,8 +282,12 @@ Schema tables:
 - `guests` — slug, localized names, seat count
 - `rsvp_responses` — RSVP submissions
 - `players` — future game hub (Supabase anon uid + nickname)
-- `events` — future live game events
+- `game_events` — future live game events (named `gameEvents` in Drizzle to avoid DOM `Event` collision)
 - `leaderboard` — future XP rankings
+
+DB-inferred types are prefixed with `Db` (e.g. `DbGuest`, `DbRsvpResponse`) to distinguish from domain models.
+Drizzle queries live only in `entities/*/queries/` or `features/*/` — never in UI components.
+Use `fetch*` prefix for async DB queries (e.g. `fetchGuestBySlug`), `get*` for sync static lookups (e.g. `getGuestBySlug`).
 
 ---
 
