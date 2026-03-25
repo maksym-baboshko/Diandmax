@@ -4,8 +4,8 @@ function SkeletonLeaderRow() {
   return (
     <div className="relative overflow-hidden rounded-3xl border border-accent/18 bg-accent/7 p-4">
       {/* shimmer sweep */}
-      <div className="live-leaderboard-shimmer pointer-events-none absolute inset-0 w-1/3 bg-linear-to-r from-transparent via-accent/10 to-transparent" />
-      <div className="live-leaderboard-leader-pulse flex items-center gap-4">
+      <div className="af-shimmer pointer-events-none absolute inset-0 w-1/3 bg-linear-to-r from-transparent via-accent/10 to-transparent" />
+      <div className="af-leader-pulse flex items-center gap-4">
         {/* rank placeholder */}
         <div className="font-cinzel w-10 text-center text-4xl text-accent/30">1</div>
         {/* avatar placeholder */}
@@ -28,8 +28,8 @@ function SkeletonRegularRow({ rank, hideOnMobile }: { rank: number; hideOnMobile
       className={`relative overflow-hidden rounded-3xl border bg-bg-secondary/30 px-4 py-3 ${rank <= 3 ? "border-accent/14" : "border-accent/8"} ${hideOnMobile ? "hidden lg:block" : ""}`}
     >
       {/* shimmer */}
-      <div className="live-leaderboard-shimmer pointer-events-none absolute inset-0 w-1/3 bg-linear-to-r from-transparent via-accent/8 to-transparent" />
-      <div className="live-leaderboard-regular-pulse flex items-center gap-3">
+      <div className="af-shimmer pointer-events-none absolute inset-0 w-1/3 bg-linear-to-r from-transparent via-accent/8 to-transparent" />
+      <div className="af-regular-pulse flex items-center gap-3">
         {/* rank */}
         <div className="font-cinzel w-7 text-center text-sm text-accent/25">{rank}</div>
         {/* avatar */}

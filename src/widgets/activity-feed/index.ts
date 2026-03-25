@@ -1,7 +1,7 @@
 export { ActivityFeedPage } from "./ActivityFeedPage";
 export type {
-  LiveSnapshot,
-  LiveFeedEventSnapshot,
+  ActivityFeedSnapshot,
+  FeedEventSnapshot,
   LeaderboardEntrySnapshot,
-  LiveFeedEventType,
+  FeedEventType,
 } from "./types";

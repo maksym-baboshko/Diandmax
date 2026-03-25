@@ -1,5 +1,5 @@
 /* ─── Activity feed keyframes ────────────────────────────── */
-@keyframes live-feed-card-scroll {
+@keyframes af-card-scroll {
   from {
     transform: translateY(0);
   }
@@ -9,7 +9,7 @@
   }
 }
 
-@keyframes live-leaderboard-leader-pulse {
+@keyframes af-leader-pulse {
   0%,
   100% {
     opacity: 0.45;
@@ -20,7 +20,7 @@
   }
 }
 
-@keyframes live-leaderboard-regular-pulse {
+@keyframes af-regular-pulse {
   0%,
   100% {
     opacity: 0.25;
@@ -31,7 +31,7 @@
   }
 }
 
-@keyframes live-leaderboard-shimmer {
+@keyframes af-shimmer {
   from {
     transform: translateX(-100%);
   }
@@ -41,7 +41,7 @@
   }
 }
 
-@keyframes live-feed-live-glitch-orange {
+@keyframes af-glitch-orange {
   0%,
   78.7% {
     transform: translateX(0);
@@ -79,7 +79,7 @@
   }
 }
 
-@keyframes live-feed-live-glitch-cyan {
+@keyframes af-glitch-cyan {
   0%,
   78.7% {
     transform: translateX(0);
@@ -117,7 +117,7 @@
   }
 }
 
-@keyframes live-feed-live-glitch-main {
+@keyframes af-glitch-main {
   0%,
   78.7% {
     transform: translateX(0) skewX(0deg);
@@ -149,50 +149,50 @@
 }
 
 /* ─── Activity feed animation classes ───────────────────── */
-.live-feed-card-scroll {
-  animation-name: live-feed-card-scroll;
+.af-card-scroll {
+  animation-name: af-card-scroll;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
   will-change: transform;
 }
 
-.live-leaderboard-leader-pulse {
-  animation: live-leaderboard-leader-pulse 7s ease-in-out infinite;
+.af-leader-pulse {
+  animation: af-leader-pulse 7s ease-in-out infinite;
 }
 
-.live-leaderboard-regular-pulse {
-  animation: live-leaderboard-regular-pulse 3.5s ease-in-out infinite;
+.af-regular-pulse {
+  animation: af-regular-pulse 3.5s ease-in-out infinite;
 }
 
-.live-leaderboard-shimmer {
-  animation: live-leaderboard-shimmer 3s ease-in-out infinite;
+.af-shimmer {
+  animation: af-shimmer 3s ease-in-out infinite;
   will-change: transform;
 }
 
-.live-feed-live-glitch-orange {
-  animation: live-feed-live-glitch-orange 3.94s linear infinite;
+.af-glitch-orange {
+  animation: af-glitch-orange 3.94s linear infinite;
   will-change: transform, opacity;
 }
 
-.live-feed-live-glitch-cyan {
-  animation: live-feed-live-glitch-cyan 3.94s linear infinite;
+.af-glitch-cyan {
+  animation: af-glitch-cyan 3.94s linear infinite;
   will-change: transform, opacity;
 }
 
-.live-feed-live-glitch-main {
-  animation: live-feed-live-glitch-main 3.94s linear infinite;
+.af-glitch-main {
+  animation: af-glitch-main 3.94s linear infinite;
   will-change: transform;
 }
 
 /* ─── Reduced motion overrides ───────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .live-feed-card-scroll,
-  .live-feed-live-glitch-orange,
-  .live-feed-live-glitch-cyan,
-  .live-feed-live-glitch-main,
-  .live-leaderboard-leader-pulse,
-  .live-leaderboard-regular-pulse,
-  .live-leaderboard-shimmer {
+  .af-card-scroll,
+  .af-glitch-orange,
+  .af-glitch-cyan,
+  .af-glitch-main,
+  .af-leader-pulse,
+  .af-regular-pulse,
+  .af-shimmer {
     animation: none !important;
   }
 }

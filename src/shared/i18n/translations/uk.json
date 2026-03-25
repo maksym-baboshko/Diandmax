@@ -200,11 +200,11 @@
     "secondary_cta": "Повернутись назад",
     "rsvp_cta": "Перейти до RSVP"
   },
-  "LiveMetadata": {
+  "ActivityFeedMetadata": {
     "live_title": "Екран для гостей | Весілля",
     "live_description": "Топ-гравці, XP-події та яскраві обіцянки вечора на одному проекторному екрані."
   },
-  "LivePage": {
+  "ActivityFeedPage": {
     "eyebrow": "Live-стрічка вечора",
     "title": "Live-стрічка",
     "description": "Топ-10 гравців, нові XP і найяскравіші обіцянки вечора в одному живому екрані.",

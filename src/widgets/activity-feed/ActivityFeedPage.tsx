@@ -7,128 +7,20 @@ import type { Locale } from "@/shared/i18n/routing";
 import { AnimatePresence } from "motion/react";
 import { useTranslations } from "next-intl";
 import { useCallback, useRef, useState, useSyncExternalStore } from "react";
+import { FeedClock } from "./FeedClock";
 import { FeedEmptyState } from "./FeedEmptyState";
 import { FeedEventCard } from "./FeedEventCard";
 import { HeroEventOverlay } from "./HeroEventOverlay";
 import { LeaderboardEmptyState } from "./LeaderboardEmptyState";
 import { LeaderboardRow } from "./LeaderboardRow";
-import { LiveClock } from "./LiveClock";
 import {
   DESKTOP_FEED_INITIAL_VISIBLE,
   DESKTOP_FEED_LOAD_MORE_STEP,
   MOBILE_FEED_INITIAL_VISIBLE,
   MOBILE_FEED_LOAD_MORE_STEP,
 } from "./activity-feed-helpers";
-import type { LeaderboardEntrySnapshot, LiveFeedEventSnapshot, LiveSnapshot } from "./types";
-
-// ─── Stub data ────────────────────────────────────────────────────────────────
-
-const STUB_FEED: LiveFeedEventSnapshot[] = [
-  {
-    id: "1",
-    type: "player_joined",
-    playerId: "p1",
-    avatarKey: "olena-kovalchuk",
-    playerName: "Олена Ковальчук",
-    gameSlug: null,
-    promptI18n: null,
-    answerI18n: null,
-    xpDelta: 50,
-    createdAt: new Date(Date.now() - 120_000).toISOString(),
-  },
-  {
-    id: "2",
-    type: "promised",
-    playerId: "p2",
-    avatarKey: "andriy-bondar",
-    playerName: "Андрій Бондар",
-    gameSlug: "wheel",
-    promptI18n: { uk: "Що ти обіцяєш молодятам?", en: "What do you promise the newlyweds?" },
-    answerI18n: {
-      uk: "Завжди бути поруч і підтримувати вас у будь-яку мить!",
-      en: "Always be there and support you at any moment!",
-    },
-    xpDelta: 120,
-    createdAt: new Date(Date.now() - 240_000).toISOString(),
-  },
-  {
-    id: "3",
-    type: "xp_awarded",
-    playerId: "p3",
-    avatarKey: "maria-petrenko",
-    playerName: "Марія Петренко",
-    gameSlug: null,
-    promptI18n: null,
-    answerI18n: null,
-    xpDelta: 80,
-    createdAt: new Date(Date.now() - 360_000).toISOString(),
-  },
-  {
-    id: "4",
-    type: "answered",
-    playerId: "p1",
-    avatarKey: "olena-kovalchuk",
-    playerName: "Олена Ковальчук",
-    gameSlug: "trivia",
-    promptI18n: { uk: "Де познайомилися Максим і Діана?", en: "Where did Maksym and Diana meet?" },
-    answerI18n: { uk: "У Бергені", en: "In Bergen" },
-    xpDelta: 100,
-    createdAt: new Date(Date.now() - 480_000).toISOString(),
-  },
-  {
-    id: "5",
-    type: "new_top_player",
-    playerId: "p2",
-    avatarKey: "andriy-bondar",
-    playerName: "Андрій Бондар",
-    gameSlug: null,
-    promptI18n: null,
-    answerI18n: null,
-    xpDelta: null,
-    createdAt: new Date(Date.now() - 600_000).toISOString(),
-  },
-  {
-    id: "6",
-    type: "player_joined",
-    playerId: "p4",
-    avatarKey: "ivan-sydorenko",
-    playerName: "Іван Сидоренко",
-    gameSlug: null,
-    promptI18n: null,
-    answerI18n: null,
-    xpDelta: 50,
-    createdAt: new Date(Date.now() - 720_000).toISOString(),
-  },
-  {
-    id: "7",
-    type: "promised",
-    playerId: "p3",
-    avatarKey: "maria-petrenko",
-    playerName: "Марія Петренко",
-    gameSlug: "wheel",
-    promptI18n: { uk: "Твоє побажання парі?", en: "Your wish for the couple?" },
-    answerI18n: {
-      uk: "Міцного здоров'я та невичерпного щастя!",
-      en: "Good health and endless happiness!",
-    },
-    xpDelta: 110,
-    createdAt: new Date(Date.now() - 840_000).toISOString(),
-  },
-];
-
-const STUB_LEADERBOARD: LeaderboardEntrySnapshot[] = [
-  { rank: 1, playerId: "p2", avatarKey: "andriy-bondar", nickname: "Андрій Б.", totalPoints: 350 },
-  { rank: 2, playerId: "p1", avatarKey: "olena-kovalchuk", nickname: "Олена К.", totalPoints: 280 },
-  { rank: 3, playerId: "p3", avatarKey: "maria-petrenko", nickname: "Марія П.", totalPoints: 190 },
-  { rank: 4, playerId: "p4", avatarKey: "ivan-sydorenko", nickname: "Іван С.", totalPoints: 120 },
-  { rank: 5, playerId: "p5", avatarKey: "sofiya-moroz", nickname: "Софія М.", totalPoints: 80 },
-];
-
-const STUB_SNAPSHOT: LiveSnapshot = {
-  feed: STUB_FEED,
-  leaderboard: STUB_LEADERBOARD,
-  generatedAt: new Date().toISOString(),
-};
+import type { FeedEventSnapshot } from "./types";
+import { useActivityFeedSnapshot } from "./useActivityFeedSnapshot";
 
 // ─── Mobile media query ───────────────────────────────────────────────────────
 
@@ -158,13 +50,10 @@ interface ActivityFeedPageProps {
 }
 
 export function ActivityFeedPage({ locale }: ActivityFeedPageProps) {
-  const t = useTranslations("LivePage");
+  const t = useTranslations("ActivityFeedPage");
 
-  // In PR 8 we render stub data. PR 9+ will wire this to /api/live.
-  const snapshot = STUB_SNAPSHOT;
-  const isLoading = false;
-  const error = false;
-  const heroEvent = null;
+  const { snapshot, isLoading, error } = useActivityFeedSnapshot();
+  const heroEvent = null; // wired in future game hub phase
 
   const isMobile = useSyncExternalStore(
     subscribeToMobile,
@@ -176,11 +65,11 @@ export function ActivityFeedPage({ locale }: ActivityFeedPageProps) {
   const [desktopVisibleCount, setDesktopVisibleCount] = useState(DESKTOP_FEED_INITIAL_VISIBLE);
 
   const visibleCount = isMobile ? mobileVisibleCount : desktopVisibleCount;
-  const hasMoreFeed = snapshot.feed.length > visibleCount;
-  const visibleFeed = snapshot.feed.slice(0, visibleCount);
+  const hasMoreFeed = (snapshot?.feed.length ?? 0) > visibleCount;
+  const visibleFeed = (snapshot?.feed ?? []).slice(0, visibleCount);
 
-  const showFeedEmptyState = isLoading || snapshot.feed.length === 0;
-  const showLeaderboardEmptyState = isLoading || snapshot.leaderboard.length === 0;
+  const showFeedEmptyState = isLoading || !snapshot?.feed.length;
+  const showLeaderboardEmptyState = isLoading || !snapshot?.leaderboard.length;
 
   const desktopFeedColumns = [
     visibleFeed.filter((_, i) => i % 2 === 0),
@@ -231,7 +120,7 @@ export function ActivityFeedPage({ locale }: ActivityFeedPageProps) {
 
           {/* Center: clock (desktop only) */}
           <div className="absolute left-1/2 hidden -translate-x-1/2 lg:block">
-            <LiveClock />
+            <FeedClock />
           </div>
 
           {/* Right: theme + language + home link */}
@@ -319,7 +208,7 @@ export function ActivityFeedPage({ locale }: ActivityFeedPageProps) {
             ) : (
               <div className="grid gap-3">
                 <AnimatePresence mode="popLayout" initial={false}>
-                  {snapshot.leaderboard.map((entry) => (
+                  {(snapshot?.leaderboard ?? []).map((entry) => (
                     <LeaderboardRow
                       key={entry.playerId}
                       entry={entry}
@@ -340,8 +229,8 @@ export function ActivityFeedPage({ locale }: ActivityFeedPageProps) {
       <AnimatePresence>
         {heroEvent && (
           <HeroEventOverlay
-            key={(heroEvent as LiveFeedEventSnapshot).id}
-            heroEvent={heroEvent as LiveFeedEventSnapshot}
+            key={(heroEvent as FeedEventSnapshot).id}
+            heroEvent={heroEvent as FeedEventSnapshot}
             locale={locale}
           />
         )}

@@ -39,11 +39,11 @@ export function getAvatarMonogram(avatarKey: string | null, fallbackName: string
 
 // ─── Event display helpers ───────────────────────────────────────────────────
 
-import type { LiveFeedEventType } from "./types";
+import type { FeedEventType } from "./types";
 
 /** Returns the i18n key for the feed card label. */
-export function getEventLabelKey(type: LiveFeedEventType): string {
-  const map: Record<LiveFeedEventType, string> = {
+export function getEventLabelKey(type: FeedEventType): string {
+  const map: Record<FeedEventType, string> = {
     player_joined: "event_player_joined",
     xp_awarded: "event_xp_awarded",
     answered: "event_answered",
@@ -54,8 +54,8 @@ export function getEventLabelKey(type: LiveFeedEventType): string {
 }
 
 /** Returns the i18n key for the hero event overlay label. */
-export function getHeroLabelKey(type: LiveFeedEventType): string {
-  const map: Record<LiveFeedEventType, string> = {
+export function getHeroLabelKey(type: FeedEventType): string {
+  const map: Record<FeedEventType, string> = {
     player_joined: "hero_generic",
     xp_awarded: "hero_generic",
     answered: "hero_generic",
@@ -81,20 +81,18 @@ export function getEventPrompt(
 
 // ─── Hero event queue helpers ─────────────────────────────────────────────────
 
-import type { LiveFeedEventSnapshot } from "./types";
+import type { FeedEventSnapshot } from "./types";
 
-const HERO_TYPES: Set<LiveFeedEventType> = new Set(["promised", "new_top_player"]);
+const HERO_TYPES: Set<FeedEventType> = new Set(["promised", "new_top_player"]);
 
-export function filterQueueableHeroEvents(
-  events: LiveFeedEventSnapshot[],
-): LiveFeedEventSnapshot[] {
-  return events.filter((e) => HERO_TYPES.has(e.type as LiveFeedEventType));
+export function filterQueueableHeroEvents(events: FeedEventSnapshot[]): FeedEventSnapshot[] {
+  return events.filter((e) => HERO_TYPES.has(e.type as FeedEventType));
 }
 
 export function collectUnseenHeroEvents(
-  events: LiveFeedEventSnapshot[],
+  events: FeedEventSnapshot[],
   seenIds: Set<string>,
-): LiveFeedEventSnapshot[] {
+): FeedEventSnapshot[] {
   return filterQueueableHeroEvents(events).filter((e) => !seenIds.has(e.id));
 }
 

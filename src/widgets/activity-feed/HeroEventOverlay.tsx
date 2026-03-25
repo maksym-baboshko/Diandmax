@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 import { EASE } from "./activity-feed-helpers";
 import { getAvatarMonogram, getEventPrompt, getHeroLabelKey } from "./activity-feed-helpers";
-import type { LiveFeedEventSnapshot } from "./types";
+import type { FeedEventSnapshot } from "./types";
 
 function SonarRing({ scale, delay }: { scale: number; delay: number }) {
   return (
@@ -50,13 +50,13 @@ function XpCounter({ target }: { target: number }) {
 }
 
 interface HeroEventOverlayProps {
-  heroEvent: LiveFeedEventSnapshot;
+  heroEvent: FeedEventSnapshot;
   locale: Locale;
   totalPoints?: number;
 }
 
 export function HeroEventOverlay({ heroEvent, locale, totalPoints }: HeroEventOverlayProps) {
-  const t = useTranslations("LivePage");
+  const t = useTranslations("ActivityFeedPage");
   const monogram = getAvatarMonogram(heroEvent.avatarKey, heroEvent.playerName);
   const labelKey = getHeroLabelKey(heroEvent.type);
   const prompt = getEventPrompt(heroEvent, locale);

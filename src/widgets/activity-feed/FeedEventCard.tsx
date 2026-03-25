@@ -9,7 +9,7 @@ import {
   getEventLabelKey,
   getEventPrompt,
 } from "./activity-feed-helpers";
-import type { LiveFeedEventSnapshot } from "./types";
+import type { FeedEventSnapshot } from "./types";
 
 function formatRelativeTime(isoString: string): string {
   const diff = Math.floor((Date.now() - new Date(isoString).getTime()) / 1000);
@@ -33,7 +33,7 @@ function EventMeta({
   labelKey: string;
   createdAt: string;
 }) {
-  const t = useTranslations("LivePage");
+  const t = useTranslations("ActivityFeedPage");
   return (
     <div className="flex items-center gap-1.5 text-[11px] text-accent/70">
       <span>{t(labelKey as Parameters<typeof t>[0])}</span>
@@ -44,12 +44,12 @@ function EventMeta({
 }
 
 interface FeedEventCardProps {
-  event: LiveFeedEventSnapshot;
+  event: FeedEventSnapshot;
 }
 
 export function FeedEventCard({ event }: FeedEventCardProps) {
   const locale = useLocale() as Locale;
-  const t = useTranslations("LivePage");
+  const t = useTranslations("ActivityFeedPage");
 
   const monogram = getAvatarMonogram(event.avatarKey, event.playerName);
   const labelKey = getEventLabelKey(event.type);

@@ -2,6 +2,7 @@
 
 import { db } from "@/infrastructure/db/client";
 import { rsvpResponses } from "@/infrastructure/db/schema";
+import { sendRsvpNotification } from "@/infrastructure/email";
 import { logServerError, logServerInfo, runDeferredTasks } from "@/shared/lib/server";
 import { after } from "next/server";
 import { rsvpSchema } from "../schema/rsvp-schema";
@@ -56,6 +57,18 @@ export async function submitRsvp(data: RsvpFormData): Promise<SubmitRsvpResult> 
               context: { slug },
             });
           },
+        },
+        {
+          label: "send-rsvp-email",
+          run: () =>
+            sendRsvpNotification({
+              guestNames,
+              attending,
+              guests,
+              dietary,
+              message,
+              slug,
+            }),
         },
       ]),
     );

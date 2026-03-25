@@ -5,14 +5,14 @@ import { ActivityFeedPage } from "@/widgets/activity-feed";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-interface LivePageProps {
+interface ActivityFeedPageProps {
   params: Promise<{ locale: string }>;
 }
 
-export async function generateMetadata({ params }: LivePageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: ActivityFeedPageProps): Promise<Metadata> {
   const { locale } = await params;
   const typedLocale = resolveLocale(locale);
-  const t = await getTranslations({ locale: typedLocale, namespace: "LiveMetadata" });
+  const t = await getTranslations({ locale: typedLocale, namespace: "ActivityFeedMetadata" });
 
   return {
     title: t("live_title"),
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: LivePageProps): Promise<Metad
   };
 }
 
-export default async function LivePage({ params }: LivePageProps) {
+export default async function ActivityFeedRoute({ params }: ActivityFeedPageProps) {
   const { locale } = await params;
   const typedLocale = resolveLocale(locale);
   setRequestLocale(typedLocale);

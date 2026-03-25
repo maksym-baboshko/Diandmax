@@ -1,13 +1,13 @@
-export type LiveFeedEventType =
+export type FeedEventType =
   | "player_joined"
   | "xp_awarded"
   | "answered"
   | "promised"
   | "new_top_player";
 
-export interface LiveFeedEventSnapshot {
+export interface FeedEventSnapshot {
   id: string;
-  type: LiveFeedEventType;
+  type: FeedEventType;
   playerId: string | null;
   avatarKey: string | null;
   playerName: string | null;
@@ -26,8 +26,8 @@ export interface LeaderboardEntrySnapshot {
   totalPoints: number;
 }
 
-export interface LiveSnapshot {
-  feed: LiveFeedEventSnapshot[];
+export interface ActivityFeedSnapshot {
+  feed: FeedEventSnapshot[];
   leaderboard: LeaderboardEntrySnapshot[];
   generatedAt: string; // ISO string
 }

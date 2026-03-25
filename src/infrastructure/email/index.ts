@@ -1,1 +1,2 @@
-// barrel export — populated in subsequent PRs
+export { sendRsvpNotification } from "./sender";
+export type { RsvpNotificationPayload } from "./sender";

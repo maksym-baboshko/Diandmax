@@ -200,11 +200,11 @@
     "secondary_cta": "Go Back",
     "rsvp_cta": "Go to RSVP"
   },
-  "LiveMetadata": {
+  "ActivityFeedMetadata": {
     "live_title": "Live Screen | Wedding",
     "live_description": "A projector view with the top players, XP moments, and the brightest promises of the evening."
   },
-  "LivePage": {
+  "ActivityFeedPage": {
     "eyebrow": "Live feed of the evening",
     "title": "Live feed",
     "description": "Top 10 players, fresh XP, and the brightest promises of the evening in one live screen.",

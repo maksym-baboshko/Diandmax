@@ -25,7 +25,7 @@ function GhostCard({
   return (
     <div
       className={cn(
-        "live-feed-card-scroll absolute left-0 right-0 rounded-3xl border border-accent/8 bg-bg-secondary/20 px-5 py-4",
+        "af-card-scroll absolute left-0 right-0 rounded-3xl border border-accent/8 bg-bg-secondary/20 px-5 py-4",
         wide && "border-accent/12 bg-accent/5",
       )}
       style={{
@@ -52,7 +52,7 @@ interface FeedEmptyStateProps {
 }
 
 export function FeedEmptyState({ variant }: FeedEmptyStateProps) {
-  const t = useTranslations("LivePage");
+  const t = useTranslations("ActivityFeedPage");
 
   return (
     <div className="relative flex h-[520px] w-full overflow-hidden rounded-4xl">
@@ -116,20 +116,20 @@ export function FeedEmptyState({ variant }: FeedEmptyStateProps) {
         <div className="relative select-none">
           {/* Orange glitch layer */}
           <span
-            className="live-feed-live-glitch-orange font-cinzel pointer-events-none absolute inset-0 text-7xl font-black tracking-[0.25em] text-orange-400/80"
+            className="af-glitch-orange font-cinzel pointer-events-none absolute inset-0 text-7xl font-black tracking-[0.25em] text-orange-400/80"
             aria-hidden="true"
           >
             LIVE
           </span>
           {/* Cyan glitch layer */}
           <span
-            className="live-feed-live-glitch-cyan font-cinzel pointer-events-none absolute inset-0 text-7xl font-black tracking-[0.25em] text-cyan-400/65"
+            className="af-glitch-cyan font-cinzel pointer-events-none absolute inset-0 text-7xl font-black tracking-[0.25em] text-cyan-400/65"
             aria-hidden="true"
           >
             LIVE
           </span>
           {/* Main text */}
-          <span className="live-feed-live-glitch-main font-cinzel relative text-7xl font-black tracking-[0.25em] text-accent">
+          <span className="af-glitch-main font-cinzel relative text-7xl font-black tracking-[0.25em] text-accent">
             LIVE
           </span>
         </div>

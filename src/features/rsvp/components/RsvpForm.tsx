@@ -172,15 +172,18 @@ export function RsvpForm({ slug, guestVocative, maxSeats }: RsvpFormProps) {
               </p>
               <p className="mb-3 text-xs text-text-secondary">{t("guest_names_hint")}</p>
               <div className="flex flex-col gap-3">
-                {guestNames.map((_, index) => (
-                  <Input
-                    key={index}
-                    placeholder={t("guest_name_placeholder")}
-                    aria-label={t("guest_name_field_label", { number: index + 1 })}
-                    error={!!errors.guestNames?.[index]}
-                    {...register(`guestNames.${index}`)}
-                  />
-                ))}
+                {guestNames.map(
+                  // biome-ignore lint/suspicious/noArrayIndexKey: ordered form slots, no stable id
+                  (_, index) => (
+                    <Input
+                      key={index}
+                      placeholder={t("guest_name_placeholder")}
+                      aria-label={t("guest_name_field_label", { number: index + 1 })}
+                      error={!!errors.guestNames?.[index]}
+                      {...register(`guestNames.${index}`)}
+                    />
+                  ),
+                )}
               </div>
               {errors.guestNames && (
                 <p className="mt-2 text-sm text-error">{t("guest_names_required")}</p>

@@ -11,7 +11,7 @@ function getTimeParts() {
   };
 }
 
-export function LiveClock() {
+export function FeedClock() {
   const [parts, setParts] = useState({ hh: "00", mm: "00", ss: "00" });
 
   useEffect(() => {

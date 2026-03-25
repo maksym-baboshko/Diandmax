@@ -30,6 +30,7 @@ export const rsvpResponses = pgTable("rsvp_responses", {
 export const players = pgTable("players", {
   id: uuid("id").primaryKey().defaultRandom(),
   nickname: text("nickname").notNull(),
+  avatarKey: text("avatar_key"),
   supabaseAnonUid: text("supabase_anon_uid").unique(),
   guestSlug: text("guest_slug").references(() => guests.slug),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
