@@ -148,7 +148,7 @@ export function DressCode() {
       <Ornament position="bottom-left" size="sm" className="opacity-40" />
 
       {!liteMotion && (
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/4 blur-[150px]" />
+        <div className="pointer-events-none absolute left-1/2 top-1/2 h-150 w-200 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/4 blur-[150px]" />
       )}
 
       <SectionHeading subtitle={t("subtitle")}>{t("title")}</SectionHeading>
@@ -160,7 +160,7 @@ export function DressCode() {
         viewport={{ once: true }}
         transition={{ duration: liteMotion ? 0.7 : 1.3, delay: liteMotion ? 0.04 : 0.15, ease }}
         style={{ transformOrigin: "left" }}
-        className="mx-auto mt-10 flex h-[3px] max-w-xl overflow-hidden rounded-full"
+        className="mx-auto mt-10 flex h-0.75 max-w-xl overflow-hidden rounded-full"
       >
         {uniqueStripColors.map((c, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: color strip uses index
