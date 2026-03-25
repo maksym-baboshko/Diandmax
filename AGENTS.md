@@ -26,8 +26,9 @@ This file mirrors `CLAUDE.md`. Refer to `CLAUDE.md` for the full specification.
 |---|---|
 | `/` and `/en` | Full invitation page |
 | `/invite/[slug]` | Personalized invite (noindex) |
-| `/live` | Activity feed — stub data (noindex) |
+| `/live` | Activity feed — polls `/api/activity-feed` (noindex) |
 | `/api/rsvp` | RSVP POST endpoint |
+| `/api/activity-feed` | Activity feed GET endpoint (game_events + leaderboard) |
 
 ---
 
@@ -63,7 +64,15 @@ import { useRouter, usePathname, Link } from "@/shared/i18n/navigation"
 ```bash
 pnpm typecheck   # must pass
 pnpm lint        # biome check — must pass
+pnpm test        # vitest run — must pass
 pnpm build       # must pass
+```
+
+## Git Hooks
+
+```
+pre-commit  →  lint-staged (biome check --write on staged files)
+pre-push    →  pnpm typecheck + pnpm test
 ```
 
 ---

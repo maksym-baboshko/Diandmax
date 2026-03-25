@@ -9,8 +9,8 @@
 
 **diandmax** is a wedding invitation site and future event hub for Maksym & Diana's wedding (June 28, 2026, Grand Hotel Terminus, Bergen, Norway).
 
-**Phase 1 (current):** Wedding invitation site with RSVP.
-**Phase 2 (planned):** Game hub — ~6 wedding games, live feed, leaderboard, guest chat, QR-based check-in with Supabase Anonymous Auth.
+**Phase 1 (current):** Wedding invitation site with RSVP + activity feed (DB-backed, polling).
+**Phase 2 (planned):** Game hub — ~6 wedding games, Supabase Realtime feed, leaderboard, guest chat, QR-based check-in with Supabase Anonymous Auth.
 
 ---
 
@@ -31,7 +31,7 @@
 | Database | Supabase Postgres + Drizzle ORM | Type-safe queries, migrations |
 | Email | Resend + react-email | Reusable templates |
 | Lint/Format | Biome | Single tool, fast |
-| Git hooks | Husky + lint-staged | Pre-commit checks |
+| Git hooks | Husky + lint-staged | Pre-commit + pre-push checks |
 | Testing | Vitest + Playwright | Unit + E2E |
 | CI/CD | GitHub Actions → Vercel | Deploy only if CI passes |
 | Observability | @vercel/analytics + @vercel/speed-insights | Built-in Vercel |
@@ -96,7 +96,9 @@ src/
 │   │       └── [slug]/
 │   │           └── page.tsx
 │   ├── api/
-│   │   └── rsvp/
+│   │   ├── rsvp/
+│   │   │   └── route.ts
+│   │   └── activity-feed/
 │   │       └── route.ts
 │   ├── global-not-found.tsx
 │   ├── globals.css
@@ -126,7 +128,7 @@ src/
 ├── entities/
 │   ├── guest/
 │   │   ├── queries/           # fetchGuestBySlug, fetchGuests (Drizzle)
-│   │   └── index.ts           # re-exports Guest from @/shared/config
+│   │   └── index.ts
 │   └── event/                 # future game hub
 │       ├── types.ts
 │       └── index.ts
@@ -184,28 +186,30 @@ src/
 │   ├── not-found/
 │   └── activity-feed/
 │       ├── ActivityFeedPage.tsx
-│       ├── LiveClock.tsx
+│       ├── FeedClock.tsx
 │       ├── FeedEventCard.tsx
 │       ├── FeedEmptyState.tsx
 │       ├── LeaderboardRow.tsx
 │       ├── LeaderboardEmptyState.tsx
 │       ├── HeroEventOverlay.tsx
+│       ├── useActivityFeedSnapshot.ts
 │       ├── activity-feed-helpers.ts
+│       ├── animations.css             # af-* keyframes, imported in globals.css
 │       ├── types.ts
 │       └── index.ts
 │
-└── infrastructure/
-    ├── db/
-    │   ├── schema.ts          # Drizzle table definitions
-    │   ├── client.ts          # Supabase + Drizzle client singleton
-    │   └── migrations/
-    └── email/
-        ├── templates/         # react-email components
-        └── sender.ts          # Resend send function
-
-src/testing/
-├── helpers/
-└── fixtures/
+├── infrastructure/
+│   ├── db/
+│   │   ├── schema.ts          # Drizzle table definitions
+│   │   ├── client.ts          # Drizzle client singleton (postgres direct)
+│   │   └── migrations/
+│   └── email/
+│       ├── templates/         # react-email components
+│       └── sender.ts          # Resend send function
+│
+└── test/
+    └── mocks/
+        └── next-font.ts       # Vitest mock for next/font/google
 ```
 
 ---
@@ -228,11 +232,13 @@ src/testing/
 - Drizzle queries live only in `entities/*/queries/` or `features/*/`
 - UI components never access the DB directly
 - Server Actions handle all mutations from the client
+- DB connects via `DATABASE_URL` (direct postgres connection string)
+- No Supabase JS client yet — added in game hub phase for Realtime + Anonymous Auth
 
 ### Server Action Priority
 
 Use Server Actions over API routes for mutations wherever possible.
-API routes are for: webhooks, external integrations, the RSVP endpoint (existing).
+API routes are for: webhooks, external integrations, RSVP endpoint, activity feed endpoint.
 
 ---
 
@@ -240,31 +246,34 @@ API routes are for: webhooks, external integrations, the RSVP endpoint (existing
 
 ```
 guests
-  id          uuid PK
-  slug        text UNIQUE
-  name_uk     text
-  name_en     text
-  vocative_uk text
-  form_name   text
-  seats       int
-  created_at  timestamptz
+  id           uuid PK
+  slug         text UNIQUE
+  name_uk      text
+  name_en      text
+  vocative_uk  text
+  vocative_en  text
+  form_name    text nullable
+  seats        int
+  created_at   timestamptz
 
 rsvp_responses
   id           uuid PK
   guest_slug   text FK→guests.slug
+  guest_names  text[]
   attending    text  ("yes"|"no")
   guests_count int
   dietary      text nullable
   message      text nullable
   created_at   timestamptz
 
--- Future: game hub
+-- Phase 2: game hub
 players
-  id               uuid PK
-  nickname         text
-  supabase_anon_uid text nullable
-  guest_slug       text nullable FK→guests.slug
-  created_at       timestamptz
+  id                uuid PK
+  nickname          text
+  avatar_key        text nullable
+  supabase_anon_uid text nullable UNIQUE
+  guest_slug        text nullable FK→guests.slug
+  created_at        timestamptz
 
 game_events                          -- named gameEvents in Drizzle (avoids DOM Event collision)
   id         uuid PK
@@ -345,47 +354,74 @@ react-email template  →  sender.ts (Resend)  →  deferred task
 - Sending in `infrastructure/email/sender.ts`
 - Always fire via deferred tasks (`after()` + `runDeferredTasks()`)
 - Never `void asyncFn()` — unreliable on Vercel serverless
+- Required env vars: `RESEND_API_KEY`, `RSVP_TO_EMAILS`, `RSVP_FROM_EMAIL`
+
+---
+
+## Activity Feed Architecture
+
+```
+/live page
+  └── ActivityFeedPage (client)
+        └── useActivityFeedSnapshot   # polls every 30s, refreshes on tab focus
+              └── GET /api/activity-feed
+                    └── Drizzle: game_events ⨝ players + leaderboard ⨝ players
+```
+
+- CSS animations use `af-*` prefix (defined in `activity-feed/animations.css`)
+- `animations.css` is imported at the top of `globals.css`
+- Supabase Realtime broadcast channel will be added in game hub phase
 
 ---
 
 ## Testing Strategy
 
-### Vitest (unit + integration)
+### Vitest (unit)
 
-Focus:
-- `features/rsvp/schema/` — Zod validation
-- `entities/*/queries/` — DB query logic (mock Drizzle)
-- `shared/lib/` — utility functions
-- Server actions — mock dependencies
+- `src/widgets/activity-feed/activity-feed-helpers.test.ts` — 26 tests
+- `src/features/rsvp/schema/rsvp-schema.test.ts` — 12 tests
+- Mock for `next/font/google` in `src/test/mocks/next-font.ts`
 
 ### Playwright (E2E)
 
 Critical paths:
-- Homepage loads, splash animation shows once
-- RSVP form submit (success + error)
-- `/live` page renders
-- `/invite/[slug]` shows personalized copy
-- Language switcher (uk ↔ en)
-- Theme switcher (light ↔ dark)
+- Homepage loads, navbar renders
+- Hero shows couple names
+- RSVP section present
+- `/live` page renders, shows LIVE indicator
+- `/en` and `/en/live` locale variants
 
 ---
 
 ## CI Pipeline
 
-```yaml
-# .github/workflows/ci.yml
-jobs:
-  ci:
-    steps:
-      - Install dependencies (pnpm)
-      - Typecheck (tsc --noEmit)
-      - Biome check
-      - Vitest run
-      - Playwright test (chromium)
-      - Next.js build
-  deploy:
-    needs: [ci]
-    # Vercel deploy — only if all CI checks pass
+```
+quality (typecheck + lint)
+    ↓
+test (vitest unit)
+    ↓
+build (next build)
+    ↓
+e2e (playwright chromium)
+```
+
+Required GitHub Secrets:
+- `DATABASE_URL`
+- `RESEND_API_KEY`
+- `RSVP_TO_EMAILS`
+- `RSVP_FROM_EMAIL`
+
+---
+
+## Git Hooks
+
+```
+pre-commit  →  lint-staged
+                 *.{ts,tsx,js,jsx}  →  biome check --write
+                 *.{json,css,md}    →  biome format --write
+
+pre-push    →  pnpm typecheck
+            →  pnpm test
 ```
 
 ---

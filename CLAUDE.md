@@ -14,8 +14,9 @@ This repository contains:
 
 - the invitation site at `/` and `/en`
 - personalized invite pages at `/invite/[slug]`
-- the projector/live feed page at `/live` (UI only — games backend is being built)
+- the activity feed page at `/live` (UI + real API — games backend is being built)
 - the RSVP API at `/api/rsvp`
+- the activity feed API at `/api/activity-feed`
 
 Future (game hub phase):
 
@@ -89,7 +90,8 @@ src/
 │   │   ├── live/page.tsx             # activity feed (noindex)
 │   │   └── invite/[slug]/page.tsx    # personalized invite (noindex)
 │   ├── api/
-│   │   └── rsvp/route.ts
+│   │   ├── rsvp/route.ts
+│   │   └── activity-feed/route.ts
 │   ├── global-not-found.tsx          # fallback 404 (globalNotFound)
 │   ├── globals.css
 │   └── layout.tsx
@@ -133,13 +135,15 @@ src/
 │   ├── personal-invitation/
 │   ├── activity-feed/
 │   │   ├── ActivityFeedPage.tsx
-│   │   ├── LiveClock.tsx
+│   │   ├── FeedClock.tsx
 │   │   ├── FeedEventCard.tsx
 │   │   ├── LeaderboardRow.tsx
 │   │   ├── HeroEventOverlay.tsx
 │   │   ├── FeedEmptyState.tsx
 │   │   ├── LeaderboardEmptyState.tsx
+│   │   ├── useActivityFeedSnapshot.ts
 │   │   ├── activity-feed-helpers.ts
+│   │   ├── animations.css
 │   │   └── types.ts
 │   ├── navbar/
 │   ├── not-found/
@@ -151,14 +155,17 @@ src/
 │   ├── location/
 │   ├── dress-code/
 │   └── gifts/
-└── infrastructure/
-    ├── db/
-    │   ├── schema.ts                 # Drizzle schema
-    │   ├── client.ts                 # Supabase + Drizzle client
-    │   └── migrations/
-    └── email/
-        ├── templates/
-        └── sender.ts
+├── infrastructure/
+│   ├── db/
+│   │   ├── schema.ts                 # Drizzle schema
+│   │   ├── client.ts                 # Drizzle client (postgres direct)
+│   │   └── migrations/
+│   └── email/
+│       ├── templates/
+│       └── sender.ts
+└── test/
+    └── mocks/
+        └── next-font.ts              # Vitest mock for next/font/google
 ```
 
 Barrel exports (`index.ts`) are used across the repo. Import from the barrel when one exists.
@@ -173,7 +180,7 @@ Barrel exports (`index.ts`) are used across the repo. Import from the barrel whe
 - `/invite/[slug]` renders guest-specific copy and seat count
 - the RSVP form uses a honeypot `website` field to catch bots
 - RSVP responses are persisted to Supabase via Drizzle
-- email confirmation is sent via Resend using the deferred tasks pattern
+- email notification is sent via Resend using the deferred tasks pattern
 
 RSVP payload shape:
 
@@ -187,9 +194,11 @@ RSVP payload shape:
 ### Activity feed (/live)
 
 - `/live` is the activity feed page, marked `noindex`
-- renders with stub data until the games backend is built
-- type contracts: `LiveSnapshot`, `LiveFeedEventSnapshot`, `LeaderboardEntrySnapshot` in `src/widgets/activity-feed/types.ts`
-- connecting real data means wiring `ActivityFeedPage.tsx` to a new `/api/live` endpoint
+- polls `GET /api/activity-feed` every 30s; refreshes on tab visibility change
+- type contracts: `ActivityFeedSnapshot`, `FeedEventSnapshot`, `LeaderboardEntrySnapshot` in `src/widgets/activity-feed/types.ts`
+- `useActivityFeedSnapshot` hook manages polling + error state
+- CSS animation keyframes live in `animations.css` (imported via `globals.css`), all prefixed `af-*`
+- Supabase Realtime (broadcast channel) will be wired in the game hub phase
 
 ---
 
@@ -289,6 +298,8 @@ DB-inferred types are prefixed with `Db` (e.g. `DbGuest`, `DbRsvpResponse`) to d
 Drizzle queries live only in `entities/*/queries/` or `features/*/` — never in UI components.
 Use `fetch*` prefix for async DB queries (e.g. `fetchGuestBySlug`), `get*` for sync static lookups (e.g. `getGuestBySlug`).
 
+DB connects via `DATABASE_URL` (direct postgres connection string). No Supabase JS client used yet — will be added in game hub phase for Realtime + Anonymous Auth.
+
 ---
 
 ## Architectural Contracts
@@ -311,6 +322,13 @@ pnpm lint        # biome check
 pnpm build       # next build
 pnpm test        # vitest run
 pnpm test:e2e    # playwright test
+```
+
+## Git Hooks
+
+```
+pre-commit  →  lint-staged (biome check --write on staged files)
+pre-push    →  pnpm typecheck + pnpm test
 ```
 
 ---
