@@ -7,7 +7,7 @@ Venue: Grand Hotel Terminus, Bergen, Norway.
 > Keep `AGENTS.md` and `CLAUDE.md` aligned.
 > If a local `GEMINI.md` exists, keep that one aligned too.
 
-This repository is a **full rewrite** of the previous `wedaster` project.
+This repository is a **full rewrite** of the previous invitation codebase for `diandmax`.
 The old codebase has been removed. All code is being rebuilt from scratch with a new stack.
 
 This repository contains:
