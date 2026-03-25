@@ -28,7 +28,7 @@ export async function PersonalInvitationPage({ guest }: PersonalInvitationPagePr
     <>
       <Splash />
       <Navbar />
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1} className="relative scroll-mt-24 outline-none">
         <Hero />
         <PersonalInvitationSection guest={guest} />
         <OurStory />
@@ -38,27 +38,15 @@ export async function PersonalInvitationPage({ guest }: PersonalInvitationPagePr
         <Gifts />
 
         {/* RSVP */}
-        <SectionWrapper id="rsvp">
-          <div className="mx-auto max-w-lg">
+        <SectionWrapper id="rsvp" className="relative overflow-hidden pt-12 pb-8 md:py-24">
+          <div className="mx-auto max-w-7xl px-4">
             <AnimatedReveal direction="up">
-              <SectionHeading subtitle={t("subtitle")} align="center">
-                {t("title")}
-              </SectionHeading>
+              <SectionHeading subtitle={t("subtitle")}>{t("title")}</SectionHeading>
             </AnimatedReveal>
 
-            {/* Personalized seat note */}
-            <AnimatedReveal direction="up" delay={0.1}>
-              <div className="mb-6 rounded-2xl border border-accent/15 bg-bg-secondary px-6 py-4">
-                <p className="font-cinzel mb-1 text-xs uppercase tracking-widest text-text-secondary">
-                  {t("personalized_note_label")}
-                </p>
-                <p className="text-sm text-text-secondary">
-                  {t("personalized_note", { name: vocative, seats: guest.seats })}
-                </p>
-              </div>
-            </AnimatedReveal>
-
-            <RsvpForm slug={guest.slug} guestVocative={vocative} maxSeats={guest.seats} />
+            <div className="relative z-10 mx-auto mt-12 flex max-w-7xl flex-col items-center justify-center md:mt-32 xl:flex-row">
+              <RsvpForm slug={guest.slug} guestVocative={vocative} maxSeats={guest.seats} />
+            </div>
           </div>
         </SectionWrapper>
       </main>

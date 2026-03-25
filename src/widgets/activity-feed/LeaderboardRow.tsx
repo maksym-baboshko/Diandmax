@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/shared/lib";
 import { motion } from "motion/react";
 import { getAvatarMonogram } from "./activity-feed-helpers";
 import type { LeaderboardEntrySnapshot } from "./types";
@@ -10,71 +11,61 @@ interface LeaderboardRowProps {
 }
 
 export function LeaderboardRow({ entry, isLeader }: LeaderboardRowProps) {
-  const monogram = getAvatarMonogram(entry.avatarKey, entry.nickname);
-
   if (isLeader) {
     return (
       <motion.div
         layout
-        className="relative overflow-hidden rounded-3xl border border-accent/18 bg-accent/7 p-4"
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 8 }}
-        transition={{ duration: 0.35 }}
+        className="relative overflow-hidden rounded-3xl border border-accent/18 bg-accent/7 px-5 py-4 shadow-[0_12px_28px_-20px_rgba(0,0,0,0.45)]"
       >
-        {/* Top gradient line */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-accent/50 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-accent/65 to-transparent" />
 
         <div className="flex items-center gap-4">
-          {/* Rank */}
-          <div className="font-cinzel w-10 shrink-0 text-center text-4xl font-bold text-accent/70">
-            {entry.rank}
+          <div className="font-cinzel text-4xl leading-none text-accent">1</div>
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-accent/32 bg-accent/12 font-cinzel text-sm tracking-[0.14em] text-accent">
+            {getAvatarMonogram(entry.avatarKey, entry.nickname)}
           </div>
-          {/* Avatar */}
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-accent/35 bg-accent/15 font-cinzel text-base font-bold text-accent">
-            {monogram}
-          </div>
-          {/* Nickname */}
           <div className="min-w-0 flex-1">
-            <p className="truncate text-xl font-semibold text-text-primary">{entry.nickname}</p>
+            <p className="truncate text-xl font-normal leading-tight text-text-primary">
+              {entry.nickname}
+            </p>
           </div>
-          {/* Points */}
-          <div className="font-cinzel shrink-0 text-3xl font-bold text-accent">
-            {entry.totalPoints}
+          <div className="flex shrink-0 items-baseline gap-1.5">
+            <span className="font-cinzel text-3xl leading-none text-accent">
+              {entry.totalPoints}
+            </span>
+            <span className="font-cinzel text-[9px] uppercase tracking-[0.22em] text-text-secondary/50">
+              XP
+            </span>
           </div>
         </div>
       </motion.div>
     );
   }
 
-  const isTopThree = entry.rank <= 3;
-
   return (
     <motion.div
       layout
-      className={`relative overflow-hidden rounded-3xl border bg-bg-secondary/30 px-4 py-3 ${isTopThree ? "border-accent/14" : "border-accent/8"}`}
-      initial={{ opacity: 0, x: 8 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -8 }}
-      transition={{ duration: 0.3 }}
+      className={cn(
+        "flex items-center gap-3 rounded-2xl border px-4 py-3 shadow-[0_12px_28px_-20px_rgba(0,0,0,0.45)]",
+        entry.rank === 2 || entry.rank === 3
+          ? "border-accent/14 bg-bg-secondary/30"
+          : "border-accent/8 bg-bg-secondary/30",
+      )}
     >
-      <div className="flex items-center gap-3">
-        {/* Rank */}
-        <div className="font-cinzel w-7 shrink-0 text-center text-sm text-accent/50">
-          {entry.rank}
-        </div>
-        {/* Avatar */}
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-accent/20 bg-accent/10 font-cinzel text-xs font-bold text-accent">
-          {monogram}
-        </div>
-        {/* Nickname */}
-        <p className="min-w-0 flex-1 truncate text-[18px] font-light text-text-primary">
-          {entry.nickname}
-        </p>
-        {/* Points */}
-        <div className="font-cinzel shrink-0 text-xl font-bold text-accent/80">
-          {entry.totalPoints}
-        </div>
+      <div className="w-6 shrink-0 text-center font-cinzel text-base text-accent/60">
+        {entry.rank}
+      </div>
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-accent/16 bg-accent/8 font-cinzel text-xs tracking-[0.14em] text-accent">
+        {getAvatarMonogram(entry.avatarKey, entry.nickname)}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-[18px] font-light text-text-primary">{entry.nickname}</p>
+      </div>
+      <div className="shrink-0 text-right">
+        <span className="font-cinzel text-xl text-text-primary">{entry.totalPoints}</span>
+        <span className="ml-1.5 text-[9px] uppercase tracking-[0.2em] text-text-secondary/45">
+          XP
+        </span>
       </div>
     </motion.div>
   );

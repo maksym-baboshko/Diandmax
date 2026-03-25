@@ -6,7 +6,6 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 
 export function Splash() {
   const t = useTranslations("Splash");
-
   const isClient = useSyncExternalStore(
     () => () => {},
     () => true,
@@ -55,20 +54,18 @@ export function Splash() {
           />
 
           <motion.div
-            className="relative -translate-y-12 flex h-72 w-96 max-w-[90vw] items-center justify-center md:h-[420px] md:w-[560px]"
+            className="relative flex h-72 w-96 max-w-[90vw] -translate-y-12 items-center justify-center md:h-[420px] md:w-[560px]"
             initial={{ scale: 0.95, opacity: 0, y: 30 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 1.05, opacity: 0, filter: "blur(4px)" }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             style={{ perspective: "900px" }}
           >
-            {/* Envelope body */}
-            <div className="absolute inset-0 rounded-sm bg-[#EAE0CE] shadow-xl" />
+            <div className="absolute inset-0 rounded-sm bg-[#EAE0CE] shadow-xl z-0" />
 
-            {/* Envelope decorative border */}
             <div className="absolute inset-0 z-[5] pointer-events-none overflow-hidden">
               <svg
-                className="w-full h-full"
+                className="h-full w-full"
                 viewBox="0 0 400 300"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
@@ -134,21 +131,19 @@ export function Splash() {
               </svg>
             </div>
 
-            {/* Letter card */}
             <motion.div
-              className="absolute flex flex-col items-center justify-center rounded-sm border border-[#E6D5C3] bg-[#FAF6F0] p-6 text-center shadow-md z-20"
-              style={{ left: "4%", top: "7%", width: "92%", height: "85%" }}
+              className="absolute flex h-[85%] w-[92%] flex-col items-center justify-center rounded-sm border border-[#E6D5C3] bg-[#FAF6F0] p-6 text-center shadow-md z-20"
               initial={{ y: 0, scale: 0.98 }}
               animate={{ y: "-65%", scale: 1 }}
               transition={{
                 y: { duration: 1.2, delay: 2, ease: [0.34, 1.56, 0.64, 1] },
                 scale: { duration: 1.2, delay: 2, ease: "easeInOut" },
               }}
+              style={{ left: "4%", top: "7%" }}
             >
-              {/* Corner ornaments */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-sm">
                 <svg
-                  className="w-full h-full"
+                  className="h-full w-full"
                   viewBox="-2 -5 404 288"
                   preserveAspectRatio="none"
                   fill="none"
@@ -166,6 +161,7 @@ export function Splash() {
                   />
                   <path d="M12 12 C9 8 9 3 12 0 C15 3 15 8 12 12 Z" fill="#A87848" opacity="0.45" />
                   <path d="M12 12 C7 9 4 5 7 3 C10 5 12 9 12 12 Z" fill="#A87848" opacity="0.37" />
+                  <path d="M12 12 C9 15 5 15 3 12 C5 9 9 9 12 12 Z" fill="#A87848" opacity="0.30" />
                   <path
                     d="M388 12 C385 8 385 3 388 0 C391 3 391 8 388 12 Z"
                     fill="#A87848"
@@ -177,14 +173,39 @@ export function Splash() {
                     opacity="0.37"
                   />
                   <path
+                    d="M388 12 C391 15 395 15 397 12 C395 9 391 9 388 12 Z"
+                    fill="#A87848"
+                    opacity="0.30"
+                  />
+                  <path
                     d="M12 266 C9 270 9 275 12 278 C15 275 15 270 12 266 Z"
                     fill="#A87848"
                     opacity="0.45"
                   />
                   <path
+                    d="M12 266 C7 269 4 273 7 275 C10 273 12 269 12 266 Z"
+                    fill="#A87848"
+                    opacity="0.37"
+                  />
+                  <path
+                    d="M12 266 C9 263 5 263 3 266 C5 269 9 269 12 266 Z"
+                    fill="#A87848"
+                    opacity="0.30"
+                  />
+                  <path
                     d="M388 266 C385 270 385 275 388 278 C391 275 391 270 388 266 Z"
                     fill="#A87848"
                     opacity="0.45"
+                  />
+                  <path
+                    d="M388 266 C391 269 395 273 393 275 C390 273 388 269 388 266 Z"
+                    fill="#A87848"
+                    opacity="0.37"
+                  />
+                  <path
+                    d="M388 266 C391 263 395 263 397 266 C395 269 391 269 388 266 Z"
+                    fill="#A87848"
+                    opacity="0.30"
                   />
                 </svg>
               </div>
@@ -219,19 +240,17 @@ export function Splash() {
               </p>
             </motion.div>
 
-            {/* Flap triangle (hides top opening) — fades out */}
             <motion.div
-              className="absolute inset-x-0 top-0 h-1/2 pointer-events-none z-[35]"
-              style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)", backgroundColor: "#F6ECE2" }}
+              className="absolute inset-x-0 top-0 h-1/2 bg-[#F6ECE2] pointer-events-none z-[35]"
+              style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
               initial={{ opacity: 1 }}
               animate={{ opacity: 0 }}
               transition={{ duration: 0.1, delay: 0.9 }}
             />
 
-            {/* Static envelope flaps (left, right, bottom) */}
             <div className="absolute inset-0 z-30 pointer-events-none">
               <svg
-                className="w-full h-full"
+                className="h-full w-full"
                 viewBox="0 0 400 300"
                 preserveAspectRatio="none"
                 fill="none"
@@ -262,7 +281,6 @@ export function Splash() {
               </svg>
             </div>
 
-            {/* 3D top flap (opens via rotateX) */}
             <motion.div
               className="absolute inset-0 h-full w-full origin-top pointer-events-none"
               style={{ transformStyle: "preserve-3d", zIndex: flapZIndex }}
@@ -270,10 +288,9 @@ export function Splash() {
               animate={{ rotateX: -180 }}
               transition={{ duration: 0.75, delay: 1, ease: "easeInOut" }}
             >
-              {/* Front side: top flap */}
               <div className="absolute inset-0" style={{ backfaceVisibility: "hidden" }}>
                 <svg
-                  className="w-full h-full"
+                  className="h-full w-full"
                   viewBox="0 0 400 300"
                   preserveAspectRatio="none"
                   fill="none"
@@ -293,7 +310,7 @@ export function Splash() {
                   />
                 </svg>
               </div>
-              {/* Back side: textured inside */}
+
               <div
                 className="absolute inset-0"
                 style={{
@@ -309,9 +326,8 @@ export function Splash() {
               />
             </motion.div>
 
-            {/* Gold wax seal */}
             <motion.div
-              className="absolute left-1/2 top-[52%] z-50 flex h-24 w-24 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full md:h-32 md:w-32"
+              className="absolute left-1/2 top-[52%] flex h-[6.5rem] w-[6.5rem] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full z-50 md:h-32 md:w-32"
               style={{
                 background: "radial-gradient(circle at 38% 35%, #dfc285, #c49640 50%, #9a7228)",
                 boxShadow:
@@ -339,6 +355,7 @@ export function Splash() {
                 <path d="M50 93 L51.8 90 L50 87 L48.2 90 Z" fill="rgba(255,245,200,0.6)" />
                 <path d="M7 50 L10 51.8 L13 50 L10 48.2 Z" fill="rgba(255,245,200,0.6)" />
               </svg>
+
               <div className="relative z-10 flex flex-col items-center gap-1">
                 <div className="h-px w-7 bg-[#f5e8c0]/65" />
                 <span className="font-serif text-xl font-bold italic tracking-widest text-[#faf4ea] drop-shadow md:text-2xl">

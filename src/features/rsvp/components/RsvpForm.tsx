@@ -1,15 +1,27 @@
 "use client";
 
-import { MOTION_EASE, cn } from "@/shared/lib";
-import { Button, Input, Textarea } from "@/shared/ui";
+import { MOTION_EASE, useLiteMotion } from "@/shared/lib";
+import { AnimatedReveal } from "@/shared/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AnimatePresence, motion } from "motion/react";
+import { type Variants, motion } from "motion/react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+
 import { submitRsvp } from "../actions/submit-rsvp";
 import { rsvpSchema } from "../schema/rsvp-schema";
 import type { RsvpFormData } from "../schema/rsvp-schema";
+import {
+  RsvpAttendanceSection,
+  RsvpAttendingDetailsSection,
+  RsvpDivider,
+  RsvpGuestNamesSection,
+  RsvpMessageSection,
+  RsvpPersonalizedNoteSection,
+  RsvpPhotoCluster,
+  RsvpSubmitSection,
+} from "./RsvpFormSections";
+import { RsvpSuccessOverlay } from "./RsvpSuccessOverlay";
 
 interface RsvpFormProps {
   slug?: string;
@@ -19,9 +31,16 @@ interface RsvpFormProps {
 
 export function RsvpForm({ slug, guestVocative, maxSeats }: RsvpFormProps) {
   const t = useTranslations("RSVP");
+  const liteMotion = useLiteMotion();
   const [submitted, setSubmitted] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [submittedName, setSubmittedName] = useState("");
+  const [submittedAttending, setSubmittedAttending] = useState<RsvpFormData["attending"] | null>(
+    null,
+  );
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [attendingChoice, setAttendingChoice] = useState<"yes" | "no" | null>(null);
+  const guestNameKeyCounterRef = useRef(1);
+  const [guestNameKeys, setGuestNameKeys] = useState<string[]>(["guest-name-0"]);
 
   const {
     register,
@@ -39,13 +58,73 @@ export function RsvpForm({ slug, guestVocative, maxSeats }: RsvpFormProps) {
     },
   });
 
+  const attendingChoice = watch("attending");
   const guestsValue = watch("guests") ?? 1;
   const guestNames = watch("guestNames") ?? [""];
+  const visibleGuestFieldsCount = attendingChoice === "yes" ? guestsValue : 1;
 
-  function handleAttendingChange(value: "yes" | "no") {
-    setAttendingChoice(value);
-    setValue("attending", value, { shouldValidate: true });
-  }
+  const formStagger: Variants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.07,
+        delayChildren: liteMotion ? 0.18 : 0.45,
+      },
+    },
+  };
+
+  const formField: Variants = {
+    hidden: { opacity: 0, y: liteMotion ? 14 : 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: liteMotion ? 0.4 : 0.55, ease: MOTION_EASE },
+    },
+  };
+  const translateSection = (
+    key: string,
+    values?: Record<string, string | number | null | undefined>,
+  ) => t(key, values as Record<string, string | number | Date> | undefined);
+
+  useEffect(() => {
+    const normalizedCurrent = guestNames.length > 0 ? guestNames : [""];
+    const updated =
+      visibleGuestFieldsCount > normalizedCurrent.length
+        ? [
+            ...normalizedCurrent,
+            ...Array<string>(visibleGuestFieldsCount - normalizedCurrent.length).fill(""),
+          ]
+        : normalizedCurrent.slice(0, visibleGuestFieldsCount);
+
+    const didChange =
+      updated.length !== normalizedCurrent.length ||
+      updated.some((value, index) => value !== normalizedCurrent[index]);
+
+    if (didChange) {
+      setValue("guestNames", updated, { shouldValidate: true });
+    }
+  }, [guestNames, setValue, visibleGuestFieldsCount]);
+
+  useEffect(() => {
+    setGuestNameKeys((currentKeys) => {
+      if (visibleGuestFieldsCount === currentKeys.length) {
+        return currentKeys;
+      }
+
+      if (visibleGuestFieldsCount < currentKeys.length) {
+        return currentKeys.slice(0, visibleGuestFieldsCount);
+      }
+
+      const nextKeys = [...currentKeys];
+
+      while (nextKeys.length < visibleGuestFieldsCount) {
+        nextKeys.push(`guest-name-${guestNameKeyCounterRef.current}`);
+        guestNameKeyCounterRef.current += 1;
+      }
+
+      return nextKeys;
+    });
+  }, [visibleGuestFieldsCount]);
 
   function handleGuestsChange(newCount: number) {
     if (maxSeats && newCount > maxSeats) return;
@@ -59,179 +138,161 @@ export function RsvpForm({ slug, guestVocative, maxSeats }: RsvpFormProps) {
     setValue("guestNames", updated, { shouldValidate: true });
   }
 
+  function getSubmittedDisplayName(names: string[]) {
+    return names.find((name) => name.trim().length > 0)?.trim() ?? guestVocative ?? "";
+  }
+
   async function onSubmit(data: RsvpFormData) {
     setSubmitError(null);
+
+    if (maxSeats && data.attending === "yes" && (data.guests ?? 1) > maxSeats) {
+      setSubmitError(t("personalized_limit_error", { seats: maxSeats }));
+      return;
+    }
+
     const result = await submitRsvp(data);
+
     if (result.success) {
+      setSubmittedName(getSubmittedDisplayName(data.guestNames));
+      setSubmittedAttending(data.attending);
+      setShowConfetti(true);
       setSubmitted(true);
     } else {
       setSubmitError(t("error_generic"));
     }
   }
 
+  useEffect(() => {
+    if (!submitted) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [submitted]);
+
   if (submitted) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: MOTION_EASE }}
-        className="flex flex-col items-center gap-4 py-12 text-center"
-      >
-        <div className="font-cinzel text-5xl text-accent">✦</div>
-        <h3 className="heading-serif text-2xl">
-          {guestVocative ? t("success_title_named", { name: guestVocative }) : t("success_title")}
-        </h3>
-        <p className="text-text-secondary">
-          {attendingChoice === "no" ? t("success_subtitle_no") : t("success_subtitle_yes")}
-        </p>
-      </motion.div>
+      <RsvpSuccessOverlay
+        liteMotion={liteMotion}
+        showConfetti={showConfetti}
+        submittedName={submittedName}
+        submittedAttending={submittedAttending}
+        onHideConfetti={() => setShowConfetti(false)}
+        onDismiss={() => {
+          setSubmitted(false);
+          setSubmittedAttending(null);
+        }}
+      />
     );
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-      {/* Honeypot */}
-      <input
-        type="text"
-        tabIndex={-1}
-        aria-hidden="true"
-        className="hidden"
-        {...register("website")}
-      />
+    <div className="relative w-full max-w-2xl shrink-0 py-12">
+      <RsvpPhotoCluster />
 
-      {/* Attending toggle */}
-      <fieldset>
-        <legend className="mb-3 text-sm font-medium text-text-secondary">
-          {t("attending_label")}
-        </legend>
-        <div className="grid grid-cols-2 gap-3">
-          {(["yes", "no"] as const).map((val) => (
-            <button
-              key={val}
-              type="button"
-              onClick={() => handleAttendingChange(val)}
-              className={cn(
-                "rounded-2xl border-2 px-4 py-5 text-left transition-all duration-200",
-                attendingChoice === val
-                  ? "border-accent bg-accent/10 text-text-primary"
-                  : "border-accent/20 text-text-secondary hover:border-accent/50",
-              )}
-            >
-              <div className="font-cinzel text-lg font-bold">
-                {t(val === "yes" ? "attending_yes_heading" : "attending_no_heading")}
-              </div>
-              <div className="mt-0.5 text-xs">
-                {t(val === "yes" ? "attending_yes_note" : "attending_no_note")}
-              </div>
-            </button>
-          ))}
-        </div>
-        {errors.attending && <p className="mt-2 text-sm text-error">{t("attendance_required")}</p>}
-      </fieldset>
+      <AnimatedReveal
+        direction="up"
+        duration={1.2}
+        blur
+        className="group/form relative z-20 overflow-hidden rounded-4xl border border-accent/24 bg-bg-primary/72 shadow-[0_30px_100px_rgba(0,0,0,0.25)] md:rounded-[2.5rem]"
+      >
+        <div className="pointer-events-none absolute inset-0 z-20 rounded-4xl border border-accent/0 transition-colors duration-500 group-hover/form:border-accent/40 md:rounded-[2.5rem]" />
 
-      <AnimatePresence>
-        {attendingChoice === "yes" && (
+        <form onSubmit={handleSubmit(onSubmit)} className="relative z-10 p-6 md:p-12">
+          {!liteMotion && (
+            <>
+              <div className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full bg-accent/20 blur-[100px]" />
+              <div className="pointer-events-none absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-accent/20 blur-[100px]" />
+            </>
+          )}
+
+          <input type="hidden" {...register("guests")} />
+          <input type="hidden" {...register("slug")} />
+          <input
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            className="sr-only"
+            {...register("website")}
+          />
+
           <motion.div
-            key="yes-fields"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3, ease: MOTION_EASE }}
-            className="flex flex-col gap-6 overflow-hidden"
+            variants={formStagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.05 }}
+            className="relative z-10 space-y-7 md:space-y-9"
           >
-            {/* Guest count */}
-            <div>
-              <p className="mb-3 text-sm font-medium text-text-secondary">{t("guests_label")}</p>
-              <div className="flex items-center gap-4">
-                <button
-                  type="button"
-                  onClick={() => handleGuestsChange(guestsValue - 1)}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-accent/30 text-accent transition-colors hover:bg-accent/10"
-                  aria-label="Decrease guests"
-                >
-                  −
-                </button>
-                <span className="font-cinzel w-6 text-center text-xl font-bold text-text-primary">
-                  {guestsValue}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => handleGuestsChange(guestsValue + 1)}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-accent/30 text-accent transition-colors hover:bg-accent/10"
-                  aria-label="Increase guests"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            {/* Guest names */}
-            <div>
-              <p className="mb-1 text-sm font-medium text-text-secondary">
-                {t("guest_names_label")}
-              </p>
-              <p className="mb-3 text-xs text-text-secondary">{t("guest_names_hint")}</p>
-              <div className="flex flex-col gap-3">
-                {guestNames.map(
-                  // biome-ignore lint/suspicious/noArrayIndexKey: ordered form slots, no stable id
-                  (_, index) => (
-                    <Input
-                      key={index}
-                      placeholder={t("guest_name_placeholder")}
-                      aria-label={t("guest_name_field_label", { number: index + 1 })}
-                      error={!!errors.guestNames?.[index]}
-                      {...register(`guestNames.${index}`)}
-                    />
-                  ),
-                )}
-              </div>
-              {errors.guestNames && (
-                <p className="mt-2 text-sm text-error">{t("guest_names_required")}</p>
-              )}
-            </div>
-
-            {/* Dietary */}
-            <div>
-              <label
-                htmlFor="dietary"
-                className="mb-1 block text-sm font-medium text-text-secondary"
-              >
-                {t("dietary_label")}
-              </label>
-              <Textarea
-                id="dietary"
-                placeholder={t("dietary_placeholder")}
-                {...register("dietary")}
+            {guestVocative && maxSeats ? (
+              <RsvpPersonalizedNoteSection
+                guestVocative={guestVocative}
+                maxSeats={maxSeats}
+                t={translateSection}
+                formField={formField}
               />
-            </div>
+            ) : null}
+
+            <RsvpGuestNamesSection
+              errors={errors}
+              formField={formField}
+              isSubmitting={isSubmitting}
+              register={register}
+              t={translateSection}
+              visibleGuestFieldsCount={visibleGuestFieldsCount}
+              guestNameKeys={guestNameKeys}
+            />
+
+            <motion.div variants={formField}>
+              <RsvpDivider />
+            </motion.div>
+
+            <RsvpAttendanceSection
+              attending={attendingChoice}
+              errors={errors}
+              formField={formField}
+              isSubmitting={isSubmitting}
+              setValue={setValue}
+              t={translateSection}
+            />
+
+            <RsvpAttendingDetailsSection
+              guests={guestsValue}
+              isAttendingYes={attendingChoice === "yes"}
+              isSubmitting={isSubmitting}
+              maxGuestCount={maxSeats ?? 10}
+              register={register}
+              t={translateSection}
+              onGuestsChange={handleGuestsChange}
+            />
+
+            <motion.div variants={formField}>
+              <RsvpDivider />
+            </motion.div>
+
+            <RsvpMessageSection
+              formField={formField}
+              isSubmitting={isSubmitting}
+              register={register}
+              t={translateSection}
+            />
+
+            <RsvpSubmitSection
+              attending={attendingChoice}
+              formField={formField}
+              isSubmitting={isSubmitting}
+              liteMotion={liteMotion}
+              submitError={submitError}
+              t={translateSection}
+            />
           </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Message */}
-      <div>
-        <label htmlFor="message" className="mb-1 block text-sm font-medium text-text-secondary">
-          {t("message_label")}
-        </label>
-        <Textarea id="message" placeholder={t("message_placeholder")} {...register("message")} />
-      </div>
-
-      {submitError && <p className="text-sm text-error">{submitError}</p>}
-
-      <div className="flex flex-col gap-2">
-        <Button
-          type="submit"
-          variant="primary"
-          size="lg"
-          disabled={isSubmitting}
-          className="w-full"
-        >
-          {isSubmitting ? t("submit_loading") : t("submit")}
-        </Button>
-        <p className="text-center text-xs text-text-secondary">
-          {isSubmitting ? t("submit_loading_note") : t("delivery_note")}
-        </p>
-      </div>
-    </form>
+        </form>
+      </AnimatedReveal>
+    </div>
   );
 }

@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "@/shared/i18n/navigation";
 import { cn } from "@/shared/lib";
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore, useTransition } from "react";
 
 interface LanguageSwitcherProps {
   className?: string;
@@ -11,39 +11,52 @@ interface LanguageSwitcherProps {
 
 export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
   const locale = useLocale();
+  const t = useTranslations("Accessibility");
   const router = useRouter();
   const pathname = usePathname();
-  const t = useTranslations("Accessibility");
-  const [mounted, setMounted] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const toggleLocale = () => {
+    const nextLocale = locale === "uk" ? "en" : "uk";
 
-  // Render placeholder during SSR to prevent hydration mismatch
+    startTransition(() => {
+      router.replace(pathname, { locale: nextLocale });
+    });
+  };
+
   if (!mounted) {
-    return <span className={cn("w-8 h-4 inline-block", className)} />;
-  }
-
-  const otherLocale = locale === "uk" ? "en" : "uk";
-  const label = locale === "uk" ? t("switch_language_to_en") : t("switch_language_to_uk");
-  const displayLabel = otherLocale === "en" ? "EN" : "УК";
-
-  function handleSwitch() {
-    router.replace(pathname, { locale: otherLocale });
+    return (
+      <button
+        type="button"
+        disabled
+        className={cn(
+          "flex h-10 w-10 items-center justify-center rounded-full border border-accent bg-bg-primary text-sm font-medium text-accent opacity-0",
+          className,
+        )}
+        aria-label={locale === "uk" ? t("switch_language_to_en") : t("switch_language_to_uk")}
+      />
+    );
   }
 
   return (
     <button
       type="button"
-      onClick={handleSwitch}
-      aria-label={label}
+      onClick={toggleLocale}
       className={cn(
-        "font-cinzel text-sm uppercase tracking-wider text-text-secondary transition-colors duration-200 hover:text-accent",
+        "flex h-10 w-10 cursor-pointer select-none items-center justify-center rounded-full border border-accent text-sm font-medium transition-all duration-300",
+        "bg-bg-primary text-accent hover:bg-accent hover:text-white",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary",
+        isPending && "opacity-70",
         className,
       )}
+      aria-label={locale === "uk" ? t("switch_language_to_en") : t("switch_language_to_uk")}
     >
-      {displayLabel}
+      <span className="pointer-events-none">{locale === "uk" ? "EN" : "UA"}</span>
     </button>
   );
 }

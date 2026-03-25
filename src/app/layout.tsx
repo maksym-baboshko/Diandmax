@@ -5,6 +5,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: SITE_NAME,
   description: `${COUPLE.groom.name.en} & ${COUPLE.bride.name.en}'s Wedding · ${VENUE.locationShort}`,
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

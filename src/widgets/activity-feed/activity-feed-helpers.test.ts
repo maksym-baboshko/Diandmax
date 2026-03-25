@@ -7,6 +7,8 @@ import {
   getEventLabelKey,
   getEventPrompt,
   getHeroLabelKey,
+  getRealtimeRetryDelay,
+  shouldRetryRealtimeStatus,
   trackSeenHeroEventId,
 } from "./activity-feed-helpers";
 import type { FeedEventSnapshot } from "./types";
@@ -179,5 +181,30 @@ describe("trackSeenHeroEventId", () => {
     trackSeenHeroEventId(seen, "b", 5);
     expect(seen.size).toBe(2);
     expect(seen.has("a")).toBe(true);
+  });
+});
+
+describe("shouldRetryRealtimeStatus", () => {
+  it("retries channel failures", () => {
+    expect(shouldRetryRealtimeStatus("CHANNEL_ERROR")).toBe(true);
+    expect(shouldRetryRealtimeStatus("TIMED_OUT")).toBe(true);
+    expect(shouldRetryRealtimeStatus("CLOSED")).toBe(true);
+  });
+
+  it("ignores healthy realtime statuses", () => {
+    expect(shouldRetryRealtimeStatus("SUBSCRIBED")).toBe(false);
+    expect(shouldRetryRealtimeStatus("JOINING")).toBe(false);
+  });
+});
+
+describe("getRealtimeRetryDelay", () => {
+  it("applies exponential backoff", () => {
+    expect(getRealtimeRetryDelay(1)).toBe(2000);
+    expect(getRealtimeRetryDelay(2)).toBe(4000);
+    expect(getRealtimeRetryDelay(3)).toBe(8000);
+  });
+
+  it("caps the retry delay", () => {
+    expect(getRealtimeRetryDelay(10)).toBe(30000);
   });
 });

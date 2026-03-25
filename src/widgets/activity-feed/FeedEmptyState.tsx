@@ -1,48 +1,214 @@
 "use client";
 
-import { cn } from "@/shared/lib";
+import { MOTION_EASE, cn } from "@/shared/lib";
+import { AnimatePresence, motion } from "motion/react";
 import { useTranslations } from "next-intl";
 
-const CARD_DURATION_S = 18;
-const CARDS_PER_COL = 5;
-const CARD_DELAY_STEP = CARD_DURATION_S / CARDS_PER_COL;
+const CARD_DURATION = 18;
+const EMPTY_STATE_FADE_DURATION = 0.9;
 
-// Heights in px (must match card render height)
-const CARD_HEIGHT = 140;
-const CARD_GAP = 12;
-const CARD_STEP = CARD_HEIGHT + CARD_GAP;
+type GhostCardDef = {
+  key: string;
+  height: number;
+  hasPrompt: boolean;
+  promptLines: 2 | 3;
+  hasAnswer: boolean;
+  hasXp: boolean;
+  delay: number;
+};
 
-function GhostCard({
-  index,
-  columnOffset,
-  wide,
-}: {
-  index: number;
-  columnOffset: number;
-  wide?: boolean;
-}) {
-  const delay = columnOffset + index * CARD_DELAY_STEP;
+const FEED_EMPTY_STATE_HEADLINE_CLASS_NAME =
+  "heading-serif text-[clamp(22px,4vw,48px)] tracking-[0.03em] text-text-primary";
+
+const COL1: GhostCardDef[] = [
+  {
+    key: "col1-a",
+    height: 168,
+    hasPrompt: true,
+    promptLines: 2,
+    hasAnswer: true,
+    hasXp: true,
+    delay: 0,
+  },
+  {
+    key: "col1-b",
+    height: 92,
+    hasPrompt: false,
+    promptLines: 2,
+    hasAnswer: false,
+    hasXp: false,
+    delay: 3.6,
+  },
+  {
+    key: "col1-c",
+    height: 178,
+    hasPrompt: true,
+    promptLines: 3,
+    hasAnswer: true,
+    hasXp: true,
+    delay: 7.2,
+  },
+  {
+    key: "col1-d",
+    height: 92,
+    hasPrompt: false,
+    promptLines: 2,
+    hasAnswer: false,
+    hasXp: false,
+    delay: 10.8,
+  },
+  {
+    key: "col1-e",
+    height: 160,
+    hasPrompt: true,
+    promptLines: 2,
+    hasAnswer: false,
+    hasXp: true,
+    delay: 14.4,
+  },
+];
+
+const COL_MOBILE: GhostCardDef[] = [
+  {
+    key: "mobile-a",
+    height: 168,
+    hasPrompt: true,
+    promptLines: 2,
+    hasAnswer: true,
+    hasXp: true,
+    delay: 0,
+  },
+  {
+    key: "mobile-b",
+    height: 92,
+    hasPrompt: false,
+    promptLines: 2,
+    hasAnswer: false,
+    hasXp: false,
+    delay: 3.6,
+  },
+  {
+    key: "mobile-c",
+    height: 178,
+    hasPrompt: true,
+    promptLines: 3,
+    hasAnswer: true,
+    hasXp: true,
+    delay: 7.2,
+  },
+  {
+    key: "mobile-d",
+    height: 92,
+    hasPrompt: false,
+    promptLines: 2,
+    hasAnswer: false,
+    hasXp: false,
+    delay: 10.8,
+  },
+  {
+    key: "mobile-e",
+    height: 160,
+    hasPrompt: true,
+    promptLines: 2,
+    hasAnswer: false,
+    hasXp: true,
+    delay: 14.4,
+  },
+];
+
+const COL2: GhostCardDef[] = [
+  {
+    key: "col2-a",
+    height: 92,
+    hasPrompt: false,
+    promptLines: 2,
+    hasAnswer: false,
+    hasXp: false,
+    delay: 1.8,
+  },
+  {
+    key: "col2-b",
+    height: 178,
+    hasPrompt: true,
+    promptLines: 3,
+    hasAnswer: true,
+    hasXp: true,
+    delay: 5.4,
+  },
+  {
+    key: "col2-c",
+    height: 92,
+    hasPrompt: false,
+    promptLines: 2,
+    hasAnswer: false,
+    hasXp: false,
+    delay: 9,
+  },
+  {
+    key: "col2-d",
+    height: 168,
+    hasPrompt: true,
+    promptLines: 2,
+    hasAnswer: true,
+    hasXp: true,
+    delay: 12.6,
+  },
+  {
+    key: "col2-e",
+    height: 92,
+    hasPrompt: false,
+    promptLines: 2,
+    hasAnswer: false,
+    hasXp: false,
+    delay: 16.2,
+  },
+];
+
+function GhostCard({ height, hasPrompt, promptLines, hasAnswer, hasXp, delay }: GhostCardDef) {
   return (
     <div
-      className={cn(
-        "af-card-scroll absolute left-0 right-0 rounded-3xl border border-accent/8 bg-bg-secondary/20 px-5 py-4",
-        wide && "border-accent/12 bg-accent/5",
-      )}
+      className="af-card-scroll absolute w-full overflow-hidden rounded-3xl border border-accent/10 bg-accent/5 backdrop-blur-[2px]"
       style={{
-        height: CARD_HEIGHT,
-        bottom: -CARD_HEIGHT - index * CARD_STEP,
-        animationDuration: `${CARD_DURATION_S}s`,
+        height,
+        bottom: -height,
+        animationDuration: `${CARD_DURATION}s`,
         animationDelay: `-${delay}s`,
       }}
     >
-      <div className="flex items-center gap-3">
-        <div className="h-10 w-10 shrink-0 rounded-full bg-accent/10" />
-        <div className="flex flex-1 flex-col gap-2">
-          <div className="h-3 w-28 rounded-full bg-accent/10" />
-          <div className="h-2.5 w-16 rounded-full bg-accent/8" />
+      <div className="absolute inset-y-0 left-0 w-[3px] rounded-l-3xl bg-accent/22" />
+      <div className="py-4 pl-7 pr-5">
+        <div className="flex items-center gap-3">
+          <div className="h-11 w-11 shrink-0 rounded-full bg-accent/10" />
+          <div className="flex-1 space-y-1.5">
+            <div className="h-2.5 w-24 rounded-full bg-accent/16" />
+            <div className="h-1.5 w-40 rounded-full bg-accent/8" />
+          </div>
+          {hasXp ? (
+            <div className="flex items-baseline gap-1">
+              <div className="h-5 w-7 rounded bg-accent/14" />
+              <div className="h-1.5 w-4 rounded-full bg-accent/8" />
+            </div>
+          ) : null}
         </div>
+
+        {hasPrompt ? (
+          <div className="mt-3 space-y-2">
+            <div className="h-2 w-full rounded-full bg-accent/10" />
+            <div className="h-2 w-5/6 rounded-full bg-accent/8" />
+            {promptLines === 3 ? <div className="h-2 w-2/3 rounded-full bg-accent/7" /> : null}
+          </div>
+        ) : (
+          <div className="mt-3">
+            <div className="h-2 w-1/2 rounded-full bg-text-secondary/8" />
+          </div>
+        )}
+
+        {hasAnswer ? (
+          <div className="mt-4 rounded-2xl border border-accent/12 bg-accent/6 px-4 py-2.5">
+            <div className="h-1.5 w-3/4 rounded-full bg-accent/10" />
+          </div>
+        ) : null}
       </div>
-      {wide && <div className="mt-3 h-3 w-3/4 rounded-full bg-accent/8" />}
     </div>
   );
 }
@@ -53,101 +219,116 @@ interface FeedEmptyStateProps {
 
 export function FeedEmptyState({ variant }: FeedEmptyStateProps) {
   const t = useTranslations("ActivityFeedPage");
+  const isLoading = variant === "loading";
 
   return (
-    <div className="relative flex h-[520px] w-full overflow-hidden rounded-4xl">
-      {/* Ghost card columns (hidden while loading) */}
-      {variant === "empty" && (
-        <>
-          {/* Desktop left column */}
-          <div className="absolute inset-y-0 left-0 right-[calc(50%+6px)] hidden overflow-hidden lg:block">
+    <div className="relative flex min-h-[620px] flex-col items-center justify-center overflow-hidden rounded-3xl border border-accent/20 bg-bg-secondary/30 px-8 py-16 text-center lg:min-h-0 lg:flex-1">
+      <AnimatePresence initial={false}>
+        {isLoading ? null : (
+          <motion.div
+            key="ghost-cards"
+            className="pointer-events-none absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: EMPTY_STATE_FADE_DURATION, ease: MOTION_EASE }}
+          >
             <div
-              className="pointer-events-none absolute inset-0 z-10"
+              className="absolute inset-0 block lg:hidden"
               style={{
-                maskImage:
-                  "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
                 WebkitMaskImage:
+                  "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
+                maskImage:
                   "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
               }}
             >
-              {([0, 1, 2, 3, 4] as const).map((i) => (
-                <GhostCard key={i} index={i} columnOffset={0} />
-              ))}
+              <div className="relative h-full overflow-hidden px-3">
+                {COL_MOBILE.map(({ key, ...card }) => (
+                  <GhostCard key={key} {...card} />
+                ))}
+              </div>
             </div>
-          </div>
-          {/* Desktop right column */}
-          <div className="absolute inset-y-0 left-[calc(50%+6px)] right-0 hidden overflow-hidden lg:block">
-            <div
-              className="pointer-events-none absolute inset-0 z-10"
-              style={{
-                maskImage:
-                  "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
-                WebkitMaskImage:
-                  "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
-              }}
-            >
-              {([0, 1, 2, 3, 4] as const).map((i) => (
-                <GhostCard key={i} index={i} columnOffset={1.8} wide />
-              ))}
-            </div>
-          </div>
-          {/* Mobile single column */}
-          <div className="absolute inset-y-0 inset-x-0 overflow-hidden lg:hidden">
-            <div
-              className="pointer-events-none absolute inset-0 z-10"
-              style={{
-                maskImage:
-                  "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
-                WebkitMaskImage:
-                  "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
-              }}
-            >
-              {([0, 1, 2, 3, 4] as const).map((i) => (
-                <GhostCard key={i} index={i} columnOffset={0} />
-              ))}
-            </div>
-          </div>
-        </>
-      )}
 
-      {/* Central overlay */}
-      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-bg-primary/70 backdrop-blur-sm">
-        {/* Glitch LIVE text */}
-        <div className="relative select-none">
-          {/* Orange glitch layer */}
-          <span
-            className="af-glitch-orange font-cinzel pointer-events-none absolute inset-0 text-7xl font-black tracking-[0.25em] text-orange-400/80"
-            aria-hidden="true"
-          >
-            LIVE
-          </span>
-          {/* Cyan glitch layer */}
-          <span
-            className="af-glitch-cyan font-cinzel pointer-events-none absolute inset-0 text-7xl font-black tracking-[0.25em] text-cyan-400/65"
-            aria-hidden="true"
-          >
-            LIVE
-          </span>
-          {/* Main text */}
-          <span className="af-glitch-main font-cinzel relative text-7xl font-black tracking-[0.25em] text-accent">
-            LIVE
-          </span>
+            <div
+              className="absolute inset-0 hidden gap-3 px-3 lg:flex"
+              style={{
+                WebkitMaskImage:
+                  "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
+                maskImage:
+                  "linear-gradient(to bottom, transparent 0%, black 9%, black 88%, transparent 100%)",
+              }}
+            >
+              <div className="relative flex-1 overflow-hidden">
+                {COL1.map(({ key, ...card }) => (
+                  <GhostCard key={key} {...card} />
+                ))}
+              </div>
+              <div className="relative flex-1 overflow-hidden">
+                {COL2.map(({ key, ...card }) => (
+                  <GhostCard key={key} {...card} />
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="relative z-10 flex flex-col items-center">
+        <div className="relative flex items-center justify-center">
+          <div className="relative flex items-center gap-4">
+            <span className="relative flex h-3 w-3 shrink-0">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
+              <span className="relative inline-flex h-3 w-3 rounded-full bg-accent" />
+            </span>
+            <div className="relative">
+              <span
+                aria-hidden="true"
+                className="af-glitch-orange pointer-events-none absolute left-0 top-0 whitespace-nowrap font-cinzel text-6xl tracking-[0.28em] lg:text-7xl"
+                style={{ color: "rgba(255,155,80,0.75)" }}
+              >
+                LIVE
+              </span>
+              <span
+                aria-hidden="true"
+                className="af-glitch-cyan pointer-events-none absolute left-0 top-0 whitespace-nowrap font-cinzel text-6xl tracking-[0.28em] lg:text-7xl"
+                style={{ color: "rgba(90,210,255,0.65)" }}
+              >
+                LIVE
+              </span>
+              <span className="af-glitch-main relative whitespace-nowrap font-cinzel text-6xl tracking-[0.28em] text-accent lg:text-7xl">
+                LIVE
+              </span>
+            </div>
+          </div>
         </div>
 
-        {/* Text */}
-        {variant === "loading" ? (
-          <div className="text-center">
-            <p className="text-base font-semibold text-text-primary">
-              {t("feed_loading_headline")}
+        <div className="mt-10 grid min-h-[5.5rem] w-full lg:min-h-[8.5rem]">
+          <div
+            aria-hidden={!isLoading}
+            className={cn(
+              "col-start-1 row-start-1 flex w-full flex-col items-center gap-6 transition-opacity duration-500",
+              isLoading ? "opacity-100" : "opacity-0",
+            )}
+          >
+            <h3 className={FEED_EMPTY_STATE_HEADLINE_CLASS_NAME}>{t("feed_loading_headline")}</h3>
+            <p className="min-h-10 max-w-[26rem] text-sm leading-relaxed text-text-secondary/80 lg:min-h-14 lg:text-lg">
+              {t("feed_loading_sub")}
             </p>
-            <p className="mt-1 text-sm text-text-secondary">{t("feed_loading_sub")}</p>
           </div>
-        ) : (
-          <div className="text-center">
-            <p className="text-base font-semibold text-text-primary">{t("feed_empty_headline")}</p>
-            <p className="mt-1 max-w-xs text-sm text-text-secondary">{t("feed_empty_sub")}</p>
+
+          <div
+            aria-hidden={isLoading}
+            className={cn(
+              "col-start-1 row-start-1 flex w-full flex-col items-center gap-6 transition-opacity duration-[900ms]",
+              isLoading ? "opacity-0" : "opacity-100",
+            )}
+          >
+            <h3 className={FEED_EMPTY_STATE_HEADLINE_CLASS_NAME}>{t("feed_empty_headline")}</h3>
+            <p className="min-h-10 max-w-[26rem] text-sm leading-relaxed text-text-secondary/80 lg:min-h-14 lg:text-lg">
+              {t("feed_empty_sub")}
+            </p>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

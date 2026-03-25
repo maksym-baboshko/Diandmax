@@ -4,7 +4,8 @@ import { LanguageSwitcher } from "@/features/language-switcher";
 import { ThemeSwitcher } from "@/features/theme-switcher";
 import { Link } from "@/shared/i18n/navigation";
 import type { Locale } from "@/shared/i18n/routing";
-import { AnimatePresence } from "motion/react";
+import { MOTION_EASE } from "@/shared/lib";
+import { AnimatePresence, motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { useCallback, useRef, useState, useSyncExternalStore } from "react";
 import { FeedClock } from "./FeedClock";
@@ -19,15 +20,15 @@ import {
   MOBILE_FEED_INITIAL_VISIBLE,
   MOBILE_FEED_LOAD_MORE_STEP,
 } from "./activity-feed-helpers";
-import type { FeedEventSnapshot } from "./types";
 import { useActivityFeedSnapshot } from "./useActivityFeedSnapshot";
-
-// ─── Mobile media query ───────────────────────────────────────────────────────
 
 const MOBILE_MEDIA_QUERY = "(max-width: 1023px)";
 
 function getMobileSnapshot() {
-  if (typeof window === "undefined") return false;
+  if (typeof window === "undefined") {
+    return false;
+  }
+
   return window.matchMedia(MOBILE_MEDIA_QUERY).matches;
 }
 
@@ -36,14 +37,16 @@ function getMobileServerSnapshot() {
 }
 
 function subscribeToMobile(callback: () => void) {
-  if (typeof window === "undefined") return () => {};
-  const mq = window.matchMedia(MOBILE_MEDIA_QUERY);
-  const handler = () => callback();
-  mq.addEventListener("change", handler);
-  return () => mq.removeEventListener("change", handler);
-}
+  if (typeof window === "undefined") {
+    return () => {};
+  }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+  const mediaQuery = window.matchMedia(MOBILE_MEDIA_QUERY);
+  const handler = () => callback();
+  mediaQuery.addEventListener("change", handler);
+
+  return () => mediaQuery.removeEventListener("change", handler);
+}
 
 interface ActivityFeedPageProps {
   locale: Locale;
@@ -51,48 +54,48 @@ interface ActivityFeedPageProps {
 
 export function ActivityFeedPage({ locale }: ActivityFeedPageProps) {
   const t = useTranslations("ActivityFeedPage");
-
-  const { snapshot, isLoading, error } = useActivityFeedSnapshot();
-  const heroEvent = null; // wired in future game hub phase
-
+  const tNavbar = useTranslations("Navbar");
+  const { snapshot, isLoading, error, heroEvent } = useActivityFeedSnapshot();
   const isMobile = useSyncExternalStore(
     subscribeToMobile,
     getMobileSnapshot,
     getMobileServerSnapshot,
   );
-
   const [mobileVisibleCount, setMobileVisibleCount] = useState(MOBILE_FEED_INITIAL_VISIBLE);
   const [desktopVisibleCount, setDesktopVisibleCount] = useState(DESKTOP_FEED_INITIAL_VISIBLE);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   const visibleCount = isMobile ? mobileVisibleCount : desktopVisibleCount;
   const hasMoreFeed = (snapshot?.feed.length ?? 0) > visibleCount;
-  const visibleFeed = (snapshot?.feed ?? []).slice(0, visibleCount);
-
-  const showFeedEmptyState = isLoading || !snapshot?.feed.length;
-  const showLeaderboardEmptyState = isLoading || !snapshot?.leaderboard.length;
-
+  const visibleFeed = snapshot?.feed.slice(0, visibleCount) ?? [];
+  const showFeedEmptyState = !error && (isLoading || !snapshot?.feed.length);
+  const showLeaderboardEmptyState = !error && (isLoading || !snapshot?.leaderboard.length);
   const desktopFeedColumns = [
-    visibleFeed.filter((_, i) => i % 2 === 0),
-    visibleFeed.filter((_, i) => i % 2 !== 0),
+    { id: "left", events: visibleFeed.filter((_, index) => index % 2 === 0) },
+    { id: "right", events: visibleFeed.filter((_, index) => index % 2 !== 0) },
   ];
 
   const handleLoadMore = useCallback(() => {
-    setMobileVisibleCount((prev) => prev + MOBILE_FEED_LOAD_MORE_STEP);
+    setMobileVisibleCount((previousCount) => previousCount + MOBILE_FEED_LOAD_MORE_STEP);
   }, []);
 
-  const observerRef = useRef<IntersectionObserver | null>(null);
   const sentinelRef = useCallback((node: HTMLDivElement | null) => {
     observerRef.current?.disconnect();
     observerRef.current = null;
-    if (!node) return;
+
+    if (!node) {
+      return;
+    }
+
     observerRef.current = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting) {
-          setDesktopVisibleCount((prev) => prev + DESKTOP_FEED_LOAD_MORE_STEP);
+          setDesktopVisibleCount((previousCount) => previousCount + DESKTOP_FEED_LOAD_MORE_STEP);
         }
       },
       { rootMargin: "200px" },
     );
+
     observerRef.current.observe(node);
   }, []);
 
@@ -101,114 +104,152 @@ export function ActivityFeedPage({ locale }: ActivityFeedPageProps) {
       className="relative min-h-screen overflow-hidden bg-bg-primary text-text-primary"
       data-testid="live-projector-page"
     >
-      {/* Ambient gradient */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_55%_at_-5%_-5%,color-mix(in_srgb,var(--accent)_9%,transparent),transparent),radial-gradient(ellipse_65%_50%_at_108%_108%,color-mix(in_srgb,var(--accent)_7%,transparent),transparent)]" />
 
       <div className="relative z-10 flex min-h-screen flex-col gap-4 px-4 py-4 md:px-6 md:py-6">
-        {/* ── Header ── */}
         <header className="relative flex items-center rounded-4xl border border-accent/20 bg-bg-secondary/30 px-6 py-4 shadow-[0_20px_56px_-36px_rgba(0,0,0,0.6)] backdrop-blur-sm">
-          {/* Left: live indicator */}
-          <div className="flex shrink-0 items-center gap-2.5">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-55" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent" />
-            </span>
-            <span className="text-[14px] font-medium uppercase tracking-[0.32em] text-accent">
-              Live
-            </span>
+          <div className="flex shrink-0 items-center gap-4">
+            <div className="flex items-center gap-2.5">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-55" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent" />
+              </span>
+              <span className="text-[14px] font-medium uppercase tracking-[0.32em] text-accent">
+                Live
+              </span>
+            </div>
           </div>
 
-          {/* Center: clock (desktop only) */}
           <div className="absolute left-1/2 hidden -translate-x-1/2 lg:block">
             <FeedClock />
           </div>
 
-          {/* Right: theme + language + home link */}
-          <div className="ml-auto flex shrink-0 items-center gap-3">
-            <ThemeSwitcher />
-            <LanguageSwitcher />
-            <div aria-hidden="true" className="mx-1 h-4 w-px bg-accent/30" />
+          <div className="ml-auto hidden shrink-0 items-center gap-8 lg:flex">
             <Link
               href="/"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-accent/20 text-accent/70 transition-colors hover:border-accent/50 hover:text-accent"
-              aria-label="На головну"
+              className="group flex items-center gap-2 rounded-sm px-1 py-2 text-xs font-medium uppercase tracking-widest text-accent/70 transition-colors hover:text-accent"
+              aria-label={tNavbar("hero")}
             >
               <svg
+                width="13"
+                height="13"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="h-4 w-4"
                 aria-hidden="true"
               >
-                <path d="M19 12H5M12 5l-7 7 7 7" />
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+              {tNavbar("hero")}
+            </Link>
+            <div aria-hidden="true" className="mx-2 h-4 w-px bg-accent/30" />
+            <div className="flex items-center gap-3">
+              <ThemeSwitcher className="bg-transparent" />
+              <LanguageSwitcher className="bg-transparent" />
+            </div>
+          </div>
+
+          <div className="ml-auto flex shrink-0 items-center gap-3 lg:hidden">
+            <ThemeSwitcher className="bg-transparent" />
+            <LanguageSwitcher className="bg-transparent" />
+            <div aria-hidden="true" className="mx-1 h-4 w-px bg-accent/30" />
+            <Link
+              href="/"
+              aria-label={tNavbar("hero")}
+              className="flex h-10 w-10 items-center justify-center rounded-full text-accent transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
+            >
+              <svg
+                width="26"
+                height="26"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M19 12H5M12 19l-7-7 7-7" />
               </svg>
             </Link>
           </div>
         </header>
 
-        {/* ── Main grid ── */}
-        <div className="grid gap-4 lg:flex-1 lg:grid-cols-[minmax(0,4fr)_minmax(420px,1fr)]">
-          {/* Feed panel */}
-          <div className="flex flex-col gap-3">
+        <div className="grid gap-4 lg:flex-1 lg:grid-cols-[minmax(0,4fr)_minmax(420px,1fr)] lg:grid-rows-1">
+          <div className="flex flex-col gap-3 lg:pr-4">
             {showFeedEmptyState ? (
               <FeedEmptyState variant={isLoading ? "loading" : "empty"} />
             ) : error ? (
-              <p className="rounded-3xl border border-error/20 bg-error/5 px-5 py-4 text-sm text-error">
+              <div className="flex min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/22 px-6 text-center text-base text-text-secondary">
                 {t("feed_error")}
-              </p>
-            ) : (
+              </div>
+            ) : snapshot?.feed.length ? (
               <>
-                {/* Mobile: single column */}
-                <div className="flex flex-col gap-3 lg:hidden">
-                  {visibleFeed.map((event) => (
-                    <FeedEventCard key={event.id} event={event} />
+                <div className="flex flex-col gap-3 sm:hidden">
+                  <AnimatePresence mode="popLayout" initial={false}>
+                    {visibleFeed.map((event) => (
+                      <motion.div
+                        key={event.id}
+                        initial={{ opacity: 0, y: -16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.97 }}
+                        transition={{ duration: 0.4, ease: MOTION_EASE }}
+                      >
+                        <FeedEventCard event={event} />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+
+                <div className="hidden gap-3 sm:flex">
+                  {desktopFeedColumns.map((column) => (
+                    <div key={column.id} className="flex flex-1 flex-col gap-3">
+                      <AnimatePresence mode="popLayout" initial={false}>
+                        {column.events.map((event) => (
+                          <motion.div
+                            key={event.id}
+                            initial={{ opacity: 0, y: -16 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.97 }}
+                            transition={{ duration: 0.4, ease: MOTION_EASE }}
+                          >
+                            <FeedEventCard event={event} />
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                    </div>
                   ))}
-                  {hasMoreFeed && (
-                    <button
-                      type="button"
-                      onClick={handleLoadMore}
-                      className="font-cinzel rounded-full border border-accent/25 bg-transparent px-6 py-3 text-xs tracking-widest text-accent transition-colors hover:bg-accent/10"
-                    >
-                      {t("feed_load_more")}
-                    </button>
-                  )}
                 </div>
 
-                {/* Desktop: 2 columns */}
-                <div className="hidden gap-3 lg:grid lg:grid-cols-2">
-                  <div className="flex flex-col gap-3">
-                    {(desktopFeedColumns[0] ?? []).map((event) => (
-                      <FeedEventCard key={event.id} event={event} />
-                    ))}
-                  </div>
-                  <div className="flex flex-col gap-3">
-                    {(desktopFeedColumns[1] ?? []).map((event) => (
-                      <FeedEventCard key={event.id} event={event} />
-                    ))}
-                  </div>
-                </div>
+                {hasMoreFeed ? <div ref={sentinelRef} className="hidden h-1 lg:block" /> : null}
 
-                {/* Desktop infinite scroll sentinel */}
-                {hasMoreFeed && <div ref={sentinelRef} className="hidden h-1 lg:block" />}
+                {hasMoreFeed ? (
+                  <button
+                    type="button"
+                    onClick={handleLoadMore}
+                    className="mt-1 w-full rounded-3xl border border-accent/15 bg-bg-primary/55 py-4 text-[11px] uppercase tracking-[0.28em] text-text-secondary/60 backdrop-blur-sm transition-colors hover:border-accent/30 hover:text-accent lg:hidden"
+                  >
+                    {t("feed_load_more")}
+                  </button>
+                ) : null}
               </>
-            )}
+            ) : null}
           </div>
 
-          {/* Leaderboard panel */}
           <div className="flex flex-col gap-3">
             {showLeaderboardEmptyState ? (
               <LeaderboardEmptyState />
             ) : error ? (
-              <p className="rounded-3xl border border-error/20 bg-error/5 px-5 py-4 text-sm text-error">
+              <div className="flex min-h-64 items-center justify-center rounded-3xl border border-accent/10 bg-bg-secondary/22 px-6 text-center text-base text-text-secondary">
                 {t("leaderboard_error")}
-              </p>
-            ) : (
+              </div>
+            ) : snapshot?.leaderboard.length ? (
               <div className="grid gap-3">
                 <AnimatePresence mode="popLayout" initial={false}>
-                  {(snapshot?.leaderboard ?? []).map((entry) => (
+                  {snapshot.leaderboard.map((entry) => (
                     <LeaderboardRow
                       key={entry.playerId}
                       entry={entry}
@@ -217,23 +258,27 @@ export function ActivityFeedPage({ locale }: ActivityFeedPageProps) {
                   ))}
                 </AnimatePresence>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
 
-      {/* Bottom gradient fade */}
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 h-48 bg-linear-to-t from-bg-primary to-transparent" />
 
-      {/* Hero event overlay */}
       <AnimatePresence>
-        {heroEvent && (
+        {heroEvent ? (
           <HeroEventOverlay
-            key={(heroEvent as FeedEventSnapshot).id}
-            heroEvent={heroEvent as FeedEventSnapshot}
+            key={heroEvent.id}
+            heroEvent={heroEvent}
             locale={locale}
+            totalPoints={
+              heroEvent.playerId
+                ? snapshot?.leaderboard.find((entry) => entry.playerId === heroEvent.playerId)
+                    ?.totalPoints
+                : undefined
+            }
           />
-        )}
+        ) : null}
       </AnimatePresence>
     </section>
   );

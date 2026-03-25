@@ -19,7 +19,7 @@ export async function InvitationPage() {
     <>
       <Splash />
       <Navbar />
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1} className="relative scroll-mt-24 outline-none">
         <Hero />
         <OurStory />
         <Timeline />
@@ -28,14 +28,13 @@ export async function InvitationPage() {
         <Gifts />
 
         {/* RSVP */}
-        <SectionWrapper id="rsvp">
-          <div className="mx-auto max-w-lg">
+        <SectionWrapper id="rsvp" className="relative overflow-hidden pt-12 pb-8 md:py-24">
+          <div className="mx-auto max-w-7xl px-4">
             <AnimatedReveal direction="up">
-              <SectionHeading subtitle={t("subtitle")} align="center">
-                {t("title")}
-              </SectionHeading>
+              <SectionHeading subtitle={t("subtitle")}>{t("title")}</SectionHeading>
             </AnimatedReveal>
-            <div className="mt-8">
+
+            <div className="relative z-10 mx-auto mt-12 flex max-w-7xl flex-col items-center justify-center md:mt-32 xl:flex-row">
               <RsvpForm />
             </div>
           </div>
