@@ -89,7 +89,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   const structuredDataJson = getStructuredDataJson(typedLocale);
 
   return (
-    <html lang={typedLocale} suppressHydrationWarning>
+    <html lang={typedLocale} suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
         {/* Inline theme script prevents flash of wrong theme before React hydration */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
