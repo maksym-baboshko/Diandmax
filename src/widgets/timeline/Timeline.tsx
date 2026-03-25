@@ -7,6 +7,13 @@ import { useTranslations } from "next-intl";
 
 const ease = MOTION_EASE;
 
+type TimelineEvent = {
+  id: string;
+  time: string;
+  title: string;
+  description: string;
+};
+
 const mobileMarkerVariants: Variants = {
   hidden: { opacity: 0.001, x: -10, scale: 0.96 },
   visible: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.36, ease } },
@@ -114,20 +121,12 @@ const EVENT_ICONS: Record<string, React.ReactNode> = {
   ),
 };
 
-const EVENT_KEYS = [
-  "ceremony",
-  "photo_session",
-  "banquet",
-  "activities",
-  "cake",
-  "sparklers",
-] as const;
-
 export function Timeline() {
   const t = useTranslations("Timeline");
   const liteMotion = useLiteMotion();
 
-  const events = EVENT_KEYS.map((key) => ({
+  const eventKeys = ["ceremony", "photo_session", "banquet", "activities", "cake", "sparklers"];
+  const events: TimelineEvent[] = eventKeys.map((key) => ({
     id: key,
     time: t(`events.${key}.time`),
     title: t(`events.${key}.title`),
@@ -142,7 +141,6 @@ export function Timeline() {
       <SectionHeading subtitle={t("subtitle")}>{t("title")}</SectionHeading>
 
       <div className="relative mx-auto mt-16 max-w-5xl px-4 md:mt-24">
-        {/* Vertical line */}
         <div className="absolute bottom-0 left-9 top-0 w-px bg-linear-to-b from-transparent via-accent/40 to-transparent md:left-1/2 md:-translate-x-1/2" />
 
         <div className="flex flex-col gap-12 md:gap-16">
@@ -168,8 +166,14 @@ export function Timeline() {
 
             return (
               <div key={event.id} className="relative">
-                {/* Mobile layout */}
-                <div className="flex items-start md:hidden">
+                <motion.div
+                  initial={liteMotion ? { opacity: 1 } : undefined}
+                  whileInView={liteMotion ? { opacity: 1 } : undefined}
+                  viewport={
+                    liteMotion ? { once: true, amount: 0.35, margin: "-6% 0px -8% 0px" } : undefined
+                  }
+                  className="flex items-start md:hidden"
+                >
                   <motion.div
                     initial={liteMotion ? "hidden" : undefined}
                     whileInView={liteMotion ? "visible" : undefined}
@@ -210,10 +214,9 @@ export function Timeline() {
                       {cardContent}
                     </AnimatedReveal>
                   )}
-                </div>
+                </motion.div>
 
-                {/* Desktop layout — alternating */}
-                <div className="hidden md:grid md:grid-cols-[1fr_8rem_1fr] md:items-center">
+                <div className="hidden md:grid md:grid-cols-[1fr_8rem_1fr] md:items-center md:gap-0">
                   {isEven ? (
                     <AnimatedReveal
                       direction={liteMotion ? "up" : "right"}
@@ -243,10 +246,9 @@ export function Timeline() {
                   )}
                 </div>
 
-                {/* Connecting line desktop */}
                 <div
                   className={cn(
-                    "absolute top-1/2 hidden h-px w-16 -translate-y-1/2 md:block",
+                    "absolute top-1/2 z-0 hidden h-px w-16 -translate-y-1/2 md:block",
                     isEven
                       ? "left-[calc(50%-4rem)] bg-linear-to-r from-transparent to-accent/35"
                       : "right-[calc(50%-4rem)] bg-linear-to-l from-transparent to-accent/35",

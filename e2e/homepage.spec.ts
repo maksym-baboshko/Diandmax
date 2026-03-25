@@ -7,7 +7,7 @@ test.describe("Homepage", () => {
 
   test("renders navbar with M & D logo", async ({ page }) => {
     await expect(page.getByRole("banner")).toBeVisible();
-    await expect(page.getByRole("banner").getByText("M & D")).toBeVisible();
+    await expect(page.getByRole("banner").getByRole("link", { name: /m\s*&\s*d/i })).toBeVisible();
   });
 
   test("renders hero with couple names", async ({ page }) => {

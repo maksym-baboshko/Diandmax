@@ -71,7 +71,11 @@ function renderHeaderLink({ item, className, children, onAfterSelect, ref }: Hea
     );
   }
 
-  return <Link {...sharedProps}>{children}</Link>;
+  return (
+    <Link ref={ref} {...sharedProps}>
+      {children}
+    </Link>
+  );
 }
 
 export function HeaderFrame({
