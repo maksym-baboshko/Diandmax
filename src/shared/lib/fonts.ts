@@ -19,7 +19,7 @@ export const cinzel = Cinzel({
   display: "swap",
 });
 
-export const greatVibes = Great_Vibes({
+export const vibes = Great_Vibes({
   subsets: ["latin"],
   weight: "400",
   variable: "--font-vibes",

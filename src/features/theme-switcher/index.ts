@@ -1,1 +1,2 @@
-// barrel export — populated in subsequent PRs
+export { ThemeProvider, useTheme } from "./ThemeProvider";
+export { ThemeSwitcher } from "./ThemeSwitcher";

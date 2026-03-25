@@ -1,8 +1,77 @@
-import { routing } from "@/shared/i18n/routing";
-import type { Locale } from "@/shared/i18n/routing";
+import { ThemeProvider } from "@/features/theme-switcher";
+import {
+  PREVIEW_IMAGE,
+  PREVIEW_IMAGE_HEIGHT,
+  PREVIEW_IMAGE_WIDTH,
+  SITE_NAME,
+  getLocalePath,
+  getMetadataBase,
+  getOpenGraphLocale,
+  getStructuredDataJson,
+} from "@/shared/config";
+import { type Locale, resolveLocale, routing } from "@/shared/i18n/routing";
+import { THEME_INIT_SCRIPT, cinzel, inter, playfair, vibes } from "@/shared/lib";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
+
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const typedLocale = resolveLocale(locale);
+  const metadataBase = getMetadataBase();
+  const localePath = getLocalePath(typedLocale);
+  const alternateLocale = typedLocale === "uk" ? "en_US" : "uk_UA";
+  const t = await getTranslations({ locale: typedLocale, namespace: "Metadata" });
+  const title = t("title");
+  const description = t("description");
+
+  return {
+    metadataBase,
+    title,
+    description,
+    applicationName: SITE_NAME,
+    alternates: {
+      canonical: localePath,
+      languages: { uk: "/", en: "/en", "x-default": "/" },
+    },
+    robots: { index: true, follow: true },
+    openGraph: {
+      url: localePath,
+      siteName: SITE_NAME,
+      title,
+      description,
+      type: "website",
+      locale: getOpenGraphLocale(typedLocale),
+      alternateLocale: [alternateLocale],
+      images: [
+        {
+          url: PREVIEW_IMAGE,
+          width: PREVIEW_IMAGE_WIDTH,
+          height: PREVIEW_IMAGE_HEIGHT,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [PREVIEW_IMAGE],
+    },
+  };
+}
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
@@ -16,12 +85,28 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     notFound();
   }
 
+  const typedLocale = locale as Locale;
   const messages = await getMessages();
+  const structuredDataJson = getStructuredDataJson(typedLocale);
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body>
-        <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+    <html lang={typedLocale} suppressHydrationWarning>
+      <head>
+        {/* Inline theme script prevents flash of wrong theme before React hydration */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: structuredDataJson }}
+        />
+      </head>
+      <body
+        className={`${inter.variable} ${playfair.variable} ${cinzel.variable} ${vibes.variable} font-inter antialiased`}
+      >
+        <NextIntlClientProvider messages={messages}>
+          <ThemeProvider>{children}</ThemeProvider>
+        </NextIntlClientProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
