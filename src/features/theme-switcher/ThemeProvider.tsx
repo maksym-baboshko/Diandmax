@@ -2,6 +2,8 @@
 
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 
+const THEME_STORAGE_KEY = "theme" as const;
+
 type Theme = "light" | "dark";
 
 interface ThemeContextValue {
@@ -28,7 +30,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem("theme") as Theme | null;
+    const stored = window.localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
     // Defer to avoid React 19 cascading render warnings
@@ -41,7 +43,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   useEffect(() => {
     if (!mounted) return;
     document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("theme", theme);
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
   }, [theme, mounted]);
 
   const toggleTheme = useCallback(() => {

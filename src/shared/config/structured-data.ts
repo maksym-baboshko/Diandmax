@@ -1,4 +1,6 @@
 import type { Locale } from "@/shared/i18n/routing";
+import enMessages from "../i18n/translations/en.json";
+import ukMessages from "../i18n/translations/uk.json";
 import {
   PREVIEW_IMAGE,
   SITE_ALTERNATE_NAME,
@@ -11,19 +13,13 @@ import { COUPLE, VENUE, WEDDING_DATE } from "./wedding";
 export function getStructuredDataJson(locale: Locale): string {
   const metadataBase = getMetadataBase();
   const localePath = getLocalePath(locale);
+  const messages = locale === "uk" ? ukMessages : enMessages;
   const groomName = COUPLE.groom.name[locale];
   const brideName = COUPLE.bride.name[locale];
   const weddingDisplayName = `${groomName} & ${brideName}`;
 
-  const siteDescription =
-    locale === "uk"
-      ? "Персональний весільний сайт Максима і Діани з деталями церемонії, RSVP та інформацією для гостей."
-      : "A personal wedding website for Maksym and Diana with ceremony details, RSVP, and guest information.";
-
-  const eventDescription =
-    locale === "uk"
-      ? `Весілля ${weddingDisplayName} — ${VENUE.name}, Берген, Норвегія.`
-      : `Wedding of ${weddingDisplayName} — ${VENUE.name}, Bergen, Norway.`;
+  const { siteDescription, eventDescriptionPrefix, venueLocationFormatted } = messages.Metadata;
+  const eventDescription = `${eventDescriptionPrefix} ${weddingDisplayName} — ${VENUE.name}, ${venueLocationFormatted}.`;
 
   return JSON.stringify({
     "@context": "https://schema.org",
@@ -50,8 +46,8 @@ export function getStructuredDataJson(locale: Locale): string {
           address: {
             "@type": "PostalAddress",
             streetAddress: VENUE.address,
-            addressLocality: "Bergen",
-            addressCountry: "NO",
+            addressLocality: VENUE.city,
+            addressCountry: VENUE.countryCode,
           },
           geo: {
             "@type": "GeoCoordinates",

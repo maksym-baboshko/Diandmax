@@ -1,7 +1,10 @@
 {
   "Metadata": {
     "title": "Maksym & Diana — 28.06.2026",
-    "description": "Wedding invitation of Maksym and Diana. June 28, 2026, Grand Hotel Terminus, Bergen, Norway."
+    "description": "Wedding invitation of Maksym and Diana. June 28, 2026, Grand Hotel Terminus, Bergen, Norway.",
+    "siteDescription": "A personal wedding website for Maksym and Diana with ceremony details, RSVP, and guest information.",
+    "eventDescriptionPrefix": "Wedding of",
+    "venueLocationFormatted": "Bergen, Norway"
   },
   "Hero": {
     "title": "Maksym & Diana",

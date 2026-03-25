@@ -1,7 +1,10 @@
 {
   "Metadata": {
     "title": "Максим & Діана — 28.06.2026",
-    "description": "Весільне запрошення Максима та Діани. 28 червня 2026, Grand Hotel Terminus, Bergen, Norway."
+    "description": "Весільне запрошення Максима та Діани. 28 червня 2026, Grand Hotel Terminus, Bergen, Norway.",
+    "siteDescription": "Персональний весільний сайт Максима і Діани з деталями церемонії, RSVP та інформацією для гостей.",
+    "eventDescriptionPrefix": "Весілля",
+    "venueLocationFormatted": "Берген, Норвегія"
   },
   "Hero": {
     "title": "Максим & Діана",

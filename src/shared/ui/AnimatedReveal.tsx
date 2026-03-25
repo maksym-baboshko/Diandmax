@@ -1,8 +1,7 @@
 "use client";
 
 import { MOTION_EASE, cn, useLiteMotion } from "@/shared/lib";
-import { useInView } from "motion/react";
-import { motion } from "motion/react";
+import { motion, useInView } from "motion/react";
 import type { Variant } from "motion/react";
 import { useRef } from "react";
 

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../widgets/activity-feed/animations.css";
 
 /* ─── Design tokens ──────────────────────────────────────── */
 :root {
@@ -52,7 +53,7 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-inter), sans-serif;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.3s var(--ease-default), color 0.3s var(--ease-default);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -135,192 +136,6 @@ body {
     rgba(44, 40, 37, 0.16);
 }
 
-/* ─── Activity feed keyframes ────────────────────────────── */
-@keyframes live-feed-card-scroll {
-  from {
-    transform: translateY(0);
-  }
-
-  to {
-    transform: translateY(-1900px);
-  }
-}
-
-@keyframes live-leaderboard-leader-pulse {
-  0%,
-  100% {
-    opacity: 0.45;
-  }
-
-  50% {
-    opacity: 0.85;
-  }
-}
-
-@keyframes live-leaderboard-regular-pulse {
-  0%,
-  100% {
-    opacity: 0.25;
-  }
-
-  50% {
-    opacity: 0.85;
-  }
-}
-
-@keyframes live-leaderboard-shimmer {
-  from {
-    transform: translateX(-100%);
-  }
-
-  to {
-    transform: translateX(200%);
-  }
-}
-
-@keyframes live-feed-live-glitch-orange {
-  0%,
-  78.7% {
-    transform: translateX(0);
-    opacity: 0;
-  }
-
-  82.2% {
-    transform: translateX(-7px);
-    opacity: 0.9;
-  }
-
-  85.7% {
-    transform: translateX(5px);
-    opacity: 0;
-  }
-
-  89.3% {
-    transform: translateX(-5px);
-    opacity: 0.9;
-  }
-
-  92.9% {
-    transform: translateX(7px);
-    opacity: 0;
-  }
-
-  96.4% {
-    transform: translateX(-2px);
-    opacity: 0.6;
-  }
-
-  100% {
-    transform: translateX(0);
-    opacity: 0;
-  }
-}
-
-@keyframes live-feed-live-glitch-cyan {
-  0%,
-  78.7% {
-    transform: translateX(0);
-    opacity: 0;
-  }
-
-  82.2% {
-    transform: translateX(7px);
-    opacity: 0.75;
-  }
-
-  85.7% {
-    transform: translateX(-5px);
-    opacity: 0;
-  }
-
-  89.3% {
-    transform: translateX(5px);
-    opacity: 0.75;
-  }
-
-  92.9% {
-    transform: translateX(-7px);
-    opacity: 0;
-  }
-
-  96.4% {
-    transform: translateX(2px);
-    opacity: 0.5;
-  }
-
-  100% {
-    transform: translateX(0);
-    opacity: 0;
-  }
-}
-
-@keyframes live-feed-live-glitch-main {
-  0%,
-  78.7% {
-    transform: translateX(0) skewX(0deg);
-  }
-
-  82.2% {
-    transform: translateX(3px) skewX(-2deg);
-  }
-
-  85.7% {
-    transform: translateX(-3px) skewX(1.5deg);
-  }
-
-  89.3% {
-    transform: translateX(3px) skewX(-1.5deg);
-  }
-
-  92.9% {
-    transform: translateX(-3px) skewX(2deg);
-  }
-
-  96.4% {
-    transform: translateX(1px) skewX(0deg);
-  }
-
-  100% {
-    transform: translateX(0) skewX(0deg);
-  }
-}
-
-/* ─── Activity feed animation classes ───────────────────── */
-.live-feed-card-scroll {
-  animation-name: live-feed-card-scroll;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  will-change: transform;
-}
-
-.live-leaderboard-leader-pulse {
-  animation: live-leaderboard-leader-pulse 7s ease-in-out infinite;
-}
-
-.live-leaderboard-regular-pulse {
-  animation: live-leaderboard-regular-pulse 3.5s ease-in-out infinite;
-}
-
-.live-leaderboard-shimmer {
-  animation: live-leaderboard-shimmer 3s ease-in-out infinite;
-  will-change: transform;
-}
-
-.live-feed-live-glitch-orange {
-  animation: live-feed-live-glitch-orange 3.94s linear infinite;
-  will-change: transform, opacity;
-}
-
-.live-feed-live-glitch-cyan {
-  animation: live-feed-live-glitch-cyan 3.94s linear infinite;
-  will-change: transform, opacity;
-}
-
-.live-feed-live-glitch-main {
-  animation: live-feed-live-glitch-main 3.94s linear infinite;
-  will-change: transform;
-}
-
 /* ─── Dark mode map tint ─────────────────────────────────── */
 .dark .google-map-iframe {
   filter: invert(0.88) hue-rotate(180deg) brightness(1.1) contrast(0.9) saturate(1.2);
@@ -334,15 +149,5 @@ body {
 
   .skip-link {
     transition: none;
-  }
-
-  .live-feed-card-scroll,
-  .live-feed-live-glitch-orange,
-  .live-feed-live-glitch-cyan,
-  .live-feed-live-glitch-main,
-  .live-leaderboard-leader-pulse,
-  .live-leaderboard-regular-pulse,
-  .live-leaderboard-shimmer {
-    animation: none !important;
   }
 }
