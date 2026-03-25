@@ -38,6 +38,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           payload: gameEvents.payload,
           playerId: players.id,
           playerNickname: players.nickname,
+          playerAvatarKey: players.avatarKey,
         })
         .from(gameEvents)
         .leftJoin(players, eq(gameEvents.playerId, players.id))
@@ -49,6 +50,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           playerId: leaderboard.playerId,
           nickname: leaderboard.nickname,
           totalXp: leaderboard.totalXp,
+          avatarKey: players.avatarKey,
         })
         .from(leaderboard)
         .leftJoin(players, eq(leaderboard.playerId, players.id))
@@ -62,7 +64,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         id: row.id,
         type: row.type as FeedEventType,
         playerId: row.playerId ?? null,
-        avatarKey: null,
+        avatarKey: row.playerAvatarKey ?? null,
         playerName: row.playerNickname ?? null,
         gameSlug: (payload?.gameSlug as string | undefined) ?? null,
         promptI18n: (payload?.promptI18n as Record<string, string> | undefined) ?? null,
@@ -75,7 +77,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     const leaderboardEntries: LeaderboardEntrySnapshot[] = leaderboardRows.map((row, index) => ({
       rank: index + 1,
       playerId: row.playerId,
-      avatarKey: null,
+      avatarKey: row.avatarKey ?? null,
       nickname: row.nickname,
       totalPoints: row.totalXp,
     }));
