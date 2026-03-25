@@ -63,8 +63,6 @@ jobs:
     needs: [quality, test]
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       RSVP_TO_EMAILS: ${{ secrets.RSVP_TO_EMAILS }}
       RSVP_FROM_EMAIL: ${{ secrets.RSVP_FROM_EMAIL }}
@@ -99,8 +97,6 @@ jobs:
     needs: build
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       RSVP_TO_EMAILS: ${{ secrets.RSVP_TO_EMAILS }}
       RSVP_FROM_EMAIL: ${{ secrets.RSVP_FROM_EMAIL }}
