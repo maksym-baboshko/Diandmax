@@ -148,13 +148,28 @@ describe("collectUnseenHeroEvents", () => {
       makeEvent("3", "promised"),
     ];
     const seen = new Set(["1"]);
-    const result = collectUnseenHeroEvents(events, seen);
+    const seenOrder = ["1"];
+    const result = collectUnseenHeroEvents(events, seen, seenOrder);
     expect(result.map((e) => e.id)).toEqual(["2", "3"]);
   });
 
   it("returns empty array when all are seen", () => {
     const events = [makeEvent("1", "promised")];
-    expect(collectUnseenHeroEvents(events, new Set(["1"]))).toHaveLength(0);
+    expect(collectUnseenHeroEvents(events, new Set(["1"]), ["1"])).toHaveLength(0);
+  });
+
+  it("tracks newly seen ids in insertion order", () => {
+    const seen = new Set<string>();
+    const seenOrder: string[] = [];
+
+    collectUnseenHeroEvents(
+      [makeEvent("2", "promised"), makeEvent("3", "new_top_player")],
+      seen,
+      seenOrder,
+    );
+
+    expect(seenOrder).toEqual(["2", "3"]);
+    expect([...seen]).toEqual(["2", "3"]);
   });
 });
 
@@ -163,24 +178,40 @@ describe("collectUnseenHeroEvents", () => {
 describe("trackSeenHeroEventId", () => {
   it("adds an id to the set", () => {
     const seen = new Set<string>();
-    trackSeenHeroEventId(seen, "abc", 10);
+    const seenOrder: string[] = [];
+    trackSeenHeroEventId(seen, seenOrder, "abc", 10);
     expect(seen.has("abc")).toBe(true);
+    expect(seenOrder).toEqual(["abc"]);
   });
 
   it("evicts the oldest id when the set exceeds max", () => {
     const seen = new Set(["first", "second"]);
-    trackSeenHeroEventId(seen, "third", 2);
+    const seenOrder = ["first", "second"];
+    trackSeenHeroEventId(seen, seenOrder, "third", 2);
     expect(seen.has("first")).toBe(false);
     expect(seen.has("second")).toBe(true);
     expect(seen.has("third")).toBe(true);
     expect(seen.size).toBe(2);
+    expect(seenOrder).toEqual(["second", "third"]);
   });
 
   it("does not evict when under max", () => {
     const seen = new Set(["a"]);
-    trackSeenHeroEventId(seen, "b", 5);
+    const seenOrder = ["a"];
+    trackSeenHeroEventId(seen, seenOrder, "b", 5);
     expect(seen.size).toBe(2);
     expect(seen.has("a")).toBe(true);
+    expect(seenOrder).toEqual(["a", "b"]);
+  });
+
+  it("does not duplicate ids that are already tracked", () => {
+    const seen = new Set(["a"]);
+    const seenOrder = ["a"];
+
+    trackSeenHeroEventId(seen, seenOrder, "a", 5);
+
+    expect(seenOrder).toEqual(["a"]);
+    expect(seen.size).toBe(1);
   });
 });
 

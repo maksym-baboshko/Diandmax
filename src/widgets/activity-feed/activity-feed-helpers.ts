@@ -110,15 +110,38 @@ export function filterQueueableHeroEvents(events: FeedEventSnapshot[]): FeedEven
 export function collectUnseenHeroEvents(
   events: FeedEventSnapshot[],
   seenIds: Set<string>,
+  seenOrder: string[],
+  max = SEEN_HERO_IDS_MAX,
 ): FeedEventSnapshot[] {
-  return filterQueueableHeroEvents(events).filter((event) => !seenIds.has(event.id));
+  const unseenHeroEvents: FeedEventSnapshot[] = [];
+
+  for (const event of filterQueueableHeroEvents(events)) {
+    if (seenIds.has(event.id)) {
+      continue;
+    }
+
+    trackSeenHeroEventId(seenIds, seenOrder, event.id, max);
+    unseenHeroEvents.push(event);
+  }
+
+  return unseenHeroEvents;
 }
 
-export function trackSeenHeroEventId(seenIds: Set<string>, id: string, max: number): void {
-  seenIds.add(id);
+export function trackSeenHeroEventId(
+  seenIds: Set<string>,
+  seenOrder: string[],
+  id: string,
+  max = SEEN_HERO_IDS_MAX,
+): void {
+  if (seenIds.has(id)) {
+    return;
+  }
 
-  if (seenIds.size > max) {
-    const [oldestId] = seenIds;
+  seenIds.add(id);
+  seenOrder.push(id);
+
+  while (seenOrder.length > max) {
+    const oldestId = seenOrder.shift();
 
     if (oldestId) {
       seenIds.delete(oldestId);

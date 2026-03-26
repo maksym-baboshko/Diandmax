@@ -14,7 +14,6 @@ import {
   filterQueueableHeroEvents,
   getRealtimeRetryDelay,
   shouldRetryRealtimeStatus,
-  trackSeenHeroEventId,
 } from "./activity-feed-helpers";
 import type { ActivityFeedSnapshot, FeedEventSnapshot } from "./types";
 
@@ -43,6 +42,7 @@ export function useActivityFeedSnapshot(): UseActivityFeedSnapshotResult {
   const isRefreshingRef = useRef(false);
   const activeHeroEventIdRef = useRef<string | null>(null);
   const seenHeroEventIdsRef = useRef(new Set<string>());
+  const seenHeroEventIdsOrderRef = useRef<string[]>([]);
   const hasLoadedOnceRef = useRef(false);
   const supabaseClientRef = useRef<SupabaseClient | null>(null);
   const broadcastChannelRef = useRef<RealtimeChannel | null>(null);
@@ -107,17 +107,17 @@ export function useActivityFeedSnapshot(): UseActivityFeedSnapshotResult {
         const unseenHeroEvents = collectUnseenHeroEvents(
           nextHeroEvents,
           seenHeroEventIdsRef.current,
+          seenHeroEventIdsOrderRef.current,
         );
-
-        for (const event of unseenHeroEvents) {
-          trackSeenHeroEventId(seenHeroEventIdsRef.current, event.id, SEEN_HERO_IDS_MAX);
-        }
 
         queueHeroEvents([...unseenHeroEvents].reverse());
       } else {
-        for (const event of nextHeroEvents) {
-          trackSeenHeroEventId(seenHeroEventIdsRef.current, event.id, SEEN_HERO_IDS_MAX);
-        }
+        collectUnseenHeroEvents(
+          nextHeroEvents,
+          seenHeroEventIdsRef.current,
+          seenHeroEventIdsOrderRef.current,
+          SEEN_HERO_IDS_MAX,
+        );
       }
 
       hasLoadedOnceRef.current = true;

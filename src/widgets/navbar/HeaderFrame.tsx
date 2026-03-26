@@ -1,7 +1,7 @@
 "use client";
 
 import type { MouseEvent, ReactNode, Ref } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { LanguageSwitcher } from "@/features/language-switcher";
 import { ThemeSwitcher } from "@/features/theme-switcher";
@@ -13,6 +13,19 @@ import { AnimatePresence, motion } from "motion/react";
 const DESKTOP_MEDIA_QUERY = "(min-width: 1024px)";
 const FOCUS_RING_CLASS =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary";
+
+function subscribeScroll(onStoreChange: () => void) {
+  window.addEventListener("scroll", onStoreChange, { passive: true });
+  return () => window.removeEventListener("scroll", onStoreChange);
+}
+
+function getScrollSnapshot() {
+  return window.scrollY > 20;
+}
+
+function getServerScrollSnapshot() {
+  return false;
+}
 
 export interface HeaderNavItem {
   href: string;
@@ -95,7 +108,12 @@ export function HeaderFrame({
   footerId = "site-footer",
 }: HeaderFrameProps) {
   const liteMotion = useLiteMotion();
-  const [isScrolled, setIsScrolled] = useState(false);
+  const isScrolled = useSyncExternalStore(
+    subscribeScroll,
+    getScrollSnapshot,
+    getServerScrollSnapshot,
+  );
+  const [isTransitionReady, setIsTransitionReady] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDesktopViewport, setIsDesktopViewport] = useState(false);
   const [isKeyboardNavigation, setIsKeyboardNavigation] = useState(false);
@@ -105,10 +123,8 @@ export function HeaderFrame({
   const resolvedMobileItems = mobileItems ?? items;
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    const id = requestAnimationFrame(() => setIsTransitionReady(true));
+    return () => cancelAnimationFrame(id);
   }, []);
 
   useEffect(() => {
@@ -218,13 +234,14 @@ export function HeaderFrame({
 
       <div
         className={cn(
-          "relative z-[60] border-b py-4 transition-all duration-500",
+          "relative z-[60] border-b py-4",
+          isTransitionReady && "transition-all duration-500",
           isMobileOverlayActive
             ? "border-transparent bg-bg-primary py-4 shadow-none backdrop-blur-none"
             : isScrolled
               ? liteMotion
-                ? "border-accent/18 bg-bg-primary py-3 shadow-lg lg:bg-bg-primary/96"
-                : "border-accent/18 bg-bg-primary py-3 shadow-lg lg:bg-bg-primary/80 lg:backdrop-blur-2xl"
+                ? "border-accent/18 bg-bg-primary shadow-lg lg:bg-bg-primary/96"
+                : "border-accent/18 bg-bg-primary shadow-lg lg:bg-bg-primary/80 lg:backdrop-blur-2xl"
               : liteMotion
                 ? "border-transparent bg-bg-primary lg:bg-bg-primary/92"
                 : "border-transparent bg-bg-primary lg:bg-bg-primary/20 lg:backdrop-blur-md",
