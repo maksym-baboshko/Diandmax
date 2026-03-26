@@ -106,7 +106,7 @@ src/
 │   │   ├── page.tsx
 │   │   ├── invite/[slug]/page.tsx
 │   │   └── live/page.tsx
-│   ├── global-not-found.tsx
+│   ├── not-found.tsx
 │   ├── globals.css
 │   └── layout.tsx
 ├── entities/
