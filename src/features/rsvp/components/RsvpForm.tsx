@@ -40,6 +40,7 @@ export function RsvpForm({ slug, guestVocative, maxSeats, initialGuestName }: Rs
     null,
   );
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const attendingYesButtonRef = useRef<HTMLButtonElement | null>(null);
   const guestNameKeyCounterRef = useRef(1);
   const guestFieldToFocusRef = useRef<number | null>(null);
   const [guestNameKeys, setGuestNameKeys] = useState<string[]>(["guest-name-0"]);
@@ -191,6 +192,11 @@ export function RsvpForm({ slug, guestVocative, maxSeats, initialGuestName }: Rs
       }
     }
 
+    if (formErrors.attending) {
+      attendingYesButtonRef.current?.focus();
+      return;
+    }
+
     if (formErrors.guestNames) {
       setFocus("guestNames.0");
       return;
@@ -273,6 +279,7 @@ export function RsvpForm({ slug, guestVocative, maxSeats, initialGuestName }: Rs
       <AnimatedReveal direction="up" duration={1.2} blur className="relative z-20">
         <GlassPanel className="group/form">
           <form
+            noValidate
             onSubmit={handleSubmit(onSubmit, handleInvalidSubmit)}
             className="relative z-10 p-6 md:p-12"
           >
@@ -331,9 +338,11 @@ export function RsvpForm({ slug, guestVocative, maxSeats, initialGuestName }: Rs
                 isSubmitting={isSubmitting}
                 onAttendingChange={handleAttendingChange}
                 t={translateSection}
+                yesButtonRef={attendingYesButtonRef}
               />
 
               <RsvpAttendingDetailsSection
+                errors={errors}
                 guests={guestsValue}
                 isAttendingYes={attendingChoice === "yes"}
                 isSubmitting={isSubmitting}
@@ -348,6 +357,7 @@ export function RsvpForm({ slug, guestVocative, maxSeats, initialGuestName }: Rs
               </motion.div>
 
               <RsvpMessageSection
+                errors={errors}
                 formField={formField}
                 isSubmitting={isSubmitting}
                 register={register}

@@ -1,7 +1,6 @@
 import { resolveLiveFeedState } from "@/entities/event";
 import { PREVIEW_IMAGE, getOpenGraphLocale } from "@/shared/config";
 import { resolveLocale } from "@/shared/i18n/routing";
-import type { Locale } from "@/shared/i18n/routing";
 import { ActivityFeedPage } from "@/widgets/activity-feed";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -28,7 +27,7 @@ export async function generateMetadata({ params }: ActivityFeedPageProps): Promi
       title: t("live_title"),
       description: t("live_description"),
       type: "website",
-      locale: getOpenGraphLocale(typedLocale as Locale),
+      locale: getOpenGraphLocale(typedLocale),
       images: [{ url: PREVIEW_IMAGE, alt: t("live_title") }],
     },
   };

@@ -373,3 +373,29 @@ The future backend must preserve today’s frontend-facing shapes.
 
 No backend code may be added directly into widgets or page components.
 All future backend work must enter through repository/service interfaces that already exist today.
+
+### Re-entry checklist
+
+Do not restore dormant backend artifacts early.
+
+Only when the backend phase starts in earnest, the same change must:
+
+- restore `drizzle.config.ts`
+- add the owned schema and migration directories
+- define the server env contract
+- install backend-only dependencies alongside their first real usage
+- keep `GuestRepository`, `RsvpSubmissionService`, and `ActivityFeedSource` as the frontend-facing seams
+
+---
+
+## 12. Security Hardening Notes
+
+Security headers and CSP are intentionally deferred until the inline-script story is formalized.
+
+Current inline scripts live in `src/app/[locale]/layout.tsx`:
+
+- `THEME_INIT_SCRIPT`
+- localized JSON-LD structured data
+
+When CSP is introduced, it must use a nonce/hash strategy that is compatible with these scripts and
+with Next.js runtime behavior. Do not add a partial CSP that breaks hydration or metadata scripts.

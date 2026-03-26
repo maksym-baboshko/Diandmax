@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { useState } from "react";
+import { expect, userEvent, within } from "storybook/test";
 import { Button } from "./Button";
 
 const meta = {
@@ -32,4 +34,30 @@ export const Showcase: Story = {
       </div>
     </div>
   ),
+};
+
+function InteractiveButtonDemo() {
+  const [clicked, setClicked] = useState(false);
+
+  return (
+    <div className="flex flex-col items-center gap-4 bg-bg-primary p-8">
+      <Button onClick={() => setClicked(true)}>Натиснути</Button>
+      <p className="text-sm text-text-secondary">{clicked ? "Натиснуто" : "Очікує дії"}</p>
+    </div>
+  );
+}
+
+export const Interactive: Story = {
+  args: {
+    children: "Натиснути",
+  },
+  render: () => <InteractiveButtonDemo />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole("button", { name: "Натиснути" });
+
+    await userEvent.click(button);
+
+    await expect(canvas.getByText("Натиснуто")).toBeVisible();
+  },
 };

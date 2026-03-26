@@ -41,6 +41,19 @@ describe("rsvpSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("rejects guestNames with single-character entries", () => {
+    const result = rsvpSchema.safeParse({ ...validPayload, guestNames: ["А"] });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects guest names that exceed the allowed length", () => {
+    const result = rsvpSchema.safeParse({
+      ...validPayload,
+      guestNames: ["А".repeat(81)],
+    });
+    expect(result.success).toBe(false);
+  });
+
   it("rejects invalid attending value", () => {
     const result = rsvpSchema.safeParse({ ...validPayload, attending: "maybe" });
     expect(result.success).toBe(false);
@@ -80,5 +93,49 @@ describe("rsvpSchema", () => {
       guests: 2,
     });
     expect(result.success).toBe(true);
+  });
+
+  it("rejects more guest names than the maximum guest count", () => {
+    const result = rsvpSchema.safeParse({
+      ...validPayload,
+      guestNames: Array.from({ length: 21 }, (_, index) => `Гість ${index + 1}`),
+      guests: 20,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects dietary notes that exceed the allowed length", () => {
+    const result = rsvpSchema.safeParse({
+      ...validPayload,
+      dietary: "а".repeat(241),
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects messages that exceed the allowed length", () => {
+    const result = rsvpSchema.safeParse({
+      ...validPayload,
+      message: "б".repeat(501),
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("trims guest names and optional text fields", () => {
+    const result = rsvpSchema.safeParse({
+      ...validPayload,
+      guestNames: ["  Олена Ковальчук  "],
+      dietary: "  без глютену  ",
+      message: "  З нетерпінням чекаємо!  ",
+    });
+
+    expect(result.success).toBe(true);
+
+    if (!result.success) {
+      throw new Error("Expected schema parsing to succeed.");
+    }
+
+    expect(result.data.guestNames).toEqual(["Олена Ковальчук"]);
+    expect(result.data.dietary).toBe("без глютену");
+    expect(result.data.message).toBe("З нетерпінням чекаємо!");
   });
 });

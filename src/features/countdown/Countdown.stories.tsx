@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { expect, within } from "storybook/test";
 import { Countdown } from "./Countdown";
 
 const meta = {
@@ -22,4 +23,14 @@ export const Default: Story = {
       <Countdown />
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const countdown = canvas.getByTestId("countdown");
+
+    await expect(countdown).toBeVisible();
+    await expect(countdown).toHaveTextContent(/days|днів/i);
+    await expect(countdown).toHaveTextContent(/hours|годин/i);
+    await expect(countdown).toHaveTextContent(/mins|хвилин/i);
+    await expect(countdown).toHaveTextContent(/secs|секунд/i);
+  },
 };

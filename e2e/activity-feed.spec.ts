@@ -45,6 +45,16 @@ test.describe("/live page", () => {
     await expect(tarasLeaderboardRow).toContainText("184");
   });
 
+  test("shows the queued hero overlay for the populated mock snapshot", async ({ page }) => {
+    await page.goto("/live?state=populated");
+
+    await expect(
+      page
+        .getByTestId("hero-event-overlay")
+        .getByText("Вийшов на перше місце глобального рейтингу."),
+    ).toBeVisible();
+  });
+
   test("preserves the redesigned error state for the mock error scenario", async ({ page }) => {
     await page.goto("/live?state=error");
 
@@ -68,5 +78,16 @@ test.describe("/live page", () => {
     await expect(page.locator('[data-testid="live-projector-page"]')).toBeVisible();
     await expect(page.getByTestId("live-feed-state-empty")).toHaveAttribute("aria-hidden", "false");
     await expect(page.getByTestId("live-feed-state-empty")).toContainText("Still quiet here...");
+  });
+});
+
+test.describe("/live page — mobile", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("renders the empty state on a mobile viewport", async ({ page }) => {
+    await page.goto("/live?state=empty");
+
+    await expect(page.locator('[data-testid="live-projector-page"]')).toBeVisible();
+    await expect(page.getByTestId("live-feed-state-empty")).toHaveAttribute("aria-hidden", "false");
   });
 });

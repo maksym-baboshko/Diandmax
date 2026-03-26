@@ -1,5 +1,6 @@
 "use client";
 
+import { resolveLocale } from "@/shared/i18n/routing";
 import type { Locale } from "@/shared/i18n/routing";
 import { cn } from "@/shared/lib";
 import { useLocale, useTranslations } from "next-intl";
@@ -62,7 +63,7 @@ interface FeedEventCardProps {
 }
 
 export function FeedEventCard({ event }: FeedEventCardProps) {
-  const locale = useLocale() as Locale;
+  const locale = resolveLocale(useLocale());
   const t = useTranslations("ActivityFeedPage");
   const prompt = getEventPrompt(event, locale);
   const gameTitle = getGameTitle(event.gameSlug, locale);

@@ -9,7 +9,7 @@ import {
   getOpenGraphLocale,
   getStructuredDataJson,
 } from "@/shared/config";
-import { type Locale, resolveLocale, routing } from "@/shared/i18n/routing";
+import { isLocale, resolveLocale, routing } from "@/shared/i18n/routing";
 import { THEME_INIT_SCRIPT, cinzel, inter, playfair, vibes } from "@/shared/lib";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -81,11 +81,11 @@ interface LocaleLayoutProps {
 export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {
   const { locale } = await params;
 
-  if (!routing.locales.includes(locale as Locale)) {
+  if (!isLocale(locale)) {
     notFound();
   }
 
-  const typedLocale = locale as Locale;
+  const typedLocale = resolveLocale(locale);
   const messages = await getMessages();
   const structuredDataJson = getStructuredDataJson(typedLocale);
 

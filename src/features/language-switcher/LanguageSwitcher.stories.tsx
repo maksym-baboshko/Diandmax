@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { expect, within } from "storybook/test";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
 const meta = {
@@ -19,4 +20,11 @@ export const Default: Story = {
       <LanguageSwitcher />
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole("button");
+
+    await expect(button).toBeEnabled();
+    await expect(button).toHaveTextContent(/EN|UA/);
+  },
 };

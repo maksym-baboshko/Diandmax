@@ -51,12 +51,11 @@ behind explicit contracts instead of evolving the deleted implementation.
 | CI | GitHub Actions |
 | Analytics | `@vercel/analytics` + `@vercel/speed-insights` |
 
-### Reserved for future phases, not wired into the current runtime
+### Future-phase policy
 
-- TanStack Query
-- Zustand
-- Nuqs
-- Supabase
+Do not keep dormant runtime dependencies installed just because they might be useful later.
+Query-state libraries, Supabase, Drizzle, and related backend tooling should return only when a
+concrete owned feature lands in the same change.
 
 ## Repository Organization
 
@@ -261,5 +260,9 @@ Expected future server contracts:
 - `POST /api/rsvp` ← accepts `RsvpSubmissionInput`, returns `RsvpSubmissionResult`
 - `GET /api/activity-feed` ← returns `ActivityFeedSnapshot`
 - realtime payloads must serialize to `FeedEvent`
+
+Backend artifacts stay out of the repository until that phase starts for real. When it does, the
+same change must restore `drizzle.config.ts`, add schema/migrations, define the server env
+contract, and wire new backend-only dependencies through the existing repository/service seams.
 
 Do not reintroduce backend code without preserving these frontend-facing shapes.

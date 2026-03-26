@@ -121,6 +121,7 @@
     "guest_name_placeholder": "Guest full name",
     "guest_names_hint": "Start with your own name, then add everyone who will be attending with you.",
     "guest_names_required": "Please enter a name for each guest",
+    "guest_names_limit": "You can list up to 20 guests",
     "decrease_guests": "Decrease guests",
     "increase_guests": "Increase guests",
     "attending_label": "Will you attend?",
@@ -147,8 +148,11 @@
     "name_placeholder": "John Doe",
     "attendance_required": "* Please select if you are attending",
     "name_min": "Please enter at least 2 characters",
-    "delivery_note": "✦ Preview mode: your response is stored locally on this device",
-    "submit_loading_note": "✦ Saving your preview response",
+    "name_max": "Please keep each guest name under 80 characters",
+    "dietary_max": "Please keep dietary notes under 240 characters",
+    "message_max": "Please keep your message under 500 characters",
+    "delivery_note": "✦ Prototype mode: your response is saved only on this device",
+    "submit_loading_note": "✦ Saving your local prototype response",
     "error_generic": "Something went wrong. Please try again later.",
     "error_network": "No internet connection. Please check your network and try again."
   },
@@ -201,6 +205,13 @@
     "primary_cta": "Return Home",
     "secondary_cta": "Go Back",
     "rsvp_cta": "Go to RSVP"
+  },
+  "ErrorPage": {
+    "eyebrow": "Temporary page issue",
+    "title": "Something went wrong on this page",
+    "description": "The invitation hit an unexpected problem. Please try again, or return to the homepage.",
+    "retry_cta": "Try again",
+    "home_cta": "Return home"
   },
   "ActivityFeedMetadata": {
     "live_title": "Live Screen | Wedding",

@@ -56,3 +56,15 @@ test.describe("Homepage — /en locale", () => {
     await expect(page.getByText("Maksym").or(page.getByText("Diana")).first()).toBeVisible();
   });
 });
+
+test.describe("Homepage — mobile", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("shows the mobile navigation trigger", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByRole("button", { name: /відкрити меню|open menu/i })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /switch language|переключити мову/i }),
+    ).toBeVisible();
+  });
+});

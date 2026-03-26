@@ -24,11 +24,13 @@ test.describe("Personalized invite", () => {
 
     await expect(page.getByRole("heading", { name: "RSVP" })).toBeVisible();
     await page.getByRole("button", { name: /Так/i }).click();
-    await page.getByPlaceholder("Ім'я та прізвище гостя").nth(0).fill("Ірина Бабошко");
-    await page.getByPlaceholder("Ім'я та прізвище гостя").nth(1).fill("Марія Бабошко");
-    await page.getByPlaceholder("Ім'я та прізвище гостя").nth(2).fill("Сергій Бабошко");
+    await expect(page.getByLabel("Гість 1")).toHaveValue("Ігор Бабошко");
+    await page.getByLabel("Гість 2").fill("Ірина Бабошко");
+    await page.getByLabel("Гість 3").fill("Марія Бабошко");
+    await page.getByLabel("Гість 4").fill("Сергій Бабошко");
     await page.getByRole("button", { name: "Надіслати" }).click();
 
+    await expect(page.getByRole("dialog")).toBeVisible();
     await expect(page.getByText("Дякуємо за відповідь, Ігор!")).toBeVisible();
 
     await expect
@@ -56,5 +58,37 @@ test.describe("Personalized invite", () => {
 
     await expect(page.getByText("Papa Ihor").first()).toBeVisible();
     await expect(page.getByText("4 seats")).toBeVisible();
+  });
+
+  test("invalid submit focuses the first invalid guest field and shows the validation error", async ({
+    page,
+  }) => {
+    await page.goto(`/invite/${INVITE_SLUG}`);
+    await page.evaluate(() => {
+      document.getElementById("rsvp")?.scrollIntoView();
+    });
+    await page.getByRole("button", { name: /Так/i }).first().click();
+
+    const primaryGuestField = page.getByLabel("Гість 1");
+    await primaryGuestField.clear();
+    await page.getByRole("button", { name: "Надіслати" }).click();
+
+    await expect(primaryGuestField).toBeFocused();
+    await expect(page.locator("#rsvp-guest-name-0-error")).toBeVisible();
+  });
+});
+
+test.describe("Personalized invite — mobile", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("renders the invite and RSVP section on a narrow viewport", async ({ page }) => {
+    await page.goto(`/invite/${INVITE_SLUG}`);
+    await expect(page.getByText("Папа Ігор").first()).toBeVisible();
+
+    await page.evaluate(() => {
+      document.getElementById("rsvp")?.scrollIntoView();
+    });
+
+    await expect(page.getByRole("heading", { name: "RSVP" })).toBeVisible();
   });
 });

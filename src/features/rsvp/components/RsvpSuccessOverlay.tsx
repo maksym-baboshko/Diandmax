@@ -25,6 +25,8 @@ export function RsvpSuccessOverlay({
   onDismiss,
 }: RsvpSuccessOverlayProps) {
   const t = useTranslations("RSVP");
+  const titleId = "rsvp-success-title";
+  const descriptionId = "rsvp-success-description";
 
   return (
     <>
@@ -32,12 +34,16 @@ export function RsvpSuccessOverlay({
         {showConfetti && <ConfettiOverlay lite={liteMotion} onDone={onHideConfetti} />}
       </AnimatePresence>
 
-      <motion.div
+      <motion.dialog
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.35 }}
+        open
         className="fixed inset-0 z-[180]"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={descriptionId}
       >
         <motion.div
           initial={{ opacity: 0, y: liteMotion ? 18 : 28, scale: liteMotion ? 0.98 : 0.96 }}
@@ -92,6 +98,7 @@ export function RsvpSuccessOverlay({
             </svg>
           </motion.div>
           <motion.h3
+            id={titleId}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5, ease: MOTION_EASE }}
@@ -100,10 +107,13 @@ export function RsvpSuccessOverlay({
             {submittedName ? t("success_title_named", { name: submittedName }) : t("success_title")}
           </motion.h3>
           <motion.p
+            id={descriptionId}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.7, ease: MOTION_EASE }}
             className="relative z-10 mb-10 max-w-2xl text-base leading-relaxed text-text-secondary/90 md:text-xl"
+            aria-live="polite"
+            aria-atomic="true"
           >
             {submittedAttending === "no" ? t("success_subtitle_no") : t("success_subtitle_yes")}
           </motion.p>
@@ -118,7 +128,7 @@ export function RsvpSuccessOverlay({
             ← {t("return_button")}
           </motion.button>
         </motion.div>
-      </motion.div>
+      </motion.dialog>
     </>
   );
 }

@@ -18,18 +18,91 @@ const focusRingClass =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary";
 
 function FieldLabel({
+  as = "p",
   children,
+  className,
+  htmlFor,
+  id,
   required,
 }: {
+  as?: "label" | "legend" | "p";
   children: React.ReactNode;
+  className?: string;
+  htmlFor?: string;
+  id?: string;
   required?: boolean;
 }) {
-  return (
-    <p className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-text-secondary/90">
+  const baseClassName = cn(
+    "mb-3 block w-full text-xs font-medium uppercase tracking-[0.18em] text-text-secondary/90",
+    as === "legend" && "px-0",
+    className,
+  );
+
+  const content = (
+    <>
       {children}
       {required ? <span className="ml-1 text-accent">*</span> : null}
+    </>
+  );
+
+  if (as === "label") {
+    return (
+      <label htmlFor={htmlFor} id={id} className={baseClassName}>
+        {content}
+      </label>
+    );
+  }
+
+  if (as === "legend") {
+    return (
+      <legend id={id} className={baseClassName}>
+        {content}
+      </legend>
+    );
+  }
+
+  return (
+    <p id={id} className={baseClassName}>
+      {content}
     </p>
   );
+}
+
+function ErrorText({
+  className,
+  children,
+  id,
+  role,
+}: {
+  className?: string;
+  children: React.ReactNode;
+  id?: string;
+  role?: "alert" | "status";
+}) {
+  return (
+    <p
+      id={id}
+      role={role}
+      aria-live={role === "alert" ? "assertive" : undefined}
+      aria-atomic={role ? "true" : undefined}
+      className={cn("mt-2 text-[10px] uppercase tracking-[0.15em] text-error/85", className)}
+    >
+      {children}
+    </p>
+  );
+}
+
+function joinDescribedBy(...ids: Array<string | undefined>): string | undefined {
+  const resolved = ids.filter((value): value is string => Boolean(value));
+  return resolved.length > 0 ? resolved.join(" ") : undefined;
+}
+
+function getTranslatedError(
+  error: { message?: string } | undefined,
+  t: RsvpTranslations,
+  fallbackKey: string,
+): string {
+  return t(error?.message ?? fallbackKey);
 }
 
 export function RsvpDivider() {
@@ -226,49 +299,75 @@ export function RsvpGuestNamesSection({
   visibleGuestFieldsCount,
   guestNameKeys,
 }: RsvpGuestNamesSectionProps) {
+  const groupError =
+    errors.guestNames && !Array.isArray(errors.guestNames) ? errors.guestNames : undefined;
+  const groupErrorId = groupError ? "rsvp-guest-names-error" : undefined;
+  const hintId = visibleGuestFieldsCount > 1 ? "rsvp-guest-names-hint" : undefined;
+
   return (
     <motion.div variants={formField}>
-      <FieldLabel required>
-        {visibleGuestFieldsCount > 1 ? t("guest_names_label") : t("name_label")}
-      </FieldLabel>
-      <div className="space-y-3">
-        {guestNameKeys.slice(0, visibleGuestFieldsCount).map((key, index) => {
-          const fieldError = errors.guestNames?.[index];
-          const isPrimaryField = index === 0;
+      <fieldset
+        className="min-w-0 border-0 p-0"
+        aria-describedby={joinDescribedBy(hintId, groupErrorId)}
+      >
+        <FieldLabel as="legend" required>
+          {visibleGuestFieldsCount > 1 ? t("guest_names_label") : t("name_label")}
+        </FieldLabel>
+        <div className="space-y-3">
+          {guestNameKeys.slice(0, visibleGuestFieldsCount).map((key, index) => {
+            const fieldError = errors.guestNames?.[index];
+            const isPrimaryField = index === 0;
+            const inputId = `rsvp-guest-name-${index}`;
+            const fieldErrorId = fieldError ? `${inputId}-error` : undefined;
+            const labelText =
+              visibleGuestFieldsCount > 1
+                ? t("guest_name_field_label", { number: index + 1 })
+                : t("name_label");
 
-          return (
-            <div key={key}>
-              {visibleGuestFieldsCount > 1 ? (
-                <p className="mb-2 text-[10px] uppercase tracking-[0.15em] text-text-secondary/90">
-                  {t("guest_name_field_label", { number: index + 1 })}
-                </p>
-              ) : null}
-              <Input
-                placeholder={isPrimaryField ? t("name_placeholder") : t("guest_name_placeholder")}
-                error={!!fieldError}
-                disabled={isSubmitting}
-                className="rounded-2xl py-4 text-base"
-                {...register(`guestNames.${index}`)}
-              />
-              {fieldError ? (
-                <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-error/85">
-                  {t("name_min")}
-                </p>
-              ) : null}
-            </div>
-          );
-        })}
-      </div>
-      {visibleGuestFieldsCount > 1 ? (
-        <p className="mt-3 text-[10px] uppercase tracking-[0.13em] text-text-secondary/90">
-          {t("guest_names_hint")}
-        </p>
-      ) : null}
-      {errors.guestNames && !Array.isArray(errors.guestNames) ? (
-        <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-error/85">
-          {t("guest_names_required")}
-        </p>
-      ) : null}
+            return (
+              <div key={key}>
+                <FieldLabel
+                  as="label"
+                  htmlFor={inputId}
+                  className={
+                    visibleGuestFieldsCount > 1 ? "mb-2 text-[10px] tracking-[0.15em]" : "sr-only"
+                  }
+                >
+                  {labelText}
+                </FieldLabel>
+                <Input
+                  id={inputId}
+                  placeholder={isPrimaryField ? t("name_placeholder") : t("guest_name_placeholder")}
+                  error={!!fieldError}
+                  disabled={isSubmitting}
+                  aria-invalid={fieldError ? "true" : undefined}
+                  aria-describedby={joinDescribedBy(fieldErrorId, groupErrorId)}
+                  className="rounded-2xl py-4 text-base"
+                  {...register(`guestNames.${index}`)}
+                />
+                {fieldError ? (
+                  <ErrorText id={fieldErrorId}>
+                    {getTranslatedError(fieldError, t, "name_min")}
+                  </ErrorText>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+        {hintId ? (
+          <p
+            id={hintId}
+            className="mt-3 text-[10px] uppercase tracking-[0.13em] text-text-secondary/90"
+          >
+            {t("guest_names_hint")}
+          </p>
+        ) : null}
+        {groupError ? (
+          <ErrorText id={groupErrorId}>
+            {getTranslatedError(groupError, t, "guest_names_required")}
+          </ErrorText>
+        ) : null}
+      </fieldset>
     </motion.div>
   );
 }
@@ -280,6 +379,7 @@ interface RsvpAttendanceSectionProps {
   isSubmitting: boolean;
   onAttendingChange: (value: RsvpFormData["attending"]) => void;
   t: RsvpTranslations;
+  yesButtonRef?: { current: HTMLButtonElement | null };
 }
 
 export function RsvpAttendanceSection({
@@ -289,88 +389,97 @@ export function RsvpAttendanceSection({
   isSubmitting,
   onAttendingChange,
   t,
+  yesButtonRef,
 }: RsvpAttendanceSectionProps) {
+  const errorId = errors.attending ? "rsvp-attending-error" : undefined;
+
   return (
     <motion.div variants={formField}>
-      <FieldLabel>{t("attending_label")}</FieldLabel>
-      <div className="grid grid-cols-2 gap-3">
-        <motion.button
-          type="button"
-          disabled={isSubmitting}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => onAttendingChange("yes")}
-          className={cn(
-            "relative flex cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 px-3 py-5 transition-all duration-500 md:py-8",
-            focusRingClass,
-            attending === "yes"
-              ? "border-accent bg-accent/12 shadow-[0_14px_38px_-30px_rgba(var(--accent-rgb),0.75)]"
-              : "border-accent/18 bg-bg-primary/72 hover:border-accent/40",
-          )}
-          aria-pressed={attending === "yes"}
-        >
-          <AnimatePresence>
-            {attending === "yes" ? (
-              <motion.div
-                key="yes-glow"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="pointer-events-none absolute inset-0 bg-linear-to-b from-accent/12 to-transparent"
-              />
-            ) : null}
-          </AnimatePresence>
-          <RingIcon active={attending === "yes"} />
-          <span
+      <fieldset
+        className="min-w-0 border-0 p-0"
+        aria-invalid={errors.attending ? "true" : undefined}
+        aria-describedby={errorId}
+      >
+        <FieldLabel as="legend">{t("attending_label")}</FieldLabel>
+        <div className="grid grid-cols-2 gap-3">
+          <motion.button
+            ref={yesButtonRef}
+            type="button"
+            disabled={isSubmitting}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => onAttendingChange("yes")}
             className={cn(
-              "heading-serif text-lg transition-colors duration-300 md:text-xl",
-              attending === "yes" ? "text-accent" : "text-text-secondary/88",
+              "relative flex cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 px-3 py-5 transition-all duration-500 md:py-8",
+              focusRingClass,
+              attending === "yes"
+                ? "border-accent bg-accent/12 shadow-[0_14px_38px_-30px_rgba(var(--accent-rgb),0.75)]"
+                : "border-accent/18 bg-bg-primary/72 hover:border-accent/40",
             )}
+            aria-describedby={errorId}
+            aria-pressed={attending === "yes"}
           >
-            {t("attending_yes_heading")}
-          </span>
-          <span className="text-center text-[9px] leading-tight uppercase tracking-[0.14em] text-text-secondary/90 md:text-[10px]">
-            {t("attending_yes_note")}
-          </span>
-        </motion.button>
+            <AnimatePresence>
+              {attending === "yes" ? (
+                <motion.div
+                  key="yes-glow"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="pointer-events-none absolute inset-0 bg-linear-to-b from-accent/12 to-transparent"
+                />
+              ) : null}
+            </AnimatePresence>
+            <RingIcon active={attending === "yes"} />
+            <span
+              className={cn(
+                "heading-serif text-lg transition-colors duration-300 md:text-xl",
+                attending === "yes" ? "text-accent" : "text-text-secondary/88",
+              )}
+            >
+              {t("attending_yes_heading")}
+            </span>
+            <span className="text-center text-[9px] leading-tight uppercase tracking-[0.14em] text-text-secondary/90 md:text-[10px]">
+              {t("attending_yes_note")}
+            </span>
+          </motion.button>
 
-        <motion.button
-          type="button"
-          disabled={isSubmitting}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => onAttendingChange("no")}
-          className={cn(
-            "relative flex cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 px-3 py-5 transition-all duration-500 md:py-8",
-            focusRingClass,
-            attending === "no"
-              ? "border-text-secondary/48 bg-text-primary/8"
-              : "border-accent/18 bg-bg-primary/72 hover:border-accent/32",
-          )}
-          aria-pressed={attending === "no"}
-        >
-          <LeafIcon active={attending === "no"} />
-          <span
+          <motion.button
+            type="button"
+            disabled={isSubmitting}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => onAttendingChange("no")}
             className={cn(
-              "heading-serif text-lg transition-colors duration-300 md:text-xl",
-              attending === "no" ? "text-text-primary" : "text-text-secondary/88",
+              "relative flex cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 px-3 py-5 transition-all duration-500 md:py-8",
+              focusRingClass,
+              attending === "no"
+                ? "border-text-secondary/48 bg-text-primary/8"
+                : "border-accent/18 bg-bg-primary/72 hover:border-accent/32",
             )}
+            aria-describedby={errorId}
+            aria-pressed={attending === "no"}
           >
-            {t("attending_no_heading")}
-          </span>
-          <span className="text-center text-[9px] leading-tight uppercase tracking-[0.14em] text-text-secondary/90 md:text-[10px]">
-            {t("attending_no_note")}
-          </span>
-        </motion.button>
-      </div>
-      {errors.attending ? (
-        <p className="mt-2 text-[10px] uppercase tracking-[0.15em] text-error/85">
-          {t("attendance_required")}
-        </p>
-      ) : null}
+            <LeafIcon active={attending === "no"} />
+            <span
+              className={cn(
+                "heading-serif text-lg transition-colors duration-300 md:text-xl",
+                attending === "no" ? "text-text-primary" : "text-text-secondary/88",
+              )}
+            >
+              {t("attending_no_heading")}
+            </span>
+            <span className="text-center text-[9px] leading-tight uppercase tracking-[0.14em] text-text-secondary/90 md:text-[10px]">
+              {t("attending_no_note")}
+            </span>
+          </motion.button>
+        </div>
+        {errors.attending ? <ErrorText id={errorId}>{t("attendance_required")}</ErrorText> : null}
+      </fieldset>
     </motion.div>
   );
 }
 
 interface RsvpAttendingDetailsSectionProps {
+  errors: FieldErrors<RsvpFormData>;
   guests: number;
   isAttendingYes: boolean;
   isSubmitting: boolean;
@@ -381,6 +490,7 @@ interface RsvpAttendingDetailsSectionProps {
 }
 
 export function RsvpAttendingDetailsSection({
+  errors,
   guests,
   isAttendingYes,
   isSubmitting,
@@ -389,6 +499,9 @@ export function RsvpAttendingDetailsSection({
   t,
   onGuestsChange,
 }: RsvpAttendingDetailsSectionProps) {
+  const dietaryError = errors.dietary;
+  const dietaryErrorId = dietaryError ? "rsvp-dietary-error" : undefined;
+
   return (
     <div
       style={{
@@ -455,14 +568,24 @@ export function RsvpAttendingDetailsSection({
           </div>
 
           <div>
-            <FieldLabel>{t("dietary_label")}</FieldLabel>
+            <FieldLabel as="label" htmlFor="dietary">
+              {t("dietary_label")}
+            </FieldLabel>
             <Textarea
               id="dietary"
               placeholder={t("dietary_placeholder")}
+              error={!!dietaryError}
               disabled={!isAttendingYes || isSubmitting}
+              aria-invalid={dietaryError ? "true" : undefined}
+              aria-describedby={dietaryErrorId}
               className="min-h-24 rounded-2xl text-sm"
               {...register("dietary")}
             />
+            {dietaryError ? (
+              <ErrorText id={dietaryErrorId}>
+                {getTranslatedError(dietaryError, t, "dietary_max")}
+              </ErrorText>
+            ) : null}
           </div>
         </div>
       </div>
@@ -471,6 +594,7 @@ export function RsvpAttendingDetailsSection({
 }
 
 interface RsvpMessageSectionProps {
+  errors: FieldErrors<RsvpFormData>;
   formField: Variants;
   isSubmitting: boolean;
   register: UseFormRegister<RsvpFormData>;
@@ -478,21 +602,35 @@ interface RsvpMessageSectionProps {
 }
 
 export function RsvpMessageSection({
+  errors,
   formField,
   isSubmitting,
   register,
   t,
 }: RsvpMessageSectionProps) {
+  const messageError = errors.message;
+  const messageErrorId = messageError ? "rsvp-message-error" : undefined;
+
   return (
     <motion.div variants={formField}>
-      <FieldLabel>{t("message_label")}</FieldLabel>
+      <FieldLabel as="label" htmlFor="message">
+        {t("message_label")}
+      </FieldLabel>
       <Textarea
         id="message"
         placeholder={t("message_placeholder")}
+        error={!!messageError}
         disabled={isSubmitting}
+        aria-invalid={messageError ? "true" : undefined}
+        aria-describedby={messageErrorId}
         className="rounded-2xl"
         {...register("message")}
       />
+      {messageError ? (
+        <ErrorText id={messageErrorId}>
+          {getTranslatedError(messageError, t, "message_max")}
+        </ErrorText>
+      ) : null}
     </motion.div>
   );
 }
@@ -514,12 +652,22 @@ export function RsvpSubmitSection({
   submitError,
   t,
 }: RsvpSubmitSectionProps) {
+  const statusMessage = !attending
+    ? t("attendance_required")
+    : isSubmitting
+      ? t("submit_loading_note")
+      : t("delivery_note");
+
   return (
     <motion.div variants={formField} className="pt-1">
       {submitError ? (
-        <p className="mb-3 text-center text-[10px] uppercase tracking-[0.13em] text-error/90">
+        <ErrorText
+          id="rsvp-submit-error"
+          role="alert"
+          className="mb-3 text-center text-[10px] uppercase tracking-[0.13em] text-error/90"
+        >
           {submitError}
-        </p>
+        </ErrorText>
       ) : null}
       <motion.button
         type="submit"
@@ -559,12 +707,13 @@ export function RsvpSubmitSection({
         ) : null}
       </motion.button>
 
-      <p className="mt-3 text-center text-[10px] uppercase tracking-[0.13em] text-text-secondary/90">
-        {!attending
-          ? t("attendance_required")
-          : isSubmitting
-            ? t("submit_loading_note")
-            : t("delivery_note")}
+      <p
+        aria-live="polite"
+        aria-atomic="true"
+        role={isSubmitting ? "status" : undefined}
+        className="mt-3 text-center text-[10px] uppercase tracking-[0.13em] text-text-secondary/90"
+      >
+        {statusMessage}
       </p>
     </motion.div>
   );

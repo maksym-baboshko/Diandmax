@@ -79,6 +79,7 @@ export function HeroEventOverlay({ heroEvent, locale, totalPoints }: HeroEventOv
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.4, ease: EASE }}
+      data-testid="hero-event-overlay"
       className="fixed inset-0 z-20 flex flex-col overflow-hidden bg-bg-primary/[0.93]"
     >
       <motion.div

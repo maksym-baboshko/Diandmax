@@ -1,5 +1,6 @@
 "use client";
 
+import { resolveLocale } from "@/shared/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 
 import type { GuestProfile } from "@/entities/guest";
@@ -11,7 +12,7 @@ interface PersonalInvitationSectionProps {
 }
 
 export function PersonalInvitationSection({ guest }: PersonalInvitationSectionProps) {
-  const locale = useLocale() as "uk" | "en";
+  const locale = resolveLocale(useLocale());
   const t = useTranslations("PersonalInvitation");
   const heroT = useTranslations("Hero");
 

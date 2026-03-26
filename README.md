@@ -82,7 +82,9 @@ Then the workflow in `.github/workflows/chromatic.yml` can publish Storybook bui
 - root bridge files preserve normal tool discovery without root clutter
 
 The deleted backend stack is not part of the current runtime. Future server work must plug into the
-existing frontend contracts instead of reintroducing direct DB/API logic into UI layers.
+existing frontend contracts instead of reintroducing direct DB/API logic into UI layers. That
+means `drizzle.config.ts`, schema folders, migrations, backend env contracts, and backend-only
+dependencies stay out of the repo until the backend phase is reintroduced on purpose.
 
 ## Test topology
 

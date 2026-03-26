@@ -1,6 +1,7 @@
 "use client";
 
 import { DRESS_CODE } from "@/shared/config";
+import { resolveLocale } from "@/shared/i18n/routing";
 import { MOTION_EASE, useLiteMotion } from "@/shared/lib";
 import { Ornament, SectionHeading, SectionWrapper } from "@/shared/ui";
 import { type Variants, motion } from "motion/react";
@@ -134,7 +135,7 @@ function GroupHeading({
 
 export function DressCode() {
   const t = useTranslations("DressCode");
-  const locale = useLocale() as "uk" | "en";
+  const locale = resolveLocale(useLocale());
   const liteMotion = useLiteMotion();
 
   const allColors = [...DRESS_CODE.ladies.colors, ...DRESS_CODE.gentlemen.colors];
