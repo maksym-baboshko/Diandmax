@@ -1,5 +1,6 @@
 "use client";
 
+import type { LiveFeedState } from "@/entities/event";
 import { LanguageSwitcher } from "@/features/language-switcher";
 import { ThemeSwitcher } from "@/features/theme-switcher";
 import { Link } from "@/shared/i18n/navigation";
@@ -12,8 +13,8 @@ import { FeedClock } from "./FeedClock";
 import { FeedEmptyState } from "./FeedEmptyState";
 import { FeedEventCard } from "./FeedEventCard";
 import { HeroEventOverlay } from "./HeroEventOverlay";
-import { LeaderboardEmptyState } from "./LeaderboardEmptyState";
-import { LeaderboardRow } from "./LeaderboardRow";
+import { LeaderboardList } from "./LeaderboardList";
+import { LeaderboardState } from "./LeaderboardState";
 import {
   DESKTOP_FEED_INITIAL_VISIBLE,
   DESKTOP_FEED_LOAD_MORE_STEP,
@@ -50,12 +51,13 @@ function subscribeToMobile(callback: () => void) {
 
 interface ActivityFeedPageProps {
   locale: Locale;
+  initialState?: Exclude<LiveFeedState, "loading">;
 }
 
-export function ActivityFeedPage({ locale }: ActivityFeedPageProps) {
+export function ActivityFeedPage({ locale, initialState = "populated" }: ActivityFeedPageProps) {
   const t = useTranslations("ActivityFeedPage");
   const tNavbar = useTranslations("Navbar");
-  const { snapshot, isLoading, error, heroEvent } = useActivityFeedSnapshot();
+  const { snapshot, state, heroEvent } = useActivityFeedSnapshot({ initialState });
   const isMobile = useSyncExternalStore(
     subscribeToMobile,
     getMobileSnapshot,
@@ -68,6 +70,9 @@ export function ActivityFeedPage({ locale }: ActivityFeedPageProps) {
   const visibleCount = isMobile ? mobileVisibleCount : desktopVisibleCount;
   const hasMoreFeed = (snapshot?.feed.length ?? 0) > visibleCount;
   const visibleFeed = snapshot?.feed.slice(0, visibleCount) ?? [];
+  const isLoading = state === "loading";
+  const isError = state === "error";
+  const isEmpty = state === "empty";
   const desktopFeedColumns = [
     { id: "left", events: visibleFeed.filter((_, index) => index % 2 === 0) },
     { id: "right", events: visibleFeed.filter((_, index) => index % 2 !== 0) },
@@ -109,17 +114,17 @@ export function ActivityFeedPage({ locale }: ActivityFeedPageProps) {
           <div className="flex shrink-0 items-center gap-4">
             <div className="flex items-center gap-2.5">
               <span className="relative flex h-2.5 w-2.5">
-                {error ? null : (
+                {isError ? null : (
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-55" />
                 )}
                 <span
-                  className={`relative inline-flex h-2.5 w-2.5 rounded-full transition-colors ${error ? "bg-text-secondary/30" : "bg-accent"}`}
+                  className={`relative inline-flex h-2.5 w-2.5 rounded-full transition-colors ${isError ? "bg-text-secondary/30" : "bg-accent"}`}
                 />
               </span>
               <span
-                className={`text-[14px] font-medium uppercase tracking-[0.32em] transition-colors ${error ? "text-text-secondary/40" : "text-accent"}`}
+                className={`text-[14px] font-medium uppercase tracking-[0.32em] transition-colors ${isError ? "text-text-secondary/40" : "text-accent"}`}
               >
-                Live
+                {t("live_label")}
               </span>
             </div>
           </div>
@@ -184,9 +189,9 @@ export function ActivityFeedPage({ locale }: ActivityFeedPageProps) {
 
         <div className="grid gap-4 lg:flex-1 lg:grid-cols-[minmax(0,4fr)_minmax(420px,1fr)] lg:grid-rows-1">
           <div className="flex flex-col gap-3 lg:pr-4">
-            {error ? (
+            {isError ? (
               <FeedEmptyState variant="error" />
-            ) : isLoading || !snapshot?.feed.length ? (
+            ) : isLoading || isEmpty || !snapshot?.feed.length ? (
               <FeedEmptyState variant={isLoading ? "loading" : "empty"} />
             ) : (
               <>
@@ -242,22 +247,12 @@ export function ActivityFeedPage({ locale }: ActivityFeedPageProps) {
           </div>
 
           <div className="flex flex-col gap-3">
-            {error ? (
-              <LeaderboardEmptyState variant="error" />
-            ) : isLoading || !snapshot?.leaderboard.length ? (
-              <LeaderboardEmptyState />
+            {isError ? (
+              <LeaderboardState variant="error" />
+            ) : isLoading || isEmpty || !snapshot?.leaderboard.length ? (
+              <LeaderboardState />
             ) : (
-              <div className="grid gap-3">
-                <AnimatePresence mode="popLayout" initial={false}>
-                  {snapshot.leaderboard.map((entry) => (
-                    <LeaderboardRow
-                      key={entry.playerId}
-                      entry={entry}
-                      isLeader={entry.rank === 1}
-                    />
-                  ))}
-                </AnimatePresence>
-              </div>
+              <LeaderboardList entries={snapshot.leaderboard} />
             )}
           </div>
         </div>

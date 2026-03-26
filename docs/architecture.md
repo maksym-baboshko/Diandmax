@@ -1,0 +1,375 @@
+# diandmax — Architecture Overview
+
+This document is the current architectural contract for the `develop` branch.
+
+The repository is in a **frontend-only, mock-first** phase. The previous backend implementation
+has been deliberately removed. The next backend phase must integrate through explicit contracts
+instead of reviving the deleted Drizzle/Supabase/Resend stack.
+
+---
+
+## 1. Current Product Scope
+
+Implemented now:
+
+- invitation homepage at `/` and `/en`
+- personalized invite pages at `/invite/[slug]`
+- live projector at `/live`
+- local/demo live states via `/live?state=populated|empty|error`
+- RSVP submission via mock service backed by `localStorage`
+- Storybook coverage for reusable primitives and composites
+- Chromatic workflow for Storybook visual review
+- Vitest + Playwright + page-level screenshot regression
+
+Not implemented in the current phase:
+
+- API routes
+- database
+- email delivery
+- auth
+- realtime transport
+- game hub backend
+
+---
+
+## 2. Architectural Style
+
+Feature-Sliced Design hybrid:
+
+```text
+app → widgets → features → entities → shared
+```
+
+Dependencies must flow downward only.
+
+### Layer responsibilities
+
+| Layer | Responsibility |
+|---|---|
+| `app/` | routes, metadata, top-level layouts, route-level composition |
+| `widgets/` | section composition and reusable page composites |
+| `features/` | focused user interactions and local stateful behavior |
+| `entities/` | domain contracts, typed fixtures, repositories, adapters |
+| `shared/` | site-wide config, i18n, utilities, design primitives |
+
+### Hard boundaries
+
+- `shared/` must not own domain fixtures
+- `features/` must not import each other’s internals
+- UI code must not talk to a backend in the current phase
+- data sources must be abstracted behind entity/feature contracts
+
+---
+
+## 3. Repository Topology
+
+The repository uses a hybrid bridge model:
+
+- `configs/<tool>/` is the canonical home for real configuration content
+- root keeps only tool entrypoints that must stay discoverable
+- `docs/` holds deeper human documentation
+- `.cache/` holds private local state and build caches
+- `artifacts/` holds generated reports and readable build outputs
+- `.next/` remains a deliberate Next.js runtime exception for generated build and type artifacts
+- `components.json` remains a root exception for shadcn CLI
+
+Current root bridge files:
+
+- `next.config.ts`
+- `postcss.config.mjs`
+- `tsconfig.json`
+- `biome.json`
+
+Root exceptions are intentional:
+
+- `tsconfig.json` stays in root as a thin shell because TypeScript editor discovery and relative
+  `include` / `paths` resolution are config-location sensitive.
+- `biome.json` stays in root as a thin shell because CLI/editor discovery is most predictable from
+  the repository root.
+
+Script-driven config entrypoints:
+
+- `pnpm test` → `configs/vitest/config.ts`
+- `pnpm test:watch` → `configs/vitest/config.ts`
+- `pnpm test:storybook` → `configs/vitest/config.ts`
+- `pnpm test:coverage` → `configs/vitest/config.ts`
+- `pnpm test:e2e` → `configs/playwright/config.ts`
+
+---
+
+## 4. Folder Contract
+
+```text
+src/
+├── app/
+│   ├── [locale]/
+│   │   ├── page.tsx
+│   │   ├── invite/[slug]/page.tsx
+│   │   └── live/page.tsx
+│   ├── global-not-found.tsx
+│   ├── globals.css
+│   └── layout.tsx
+├── entities/
+│   ├── guest/
+│   │   ├── model/
+│   │   ├── types.ts
+│   │   └── index.ts
+│   └── event/
+│       ├── model/
+│       ├── types.ts
+│       └── index.ts
+├── features/
+│   ├── countdown/
+│   ├── language-switcher/
+│   ├── theme-switcher/
+│   └── rsvp/
+│       ├── components/
+│       ├── schema/
+│       ├── services/
+│       ├── types.ts
+│       └── index.ts
+├── shared/
+│   ├── config/
+│   ├── i18n/
+│   ├── lib/
+│   └── ui/
+├── testing/
+│   └── mocks/
+└── widgets/
+    ├── activity-feed/
+    ├── footer/
+    ├── navbar/
+    ├── personal-invitation/
+    ├── timeline/
+    └── ...
+```
+
+Removed from the active architecture:
+
+- `src/app/api/**`
+- `src/infrastructure/**`
+- `src/shared/lib/server/**`
+- guest fixtures in `src/shared/config/`
+
+---
+
+## 5. Domain Contracts
+
+### Guest domain
+
+`entities/guest` is the source of truth for personalized invite data.
+
+Public contracts:
+
+- `LocalizedText`
+- `GuestProfile`
+- `InvitationContent`
+- `GuestRepository`
+
+Current adapters:
+
+- `mockGuestRepository`
+- `getAllGuestSlugs`
+- `getGuestBySlug`
+- `getInvitationContent`
+
+### Live feed domain
+
+`entities/event` is the source of truth for `/live`.
+
+Public contracts:
+
+- `FeedEventType`
+- `FeedEvent`
+- `LeaderboardEntry`
+- `ActivityFeedSnapshot`
+- `LiveFeedState`
+- `ActivityFeedSource`
+
+Current adapters:
+
+- `mockActivityFeedSource`
+- `resolveLiveFeedState`
+- `MOCK_EMPTY_ACTIVITY_FEED_SNAPSHOT`
+- `MOCK_POPULATED_ACTIVITY_FEED_SNAPSHOT`
+
+### RSVP domain
+
+`features/rsvp` owns the submission contract.
+
+Public contracts:
+
+- `RsvpSubmissionInput`
+- `RsvpSubmissionResult`
+- `RsvpSubmissionService`
+
+Current adapter:
+
+- `mockRsvpSubmissionService`
+
+The mock adapter validates with the real schema and writes accepted submissions into
+`localStorage` under `diandmax:rsvp-submissions`.
+
+---
+
+## 6. Runtime Data Flow
+
+### Homepage
+
+- static site config from `shared/config`
+- no backend reads
+- i18n from `next-intl`
+
+### Personalized invite
+
+- route receives slug
+- slug resolves via `entities/guest`
+- view derives localized invitation content from the guest contract
+- RSVP uses the mock submission service
+
+### Live projector
+
+- route optionally accepts `state`
+- state resolves through `resolveLiveFeedState`
+- widget reads from `mockActivityFeedSource`
+- empty/error/populated are explicit UI states
+- hero-event queue behavior remains client-side
+
+---
+
+## 7. Design System Phase 1
+
+Current reusable public APIs:
+
+- `Button`
+- `Input`
+- `Textarea`
+- `GlassPanel`
+- `Navbar`
+- `Countdown`
+- `LanguageSwitcher`
+- `ThemeSwitcher`
+- `TimelineRail`
+- `LeaderboardList`
+- `LeaderboardState`
+- `Footer`
+
+Storybook currently covers these reusable primitives/composites rather than full pages.
+
+The current DS rule is:
+
+- preserve visual parity first
+- extract only stable repeated surfaces
+- avoid introducing a competing visual language
+
+---
+
+## 8. Testing and Visual Safety
+
+### Required local gates
+
+```bash
+pnpm typecheck
+pnpm lint
+pnpm test
+pnpm test:storybook
+pnpm test:e2e
+pnpm build
+pnpm build-storybook
+```
+
+### Test topology
+
+- unit and pure-logic tests stay colocated with source files as `*.test.ts(x)`
+- Storybook stories stay colocated with reusable UI and feed the browser component-test lane
+- shared test support code lives in `src/testing/`
+- route-level flows and page screenshots stay in `e2e/`
+
+### Vitest projects
+
+- `unit` is the fast Node lane used by `pnpm test`
+- `storybook` is the browser lane powered by `@storybook/addon-vitest` and Playwright
+- `pnpm test:coverage` currently collects the unit coverage baseline into `artifacts/vitest/coverage/`
+
+### Storybook / Chromatic
+
+- Storybook config lives in `configs/storybook/`
+- CI builds Storybook in `.github/workflows/ci.yml`
+- CI runs Storybook browser tests in `.github/workflows/ci.yml`
+- Chromatic publishing lives in `.github/workflows/chromatic.yml`
+- required repo secret: `CHROMATIC_PROJECT_TOKEN`
+- Storybook static output lives in `artifacts/storybook/static`
+
+### Playwright
+
+- functional specs live in `e2e/*.spec.ts`
+- page-level visual baselines live in `e2e/visual.spec.ts`
+- visual baselines are committed under `e2e/visual.spec.ts-snapshots/`
+- runtime outputs live in `artifacts/playwright/`
+- local and CI browser lanes both stay on `localhost`, not `127.0.0.1`, to avoid the known Next Intl refresh-loop issue
+
+### Git hooks
+
+- `pre-commit` runs `lint-staged` only
+- `pre-push` runs `pnpm typecheck` and `pnpm test`
+- browser lanes stay in CI/manual runs instead of blocking every push
+
+---
+
+## 9. Hydration-Sensitive Files
+
+These files intentionally use guarded mount logic and should not be casually refactored:
+
+- `src/features/countdown/Countdown.tsx`
+- `src/widgets/splash/Splash.tsx`
+- `src/features/language-switcher/LanguageSwitcher.tsx`
+- `src/features/theme-switcher/ThemeProvider.tsx`
+
+---
+
+## 10. Config Rules
+
+`shared/config` is reserved for true global site constants:
+
+- wedding metadata
+- venue data
+- couple data
+- metadata helpers
+
+It must not regain:
+
+- guest lists
+- live feed fixtures
+- RSVP mock payloads
+
+Those belong to domain-owned layers.
+
+---
+
+## 11. Backend Re-entry Contract
+
+The future backend must preserve today’s frontend-facing shapes.
+
+### Planned server entry points
+
+- `POST /api/rsvp`
+  - request: `RsvpSubmissionInput`
+  - response: `RsvpSubmissionResult`
+- `GET /api/activity-feed`
+  - response: `ActivityFeedSnapshot`
+
+### Planned realtime shape
+
+- each broadcast event must serialize into `FeedEvent`
+- leaderboard snapshots must serialize into `LeaderboardEntry[]`
+
+### Planned data ownership
+
+- guest invitation data remains owned by the guest domain
+- RSVP persistence becomes an adapter behind `RsvpSubmissionService`
+- activity feed polling/realtime becomes an adapter behind `ActivityFeedSource`
+
+### Migration rule
+
+No backend code may be added directly into widgets or page components.
+All future backend work must enter through repository/service interfaces that already exist today.

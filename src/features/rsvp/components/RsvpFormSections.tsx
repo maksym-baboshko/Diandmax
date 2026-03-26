@@ -423,7 +423,7 @@ export function RsvpAttendingDetailsSection({
                     ? "cursor-not-allowed border-accent/18 bg-bg-secondary/35 text-accent/38"
                     : "cursor-pointer text-accent/85 hover:border-accent hover:bg-accent/12 hover:text-accent",
                 )}
-                aria-label="Decrease guests"
+                aria-label={t("decrease_guests")}
               >
                 −
               </button>
@@ -447,7 +447,7 @@ export function RsvpAttendingDetailsSection({
                     ? "cursor-not-allowed border-accent/18 bg-bg-secondary/35 text-accent/38"
                     : "cursor-pointer text-accent/85 hover:border-accent hover:bg-accent/12 hover:text-accent",
                 )}
-                aria-label="Increase guests"
+                aria-label={t("increase_guests")}
               >
                 +
               </button>

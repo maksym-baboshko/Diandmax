@@ -1,30 +1,35 @@
-# diandmax — Wedding Invitation & Event Hub
+# diandmax — Frontend Contract
 
-Wedding website for Maksym & Diana.
-Date: June 28, 2026.
+Wedding website for Maksym & Diana.  
+Date: June 28, 2026.  
 Venue: Grand Hotel Terminus, Bergen, Norway.
 
 > Keep `AGENTS.md` and `CLAUDE.md` aligned.
 > If a local `GEMINI.md` exists, keep that one aligned too.
 
-This repository is a **full rewrite** of the previous invitation codebase for `diandmax`.
-The old codebase has been removed. All code is being rebuilt from scratch with a new stack.
+This repository is the current rewrite of `diandmax` in a **frontend-only, mock-first** phase.
+The old backend runtime is intentionally removed. The future server layer will be reintroduced later
+behind explicit contracts instead of evolving the deleted implementation.
 
-This repository contains:
+---
 
-- the invitation site at `/` and `/en`
-- personalized invite pages at `/invite/[slug]`
-- the activity feed page at `/live` (UI + real API — games backend is being built)
-- the RSVP API at `/api/rsvp`
-- the activity feed API at `/api/activity-feed`
+## Current Scope
 
-Future (game hub phase):
+- `/` and `/en` render the invitation homepage
+- `/invite/[slug]` renders typed personalized invites from mock guest fixtures
+- `/live` renders the live projector from typed mock feed data
+- `/live?state=populated|empty|error` is the canonical local/demo state switch
+- RSVP submits into a local mock service backed by `localStorage`
+- Storybook covers reusable UI and design-system phase 1 components
+- Chromatic is wired through GitHub Actions and requires `CHROMATIC_PROJECT_TOKEN`
 
-- guest check-in with nickname
-- ~6 wedding games
-- real-time live feed with XP events
-- leaderboard
-- guest chat
+### Explicitly out of scope in the current phase
+
+- API routes
+- database access
+- Supabase Auth / Realtime
+- email sending
+- production backend mutations
 
 ---
 
@@ -32,214 +37,199 @@ Future (game hub phase):
 
 | Layer | Tool |
 |---|---|
-| Framework | Next.js (App Router) |
-| Language | TypeScript 5 (strict mode) |
+| Framework | Next.js App Router |
+| Language | TypeScript strict |
 | Styling | Tailwind CSS v4 + CSS variables |
-| Animation | motion/react |
-| i18n | next-intl 4 |
-| Forms | react-hook-form + zod + @hookform/resolvers |
-| UI primitives | shadcn/ui + Lucide React |
-| Server state | TanStack Query |
-| Client state | Zustand |
-| URL state | Nuqs |
-| Database | Supabase Postgres + Drizzle ORM |
-| Email | Resend + react-email |
-| Lint/Format | Biome |
-| Git hooks | Husky + lint-staged |
-| Testing | Vitest + Playwright |
-| CI/CD | GitHub Actions → Vercel (Free Plan) |
-| Analytics | @vercel/analytics + @vercel/speed-insights |
-| Utilities | clsx + tailwind-merge via `cn()` |
+| Motion | `motion/react` |
+| i18n | `next-intl` |
+| Forms | `react-hook-form` + `zod` |
+| UI system | custom reusable primitives + Lucide-ready DS direction |
+| Testing | Vitest (unit + Storybook browser lanes) + Playwright + page-level screenshots |
+| Component docs | Storybook 10 |
+| Visual review | Chromatic |
+| Lint/format | Biome |
+| CI | GitHub Actions |
+| Analytics | `@vercel/analytics` + `@vercel/speed-insights` |
+
+### Reserved for future phases, not wired into the current runtime
+
+- TanStack Query
+- Zustand
+- Nuqs
+- Supabase
+
+## Repository Organization
+
+- canonical config content lives in `configs/<tool>/`
+- root keeps only machine entrypoints and top-level human entrypoints
+- `docs/architecture.md` is the deeper architecture reference
+- `.cache/` is for private local state and build caches
+- `artifacts/` is for readable generated outputs and reports
+- `.next/` stays as a deliberate Next.js runtime exception
+- `components.json` remains the root exception for shadcn CLI
+- `tsconfig.json` stays in root as a thin shell because TS Server/editor discovery and relative config resolution are root-sensitive
+- `biome.json` stays in root as a thin shell because Biome CLI/editor discovery is most predictable from the repository root
+- Vitest and Playwright are script-driven from `package.json` via `--config`, so they do not keep root config files
 
 ---
 
 ## Architecture
 
-Feature-Sliced Design (FSD) hybrid with Next.js App Router.
+Feature-Sliced Design (FSD) hybrid.
 
-Dependency direction (top → bottom only):
+Dependency direction:
 
-```
+```text
 app → widgets → features → entities → shared
-                         ↘ infrastructure
 ```
-
-Features must not import each other directly. Cross-feature communication goes through entities, shared contracts, or server actions.
 
 ### Layer responsibilities
 
 | Layer | Purpose |
 |---|---|
-| `app/` | Routes, layouts, API handlers |
-| `widgets/` | Page sections and composition roots |
-| `features/` | Product features (countdown, rsvp, language-switcher, etc.) |
-| `entities/` | Domain models (guest, event, player) |
-| `shared/` | UI primitives, config, i18n, lib utilities |
-| `infrastructure/` | Supabase/Drizzle client, email sending |
+| `app/` | routes, metadata, top-level layouts |
+| `widgets/` | page sections and composite UI |
+| `features/` | focused interactive behavior |
+| `entities/` | domain contracts, typed fixtures, repositories/adapters |
+| `shared/` | global config, i18n, utilities, UI primitives |
 
-### Project Structure
+### Testing topology
 
-```text
-src/
-├── app/
-│   ├── [locale]/
-│   │   ├── page.tsx                  # invitation page
-│   │   ├── layout.tsx
-│   │   ├── error.tsx                 # locale-level error boundary
-│   │   ├── not-found.tsx             # locale-level 404
-│   │   ├── live/page.tsx             # activity feed (noindex)
-│   │   └── invite/[slug]/page.tsx    # personalized invite (noindex)
-│   ├── api/
-│   │   ├── rsvp/route.ts
-│   │   └── activity-feed/route.ts
-│   ├── global-not-found.tsx          # fallback 404 (globalNotFound)
-│   ├── globals.css
-│   └── layout.tsx
-├── features/
-│   ├── countdown/
-│   ├── language-switcher/
-│   ├── theme-switcher/
-│   └── rsvp/
-│       ├── components/
-│       ├── actions/
-│       ├── hooks/
-│       └── schema/
-├── entities/
-│   ├── guest/
-│   │   └── queries/                  # fetchGuestBySlug, fetchGuests
-│   └── event/                        # game hub (future)
-│       └── types.ts
-├── shared/
-│   ├── config/                       # wedding.ts, guests.ts, site.ts
-│   ├── i18n/
-│   │   ├── translations/
-│   │   │   ├── uk.json
-│   │   │   └── en.json
-│   │   ├── routing.ts
-│   │   ├── navigation.ts
-│   │   └── request.ts
-│   ├── lib/
-│   │   ├── motion.ts                 # MOTION_EASE constant
-│   │   ├── cn.ts
-│   │   ├── fonts.ts
-│   │   ├── theme-script.ts
-│   │   └── server/
-│   │       ├── deferred.ts
-│   │       ├── api-error-response.ts
-│   │       ├── logger.ts
-│   │       ├── csp.ts
-│   │       └── request-id.ts
-│   └── ui/                           # shadcn/ui + custom primitives
-├── widgets/
-│   ├── invitation/
-│   ├── personal-invitation/
-│   ├── activity-feed/
-│   │   ├── ActivityFeedPage.tsx
-│   │   ├── FeedClock.tsx
-│   │   ├── FeedEventCard.tsx
-│   │   ├── LeaderboardRow.tsx
-│   │   ├── HeroEventOverlay.tsx
-│   │   ├── FeedEmptyState.tsx
-│   │   ├── LeaderboardEmptyState.tsx
-│   │   ├── useActivityFeedSnapshot.ts
-│   │   ├── activity-feed-helpers.ts
-│   │   ├── animations.css
-│   │   └── types.ts
-│   ├── navbar/
-│   ├── not-found/
-│   ├── footer/
-│   ├── splash/
-│   ├── hero/
-│   ├── our-story/
-│   ├── timeline/
-│   ├── location/
-│   ├── dress-code/
-│   └── gifts/
-├── infrastructure/
-│   ├── db/
-│   │   ├── schema.ts                 # Drizzle schema
-│   │   ├── client.ts                 # Drizzle client (postgres direct)
-│   │   └── migrations/
-│   └── email/
-│       ├── templates/
-│       └── sender.ts
-└── test/
-    └── mocks/
-        └── next-font.ts              # Vitest mock for next/font/google
+- unit tests stay colocated with source files as `*.test.ts(x)`
+- Storybook stories stay colocated with reusable UI and drive the browser component-test lane
+- shared test mocks/helpers live in `src/testing/`
+- route-level and visual regression specs stay in `e2e/`
+
+### Current domain ownership
+
+- `entities/guest`
+  - `GuestProfile`
+  - `InvitationContent`
+  - `GuestRepository`
+  - typed mock guest repository and slug lookups
+- `entities/event`
+  - `FeedEvent`
+  - `LeaderboardEntry`
+  - `ActivityFeedSnapshot`
+  - `LiveFeedState`
+  - `ActivityFeedSource`
+  - typed mock feed source and state resolver
+- `features/rsvp`
+  - `RsvpSubmissionInput`
+  - `RsvpSubmissionResult`
+  - `RsvpSubmissionService`
+  - mock submission service using `localStorage`
+
+### Current runtime rules
+
+- `shared/config` contains only real global site constants and metadata helpers
+- guest fixtures must not live in `shared/config`
+- UI must not `fetch` live data in the current phase
+- no DB queries, no email sending, no server-only utilities in UI flows
+- `/live` must use typed mock source, not `/api/*`
+- personalized invites must resolve through `entities/guest`
+
+---
+
+## Public UI APIs
+
+Stable reusable exports in the current phase:
+
+- `Button`
+- `Input`
+- `Textarea`
+- `GlassPanel`
+- `Navbar`
+- `Countdown`
+- `LanguageSwitcher`
+- `ThemeSwitcher`
+- `TimelineRail`
+- `LeaderboardList`
+- `LeaderboardState`
+- `Footer`
+
+Storybook is for these reusable blocks and their variants, not for full pages.
+
+---
+
+## Critical Imports
+
+```ts
+import { WEDDING_DATE, WEDDING_DATE_ROMAN } from "@/shared/config";
+import { VENUE } from "@/shared/config";
+import { MOTION_EASE, cn } from "@/shared/lib";
+
+import { getAllGuestSlugs, getGuestBySlug, getInvitationContent } from "@/entities/guest";
+import { mockActivityFeedSource, resolveLiveFeedState } from "@/entities/event";
+import { mockRsvpSubmissionService } from "@/features/rsvp";
+
+import { usePathname, Link } from "@/shared/i18n/navigation";
 ```
 
-Barrel exports (`index.ts`) are used across the repo. Import from the barrel when one exists.
+---
+
+## Forbidden Patterns
+
+- `any` in TypeScript
+- hardcoded colors instead of CSS variables
+- hardcoded motion curve instead of `MOTION_EASE`
+- hardcoded wedding metadata instead of `@/shared/config`
+- domain fixtures in `shared/config`
+- API routes or server code for current invitation/live flows
+- DB queries in UI components
+- cross-feature internal imports
+- circular dependencies
 
 ---
 
-## Product Notes
+## Quality Gates
 
-### Invitation and RSVP
+```bash
+pnpm typecheck
+pnpm lint
+pnpm test
+pnpm test:storybook
+pnpm test:e2e
+pnpm build
+pnpm build-storybook
+```
 
-- `/` and `/en` render the full invitation page
-- `/invite/[slug]` renders guest-specific copy and seat count
-- the RSVP form uses a honeypot `website` field to catch bots
-- RSVP responses are persisted to Supabase via Drizzle
-- email notification is sent via Resend using the deferred tasks pattern
+### Test taxonomy
 
-RSVP payload shape:
+- `pnpm test` → unit Vitest project
+- `pnpm test:storybook` → Storybook-driven browser tests through `@storybook/addon-vitest`
+- `pnpm test:e2e` → Playwright route flows and screenshot baselines
+- `pnpm test:coverage` → current unit coverage baseline
 
-- `guestNames: string[]`
-- `attending: "yes" | "no"`
-- `guests: number`
-- `dietary?: string`
-- `message?: string`
-- `website?: string`
+### Git hooks
 
-### Activity feed (/live)
+- `pre-commit` runs `lint-staged` only
+- `pre-push` runs `pnpm typecheck` and `pnpm test`
 
-- `/live` is the activity feed page, marked `noindex`
-- polls `GET /api/activity-feed` every 30s; refreshes on tab visibility change
-- type contracts: `ActivityFeedSnapshot`, `FeedEventSnapshot`, `LeaderboardEntrySnapshot` in `src/widgets/activity-feed/types.ts`
-- `useActivityFeedSnapshot` hook manages polling + error state
-- CSS animation keyframes live in `animations.css` (imported via `globals.css`), all prefixed `af-*`
-- Supabase Realtime (broadcast channel) will be wired in the game hub phase
+### CI lanes
 
----
+- `quality`
+- `unit`
+- `build`
+- `storybook-build`
+- `storybook-tests`
+- `e2e`
+- separate `chromatic` workflow
 
-## Shared Config, UI, and Styling
+### Visual regression
 
-`@/shared/config` is the source of truth for wedding data, guest data, and metadata helpers.
+- `e2e/visual.spec.ts` owns current page-level screenshot baselines
+- homepage and personalized invite use stabilized above-the-fold screenshots
+- `/live` uses full-screen baselines for empty and error states
 
-- always import `WEDDING_DATE` and `WEDDING_DATE_ROMAN` from `@/shared/config`
-- always import `VENUE` (including `VENUE.locationShort` and `VENUE.directionsUrl`) from `@/shared/config`
-- do not duplicate `VENUE`, `COUPLE`, `DRESS_CODE`, guests, or metadata data in route files or widgets
+### Chromatic
 
-Reusable UI primitives in `src/shared/ui`:
-
-- `SectionWrapper`
-- `SectionHeading`
-- `AnimatedReveal`
-- `Ornament`
-- `Button`, `Input`, `Textarea` (built on shadcn/ui)
-
-Styling rules:
-
-- colors go through CSS variables defined in `src/app/globals.css`
-- prefer Tailwind classes backed by those variables: `bg-bg-primary`, `text-text-primary`, `text-accent`, `text-error`
-- avoid hardcoded colors in components (except intentional config/email/SVG cases)
-- headings use `heading-serif` or `heading-serif-italic`
-- numerals and formal labels use `font-cinzel`
-- default motion curve is `[0.22, 1, 0.36, 1]`; import `MOTION_EASE` from `@/shared/lib` — do not hardcode inline
+- workflow file: `.github/workflows/chromatic.yml`
+- required secret: `CHROMATIC_PROJECT_TOKEN`
 
 ---
 
-## Internationalization
-
-- default locale is `uk`
-- English uses `/en`
-- translations live in `src/shared/i18n/translations/uk.json` and `en.json`
-- client navigation must use `@/shared/i18n/navigation`
-- new message keys must be added to both locale files with identical structure
-
----
-
-## Hydration-Sensitive Code
+## Hydration-Sensitive
 
 Do not casually refactor these:
 
@@ -248,117 +238,28 @@ Do not casually refactor these:
 - `features/language-switcher/LanguageSwitcher.tsx`
 - `features/theme-switcher/ThemeProvider.tsx`
 
-These intentionally use hydration-safe patterns (`useSyncExternalStore`, staged mount logic).
-
 ---
 
-## Server Patterns
+## Future Backend Re-entry
 
-### Deferred tasks
+The next backend phase must plug into the existing frontend contracts instead of replacing them.
 
-On Vercel serverless, fire-and-forget is unreliable. All post-response work uses:
+Expected re-entry points:
 
-1. Return `{ data, deferredTasks: DeferredTask[] }` from repository methods
-2. Call `after(() => runDeferredTasks(tasks))` in route handlers
-3. `runDeferredTasks` uses `Promise.allSettled` — one failure does not block others
+- `GuestRepository`
+  - mock today
+  - DB-backed later
+- `RsvpSubmissionService`
+  - localStorage mock today
+  - API-backed mutation later
+- `ActivityFeedSource`
+  - mock snapshots today
+  - polling + realtime adapter later
 
-Each task is `{ label, run }` for attributable failures in structured logs.
+Expected future server contracts:
 
-### Unified error envelopes
+- `POST /api/rsvp` ← accepts `RsvpSubmissionInput`, returns `RsvpSubmissionResult`
+- `GET /api/activity-feed` ← returns `ActivityFeedSnapshot`
+- realtime payloads must serialize to `FeedEvent`
 
-All `/api/*` error responses:
-
-- `error: string`
-- `code: string`
-- `requestId: string`
-- `retryAfterSeconds?: number`
-
-Request IDs: `x-request-id` → `x-vercel-id` → `crypto.randomUUID()`.
-
-### Structured logging
-
-Use `logServerInfo()` and `logServerError()` from `@/shared/lib/server`.
-Payloads include `scope`, `event`, `requestId`, optional `context`, serialized error details.
-
----
-
-## Database
-
-Drizzle queries must live in `entities/*/queries/` or `features/*/`. UI components never query the DB directly.
-
-Schema tables:
-
-- `guests` — slug, localized names, seat count
-- `rsvp_responses` — RSVP submissions
-- `players` — future game hub (Supabase anon uid + nickname)
-- `game_events` — future live game events (named `gameEvents` in Drizzle to avoid DOM `Event` collision)
-- `leaderboard` — future XP rankings
-
-DB-inferred types are prefixed with `Db` (e.g. `DbGuest`, `DbRsvpResponse`) to distinguish from domain models.
-Drizzle queries live only in `entities/*/queries/` or `features/*/` — never in UI components.
-Use `fetch*` prefix for async DB queries (e.g. `fetchGuestBySlug`), `get*` for sync static lookups (e.g. `getGuestBySlug`).
-
-DB connects via `DATABASE_URL` (direct postgres connection string). No Supabase JS client used yet — will be added in game hub phase for Realtime + Anonymous Auth.
-
----
-
-## Architectural Contracts
-
-- Dependencies flow downward only: `app → widgets → features → entities → shared`
-- Features must not import from each other's internals (only public `index.ts`)
-- Circular dependencies are forbidden
-- Filters/search/pagination → URL state (Nuqs), not Zustand
-- Zustand → minimal global UI state only (theme, etc.)
-- `any` is forbidden in TypeScript
-- All Zod schemas are colocated with their feature/entity
-
----
-
-## Quality Gates
-
-```bash
-pnpm typecheck   # tsc --noEmit
-pnpm lint        # biome check
-pnpm build       # next build
-pnpm test        # vitest run
-pnpm test:e2e    # playwright test
-```
-
-## Git Hooks
-
-```
-pre-commit  →  lint-staged (biome check --write on staged files)
-pre-push    →  pnpm typecheck + pnpm test
-```
-
----
-
-## Key Rules
-
-- Never hardcode the wedding date; import `WEDDING_DATE` from `@/shared/config`
-- Never hardcode the Roman numeral date; import `WEDDING_DATE_ROMAN` from `@/shared/config`
-- Never hardcode venue strings; import `VENUE` from `@/shared/config`
-- Never hardcode `[0.22, 1, 0.36, 1]` inline; import `MOTION_EASE` from `@/shared/lib`
-- Keep locale message files in sync
-- Prefer server components by default
-- Server Actions first for mutations
-- Keep invite route metadata localized
-- Use existing barrel exports when they exist
-- Treat `/invite/[slug]` and `/live` as intentionally non-indexed
-- Do not remove hydration-safe patterns in countdown, splash, language switcher, or theme provider
-- Use the deferred tasks pattern for any post-response async work — never `void asyncFn()`
-
----
-
-## Useful Commands
-
-```bash
-pnpm dev
-pnpm typecheck
-pnpm lint
-pnpm build
-pnpm test
-pnpm test:e2e
-pnpm db:generate    # drizzle-kit generate
-pnpm db:migrate     # drizzle-kit migrate
-```
+Do not reintroduce backend code without preserving these frontend-facing shapes.

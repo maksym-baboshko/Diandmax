@@ -13,9 +13,16 @@
 # testing
 /coverage
 
-# next.js
+# caches and artifacts
+/.cache/
+/artifacts/
 /.next/
 /out/
+/storybook-static/
+/test-results/
+/playwright-report/
+/.storybook-home/
+/.pnpm-store/
 
 # production
 /build
@@ -40,9 +47,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# playwright
-/test-results/
 
 # AI agents
 .claude/

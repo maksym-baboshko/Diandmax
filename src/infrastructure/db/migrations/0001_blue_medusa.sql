@@ -1,1 +1,0 @@
-ALTER TABLE "players" ADD COLUMN "avatar_key" text;

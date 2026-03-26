@@ -1,16 +1,16 @@
 "use client";
 
 import { MOTION_EASE, useLiteMotion } from "@/shared/lib";
-import { AnimatedReveal } from "@/shared/ui";
+import { AnimatedReveal, GlassPanel } from "@/shared/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type Variants, motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { type DefaultValues, type FieldErrors, useForm } from "react-hook-form";
 
-import { submitRsvp } from "../actions/submit-rsvp";
 import { rsvpSchema } from "../schema/rsvp-schema";
 import type { RsvpFormData } from "../schema/rsvp-schema";
+import { mockRsvpSubmissionService } from "../services/mock-rsvp-submission-service";
 import {
   RsvpAttendanceSection,
   RsvpAttendingDetailsSection,
@@ -224,7 +224,7 @@ export function RsvpForm({ slug, guestVocative, maxSeats, initialGuestName }: Rs
       return;
     }
 
-    const result = await submitRsvp(data);
+    const result = await mockRsvpSubmissionService.submit(data);
 
     if (result.success) {
       setSubmittedName(getSubmittedDisplayName(data.guestNames));
@@ -270,106 +270,101 @@ export function RsvpForm({ slug, guestVocative, maxSeats, initialGuestName }: Rs
     <div className="relative w-full max-w-2xl shrink-0 py-12">
       <RsvpPhotoCluster />
 
-      <AnimatedReveal
-        direction="up"
-        duration={1.2}
-        blur
-        className="group/form relative z-20 overflow-hidden rounded-4xl border border-accent/24 bg-bg-primary/72 shadow-[0_30px_100px_rgba(0,0,0,0.25)] md:rounded-[2.5rem]"
-      >
-        <div className="pointer-events-none absolute inset-0 z-20 rounded-4xl border border-accent/0 transition-colors duration-500 group-hover/form:border-accent/40 md:rounded-[2.5rem]" />
-
-        <form
-          onSubmit={handleSubmit(onSubmit, handleInvalidSubmit)}
-          className="relative z-10 p-6 md:p-12"
-        >
-          {!liteMotion && (
-            <>
-              <div className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full bg-accent/20 blur-[100px]" />
-              <div className="pointer-events-none absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-accent/20 blur-[100px]" />
-            </>
-          )}
-
-          <input type="hidden" {...register("guests")} />
-          <input type="hidden" {...register("slug")} />
-          <input
-            type="text"
-            tabIndex={-1}
-            autoComplete="off"
-            aria-hidden="true"
-            className="sr-only"
-            {...register("website")}
-          />
-
-          <motion.div
-            variants={formStagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.05 }}
-            className="relative z-10 space-y-7 md:space-y-9"
+      <AnimatedReveal direction="up" duration={1.2} blur className="relative z-20">
+        <GlassPanel className="group/form">
+          <form
+            onSubmit={handleSubmit(onSubmit, handleInvalidSubmit)}
+            className="relative z-10 p-6 md:p-12"
           >
-            {guestVocative && maxSeats ? (
-              <RsvpPersonalizedNoteSection
-                guestVocative={guestVocative}
-                maxSeats={maxSeats}
-                t={translateSection}
+            {!liteMotion && (
+              <>
+                <div className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full bg-accent/20 blur-[100px]" />
+                <div className="pointer-events-none absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-accent/20 blur-[100px]" />
+              </>
+            )}
+
+            <input type="hidden" {...register("guests")} />
+            <input type="hidden" {...register("slug")} />
+            <input
+              type="text"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="sr-only"
+              {...register("website")}
+            />
+
+            <motion.div
+              variants={formStagger}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.05 }}
+              className="relative z-10 space-y-7 md:space-y-9"
+            >
+              {guestVocative && maxSeats ? (
+                <RsvpPersonalizedNoteSection
+                  guestVocative={guestVocative}
+                  maxSeats={maxSeats}
+                  t={translateSection}
+                  formField={formField}
+                />
+              ) : null}
+
+              <RsvpGuestNamesSection
+                errors={errors}
                 formField={formField}
+                isSubmitting={isSubmitting}
+                register={register}
+                t={translateSection}
+                visibleGuestFieldsCount={visibleGuestFieldsCount}
+                guestNameKeys={guestNameKeys}
               />
-            ) : null}
 
-            <RsvpGuestNamesSection
-              errors={errors}
-              formField={formField}
-              isSubmitting={isSubmitting}
-              register={register}
-              t={translateSection}
-              visibleGuestFieldsCount={visibleGuestFieldsCount}
-              guestNameKeys={guestNameKeys}
-            />
+              <motion.div variants={formField}>
+                <RsvpDivider />
+              </motion.div>
 
-            <motion.div variants={formField}>
-              <RsvpDivider />
+              <RsvpAttendanceSection
+                attending={attendingChoice}
+                errors={errors}
+                formField={formField}
+                isSubmitting={isSubmitting}
+                onAttendingChange={handleAttendingChange}
+                t={translateSection}
+              />
+
+              <RsvpAttendingDetailsSection
+                guests={guestsValue}
+                isAttendingYes={attendingChoice === "yes"}
+                isSubmitting={isSubmitting}
+                maxGuestCount={maxSeats ?? 10}
+                register={register}
+                t={translateSection}
+                onGuestsChange={handleGuestsChange}
+              />
+
+              <motion.div variants={formField}>
+                <RsvpDivider />
+              </motion.div>
+
+              <RsvpMessageSection
+                formField={formField}
+                isSubmitting={isSubmitting}
+                register={register}
+                t={translateSection}
+              />
+
+              <RsvpSubmitSection
+                attending={attendingChoice}
+                formField={formField}
+                isSubmitting={isSubmitting}
+                liteMotion={liteMotion}
+                submitError={submitError}
+                t={translateSection}
+              />
             </motion.div>
-
-            <RsvpAttendanceSection
-              attending={attendingChoice}
-              errors={errors}
-              formField={formField}
-              isSubmitting={isSubmitting}
-              onAttendingChange={handleAttendingChange}
-              t={translateSection}
-            />
-
-            <RsvpAttendingDetailsSection
-              guests={guestsValue}
-              isAttendingYes={attendingChoice === "yes"}
-              isSubmitting={isSubmitting}
-              maxGuestCount={maxSeats ?? 10}
-              register={register}
-              t={translateSection}
-              onGuestsChange={handleGuestsChange}
-            />
-
-            <motion.div variants={formField}>
-              <RsvpDivider />
-            </motion.div>
-
-            <RsvpMessageSection
-              formField={formField}
-              isSubmitting={isSubmitting}
-              register={register}
-              t={translateSection}
-            />
-
-            <RsvpSubmitSection
-              attending={attendingChoice}
-              formField={formField}
-              isSubmitting={isSubmitting}
-              liteMotion={liteMotion}
-              submitError={submitError}
-              t={translateSection}
-            />
-          </motion.div>
-        </form>
+          </form>
+        </GlassPanel>
       </AnimatedReveal>
     </div>
   );

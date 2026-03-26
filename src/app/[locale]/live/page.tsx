@@ -1,3 +1,4 @@
+import { resolveLiveFeedState } from "@/entities/event";
 import { PREVIEW_IMAGE, getOpenGraphLocale } from "@/shared/config";
 import { resolveLocale } from "@/shared/i18n/routing";
 import type { Locale } from "@/shared/i18n/routing";
@@ -7,6 +8,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 interface ActivityFeedPageProps {
   params: Promise<{ locale: string }>;
+  searchParams?: Promise<{ state?: string }>;
 }
 
 export async function generateMetadata({ params }: ActivityFeedPageProps): Promise<Metadata> {
@@ -32,9 +34,15 @@ export async function generateMetadata({ params }: ActivityFeedPageProps): Promi
   };
 }
 
-export default async function ActivityFeedRoute({ params }: ActivityFeedPageProps) {
+export default async function ActivityFeedRoute({ params, searchParams }: ActivityFeedPageProps) {
   const { locale } = await params;
   const typedLocale = resolveLocale(locale);
+  const resolvedSearchParams = await searchParams;
   setRequestLocale(typedLocale);
-  return <ActivityFeedPage locale={typedLocale} />;
+  return (
+    <ActivityFeedPage
+      locale={typedLocale}
+      initialState={resolveLiveFeedState(resolvedSearchParams?.state)}
+    />
+  );
 }

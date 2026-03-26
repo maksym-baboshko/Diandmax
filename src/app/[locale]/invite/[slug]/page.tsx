@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 
-import { getAllGuestSlugs, getGuestBySlug } from "@/shared/config";
+import { getAllGuestSlugs, getGuestBySlug } from "@/entities/guest";
+import { resolveLocale } from "@/shared/i18n/routing";
 import { PersonalInvitationPage } from "@/widgets/personal-invitation";
 
 interface InvitePageProps {
@@ -16,10 +17,13 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: InvitePageProps): Promise<Metadata> {
   const { slug, locale } = await params;
   const guest = getGuestBySlug(slug);
-  if (!guest) return { robots: { index: false, follow: false } };
+  if (!guest) {
+    return { robots: { index: false, follow: false } };
+  }
 
   const t = await getTranslations("InvitePage");
-  const name = locale === "uk" ? guest.name.uk : guest.name.en;
+  const typedLocale = resolveLocale(locale);
+  const name = guest.name[typedLocale];
 
   return {
     title: t("title", { name }),
@@ -32,7 +36,9 @@ export default async function InvitePage({ params }: InvitePageProps) {
   const { slug } = await params;
   const guest = getGuestBySlug(slug);
 
-  if (!guest) notFound();
+  if (!guest) {
+    notFound();
+  }
 
   return <PersonalInvitationPage guest={guest} />;
 }

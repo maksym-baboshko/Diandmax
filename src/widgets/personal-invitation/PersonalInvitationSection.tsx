@@ -2,12 +2,12 @@
 
 import { useLocale, useTranslations } from "next-intl";
 
-import type { Guest } from "@/entities/guest";
+import type { GuestProfile } from "@/entities/guest";
 import { COUPLE } from "@/shared/config";
 import { AnimatedReveal, Ornament, SectionWrapper } from "@/shared/ui";
 
 interface PersonalInvitationSectionProps {
-  guest: Guest;
+  guest: GuestProfile;
 }
 
 export function PersonalInvitationSection({ guest }: PersonalInvitationSectionProps) {

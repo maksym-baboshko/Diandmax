@@ -35,7 +35,7 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-  test:
+  unit:
     name: Unit Tests
     runs-on: ubuntu-latest
     needs: quality
@@ -60,12 +60,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [quality, test]
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      RSVP_TO_EMAILS: ${{ secrets.RSVP_TO_EMAILS }}
-      RSVP_FROM_EMAIL: ${{ secrets.RSVP_FROM_EMAIL }}
+    needs: [quality, unit]
     steps:
       - uses: actions/checkout@v4
 
@@ -84,15 +79,57 @@ jobs:
       - name: Build
         run: pnpm build
 
+  storybook-build:
+    name: Storybook Build
+    runs-on: ubuntu-latest
+    needs: [quality, unit]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Storybook
+        run: pnpm build-storybook
+
+  storybook-tests:
+    name: Storybook Tests
+    runs-on: ubuntu-latest
+    needs: [quality, unit]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run Storybook tests
+        run: pnpm test:storybook
+
   e2e:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: build
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      RSVP_TO_EMAILS: ${{ secrets.RSVP_TO_EMAILS }}
-      RSVP_FROM_EMAIL: ${{ secrets.RSVP_FROM_EMAIL }}
     steps:
       - uses: actions/checkout@v4
 
@@ -119,5 +156,5 @@ jobs:
         if: failure()
         with:
           name: playwright-report
-          path: playwright-report/
+          path: artifacts/playwright/
           retention-days: 7
