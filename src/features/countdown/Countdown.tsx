@@ -2,60 +2,133 @@
 
 import { WEDDING_DATE } from "@/shared/config";
 import { cn } from "@/shared/lib";
+import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { useSyncExternalStore } from "react";
 
-let _now = 0;
-
-function subscribe(cb: () => void) {
-  const timer = setInterval(() => {
-    _now = Date.now();
-    cb();
-  }, 1000);
-  return () => clearInterval(timer);
-}
-
-const getSnapshot = () => (_now === 0 ? Date.now() : _now);
-const getServerSnapshot = () => 0;
-
-interface TimeUnit {
-  value: number;
-  labelKey: "days" | "hours" | "minutes" | "seconds";
-}
-
-function getTimeLeft(target: Date, now: number): TimeUnit[] | null {
-  if (now === 0) return null;
-  const diff = target.getTime() - now;
-  if (diff <= 0) return null;
-  return [
-    { value: Math.floor(diff / 86_400_000), labelKey: "days" },
-    { value: Math.floor((diff % 86_400_000) / 3_600_000), labelKey: "hours" },
-    { value: Math.floor((diff % 3_600_000) / 60_000), labelKey: "minutes" },
-    { value: Math.floor((diff % 60_000) / 1_000), labelKey: "seconds" },
-  ];
+interface TimeLeft {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
 }
 
 interface CountdownProps {
   className?: string;
 }
 
+const TARGET_MS = WEDDING_DATE.getTime();
+const SERVER_SNAPSHOT: TimeLeft = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+
+let globalStore = calculateTimeLeft();
+const listeners = new Set<() => void>();
+let countdownIntervalStarted = false;
+
+function calculateTimeLeft(): TimeLeft {
+  const diff = TARGET_MS - Date.now();
+
+  if (diff <= 0) {
+    return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+  }
+
+  return {
+    days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+    hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+    minutes: Math.floor((diff / 1000 / 60) % 60),
+    seconds: Math.floor((diff / 1000) % 60),
+  };
+}
+
+function ensureCountdownInterval(): void {
+  if (typeof window === "undefined" || countdownIntervalStarted) {
+    return;
+  }
+
+  countdownIntervalStarted = true;
+  window.setInterval(() => {
+    globalStore = calculateTimeLeft();
+    for (const callback of listeners) {
+      callback();
+    }
+  }, 1000);
+}
+
+function subscribe(callback: () => void): () => void {
+  ensureCountdownInterval();
+  listeners.add(callback);
+
+  return () => listeners.delete(callback);
+}
+
+function getSnapshot(): TimeLeft {
+  return globalStore;
+}
+
+function getServerSnapshot(): TimeLeft {
+  return SERVER_SNAPSHOT;
+}
+
 export function Countdown({ className }: CountdownProps) {
   const t = useTranslations("Countdown");
-  const now = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const units = getTimeLeft(WEDDING_DATE, now);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+  const timeLeft = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  if (!units) return null;
+  if (!mounted) {
+    return (
+      <div
+        data-testid="countdown"
+        className={cn("flex justify-center gap-4 opacity-0 md:gap-8", className)}
+      >
+        {["days", "hours", "minutes", "seconds"].map((unit) => (
+          <div key={unit} className="flex min-w-16 flex-col items-center">
+            <span className="mb-1 font-serif text-3xl text-text-primary md:text-5xl">00</span>
+            <span className="text-xs uppercase tracking-widest text-text-secondary md:text-sm">
+              {t(unit)}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  const entries = [
+    { label: t("days"), value: timeLeft.days },
+    { label: t("hours"), value: timeLeft.hours },
+    { label: t("minutes"), value: timeLeft.minutes },
+    { label: t("seconds"), value: timeLeft.seconds },
+  ];
 
   return (
-    <div className={cn("flex items-end gap-6 sm:gap-10", className)}>
-      {units.map(({ value, labelKey }) => (
-        <div key={labelKey} className="flex flex-col items-center gap-1">
-          <span className="font-cinzel tabular-nums text-3xl font-bold leading-none text-accent sm:text-4xl md:text-5xl">
-            {String(value).padStart(2, "0")}
-          </span>
-          <span className="text-[11px] uppercase tracking-widest text-text-secondary">
-            {t(labelKey)}
-          </span>
+    <div data-testid="countdown" className={cn("flex items-start justify-center", className)}>
+      {entries.map((item, index) => (
+        <div key={item.label} className="flex items-start">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 + index * 0.1, ease: "easeOut" }}
+            className="flex min-w-16 flex-col items-center px-2 md:min-w-20 md:px-4"
+          >
+            <span className="mb-3 font-cinzel text-4xl leading-none font-medium tabular-nums tracking-widest text-text-primary md:text-5xl">
+              {item.value.toString().padStart(2, "0")}
+            </span>
+            <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-accent md:text-sm">
+              {item.label}
+            </span>
+          </motion.div>
+          {index < entries.length - 1 ? (
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.3 + index * 0.1 }}
+              className="mt-1 select-none font-cinzel text-2xl text-accent/30 md:text-3xl"
+            >
+              ·
+            </motion.span>
+          ) : null}
         </div>
       ))}
     </div>

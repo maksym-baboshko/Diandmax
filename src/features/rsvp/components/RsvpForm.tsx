@@ -5,8 +5,8 @@ import { AnimatedReveal } from "@/shared/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type Variants, motion } from "motion/react";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { type DefaultValues, useForm } from "react-hook-form";
 
 import { submitRsvp } from "../actions/submit-rsvp";
 import { rsvpSchema } from "../schema/rsvp-schema";
@@ -27,9 +27,10 @@ interface RsvpFormProps {
   slug?: string;
   guestVocative?: string;
   maxSeats?: number;
+  initialGuestName?: string;
 }
 
-export function RsvpForm({ slug, guestVocative, maxSeats }: RsvpFormProps) {
+export function RsvpForm({ slug, guestVocative, maxSeats, initialGuestName }: RsvpFormProps) {
   const t = useTranslations("RSVP");
   const liteMotion = useLiteMotion();
   const [submitted, setSubmitted] = useState(false);
@@ -41,21 +42,29 @@ export function RsvpForm({ slug, guestVocative, maxSeats }: RsvpFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const guestNameKeyCounterRef = useRef(1);
   const [guestNameKeys, setGuestNameKeys] = useState<string[]>(["guest-name-0"]);
+  const defaultValues = useMemo<DefaultValues<RsvpFormData>>(
+    () => ({
+      attending: undefined,
+      guests: maxSeats ?? 1,
+      guestNames: [initialGuestName ?? ""],
+      dietary: "",
+      message: "",
+      website: "",
+      slug,
+    }),
+    [initialGuestName, maxSeats, slug],
+  );
 
   const {
     register,
     handleSubmit,
+    reset,
     watch,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<RsvpFormData>({
     resolver: zodResolver(rsvpSchema),
-    defaultValues: {
-      attending: undefined,
-      guests: 1,
-      guestNames: [""],
-      slug,
-    },
+    defaultValues,
   });
 
   const attendingChoice = watch("attending");
@@ -139,7 +148,13 @@ export function RsvpForm({ slug, guestVocative, maxSeats }: RsvpFormProps) {
   }
 
   function getSubmittedDisplayName(names: string[]) {
-    return names.find((name) => name.trim().length > 0)?.trim() ?? guestVocative ?? "";
+    const submittedFullName = names.find((name) => name.trim().length > 0)?.trim();
+
+    if (!submittedFullName) {
+      return guestVocative ?? "";
+    }
+
+    return submittedFullName.split(/\s+/)[0] ?? guestVocative ?? "";
   }
 
   async function onSubmit(data: RsvpFormData) {
@@ -155,6 +170,7 @@ export function RsvpForm({ slug, guestVocative, maxSeats }: RsvpFormProps) {
     if (result.success) {
       setSubmittedName(getSubmittedDisplayName(data.guestNames));
       setSubmittedAttending(data.attending);
+      reset(defaultValues);
       setShowConfetti(true);
       setSubmitted(true);
     } else {

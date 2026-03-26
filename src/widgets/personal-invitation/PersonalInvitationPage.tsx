@@ -22,7 +22,9 @@ interface PersonalInvitationPageProps {
 export async function PersonalInvitationPage({ guest }: PersonalInvitationPageProps) {
   const t = await getTranslations("RSVP");
   const locale = await getLocale();
+  const localizedGuestKey = locale === "en" ? "en" : "uk";
   const vocative = getGuestVocative(guest, locale);
+  const defaultGuestName = guest.formName?.[localizedGuestKey] ?? guest.name[localizedGuestKey];
 
   return (
     <>
@@ -42,7 +44,12 @@ export async function PersonalInvitationPage({ guest }: PersonalInvitationPagePr
           <SectionHeading subtitle={t("subtitle")}>{t("title")}</SectionHeading>
 
           <div className="relative z-10 mx-auto mt-12 flex max-w-7xl flex-col items-center justify-center px-4 md:mt-32 xl:flex-row">
-            <RsvpForm slug={guest.slug} guestVocative={vocative} maxSeats={guest.seats} />
+            <RsvpForm
+              slug={guest.slug}
+              guestVocative={vocative}
+              maxSeats={guest.seats}
+              initialGuestName={defaultGuestName}
+            />
           </div>
         </SectionWrapper>
       </main>
