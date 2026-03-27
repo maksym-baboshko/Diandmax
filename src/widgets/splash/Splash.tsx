@@ -5,9 +5,11 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState, useSyncExternalStore } from "react";
 
 const SEAL_BREAK_DELAY_SECONDS = 1;
+const SEAL_BREAK_DURATION_SECONDS = 1.02;
 const INVITATION_REVEAL_DELAY_SECONDS = 2;
-const INVITATION_REVEAL_DURATION_SECONDS = 1.2;
+const INVITATION_REVEAL_DURATION_SECONDS = 1.04;
 const ENVELOPE_CLOSED_OFFSET = "-24%";
+const LETTER_OPEN_OFFSET = "-65%";
 
 export function Splash() {
   const t = useTranslations("Splash");
@@ -76,7 +78,7 @@ export function Splash() {
                 y: {
                   duration: INVITATION_REVEAL_DURATION_SECONDS,
                   delay: INVITATION_REVEAL_DELAY_SECONDS,
-                  ease: [0.34, 1.56, 0.64, 1],
+                  ease: "easeInOut",
                 },
               }}
             >
@@ -160,13 +162,13 @@ export function Splash() {
 
               <motion.div
                 className="absolute flex h-[85%] w-[92%] flex-col items-center justify-center rounded-sm border border-[#E6D5C3] bg-[#FAF6F0] p-6 text-center shadow-md z-20"
-                initial={{ y: 0, scale: 0.98 }}
-                animate={{ y: "-65%", scale: 1 }}
+                initial={{ y: 0, scale: 0.99 }}
+                animate={{ y: LETTER_OPEN_OFFSET, scale: 1 }}
                 transition={{
                   y: {
                     duration: INVITATION_REVEAL_DURATION_SECONDS,
                     delay: INVITATION_REVEAL_DELAY_SECONDS,
-                    ease: [0.34, 1.56, 0.64, 1],
+                    ease: "easeInOut",
                   },
                   scale: {
                     duration: INVITATION_REVEAL_DURATION_SECONDS,
@@ -334,7 +336,7 @@ export function Splash() {
                 initial={{ rotateX: 0 }}
                 animate={{ rotateX: -180 }}
                 transition={{
-                  duration: 0.75,
+                  duration: 0.78,
                   delay: SEAL_BREAK_DELAY_SECONDS,
                   ease: "easeInOut",
                 }}
@@ -386,14 +388,14 @@ export function Splash() {
                 }}
                 initial={{ scale: 1, opacity: 1, rotate: 0, y: 0 }}
                 animate={{
-                  scale: [1, 1, 0.82, 1.7],
+                  scale: [1, 1, 0.9, 1.24],
                   opacity: [1, 1, 1, 0],
-                  rotate: [0, 0, -7, 22],
-                  y: [0, 0, 3, -18],
+                  rotate: [0, 0, -3, 10],
+                  y: [0, 0, 2, -8],
                 }}
                 transition={{
-                  duration: SEAL_BREAK_DELAY_SECONDS,
-                  times: [0, 0.63, 0.8, 1],
+                  duration: SEAL_BREAK_DURATION_SECONDS,
+                  times: [0, 0.64, 0.84, 1],
                   ease: "easeIn",
                 }}
               >
