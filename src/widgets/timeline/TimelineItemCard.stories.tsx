@@ -5,6 +5,11 @@ import { TimelineItemCard } from "./TimelineItemCard";
 const meta = {
   title: "Widgets/Timeline/TimelineItemCard",
   component: TimelineItemCard,
+  argTypes: {
+    icon: {
+      control: false,
+    },
+  },
   parameters: {
     layout: "centered",
   },

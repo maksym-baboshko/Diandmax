@@ -1,9 +1,20 @@
+import { StorybookCenteredCanvas } from "@/testing/storybook/canvas";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { SurfacePanel } from "./SurfacePanel";
 
 const meta = {
   title: "Shared UI/SurfacePanel",
   component: SurfacePanel,
+  args: {
+    children: null,
+    hoverable: true,
+    tone: "default",
+  },
+  argTypes: {
+    children: {
+      control: false,
+    },
+  },
   parameters: {
     layout: "centered",
   },
@@ -14,13 +25,15 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 function ExampleSurface({
+  hoverable,
   tone,
 }: {
+  hoverable: boolean;
   tone: "default" | "subtle" | "highlighted";
 }) {
   return (
-    <div className="w-[min(40rem,92vw)] bg-bg-primary p-8">
-      <SurfacePanel tone={tone} hoverable contentClassName="p-8">
+    <StorybookCenteredCanvas widthClassName="w-[min(40rem,92vw)]" paddingClassName="p-8">
+      <SurfacePanel tone={tone} hoverable={hoverable} contentClassName="p-8">
         <p className="surface-panel-label">Canonical surface</p>
         <h3 className="heading-serif mt-4 text-3xl text-text-primary">
           {tone === "default" ? "Default" : tone === "subtle" ? "Subtle" : "Highlighted"} panel
@@ -30,27 +43,34 @@ function ExampleSurface({
           one-off card recipe.
         </p>
       </SurfacePanel>
-    </div>
+    </StorybookCenteredCanvas>
   );
 }
 
 export const Default: Story = {
-  args: {
-    children: null,
-  },
-  render: () => <ExampleSurface tone="default" />,
+  render: (args) => <ExampleSurface hoverable={args.hoverable ?? true} tone="default" />,
 };
 
 export const Subtle: Story = {
   args: {
-    children: null,
+    tone: "subtle",
   },
-  render: () => <ExampleSurface tone="subtle" />,
+  render: (args) => <ExampleSurface hoverable={args.hoverable ?? true} tone="subtle" />,
 };
 
 export const Highlighted: Story = {
   args: {
-    children: null,
+    tone: "highlighted",
   },
-  render: () => <ExampleSurface tone="highlighted" />,
+  render: (args) => <ExampleSurface hoverable={args.hoverable ?? true} tone="highlighted" />,
+};
+
+export const DarkSurface: Story = {
+  args: {
+    tone: "subtle",
+  },
+  globals: {
+    theme: "dark",
+  },
+  render: (args) => <ExampleSurface hoverable={args.hoverable ?? true} tone="subtle" />,
 };

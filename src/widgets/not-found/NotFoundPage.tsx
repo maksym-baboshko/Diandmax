@@ -53,12 +53,7 @@ function ThemeToggleButton({
   switchThemeToDarkLabel,
   switchThemeToLightLabel,
 }: Pick<NotFoundPageContent, "switchThemeToDarkLabel" | "switchThemeToLightLabel">) {
-  const { theme, toggleTheme } = useTheme();
-  const mounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
-  );
+  const { mounted, theme, toggleTheme } = useTheme();
 
   if (!mounted) {
     return <div className="h-10 w-10 rounded-full border border-accent/20 opacity-0" />;

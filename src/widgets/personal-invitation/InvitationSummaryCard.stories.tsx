@@ -4,6 +4,17 @@ import { InvitationSummaryCard } from "./InvitationSummaryCard";
 const meta = {
   title: "Widgets/Personal Invitation/InvitationSummaryCard",
   component: InvitationSummaryCard,
+  argTypes: {
+    title: {
+      control: false,
+    },
+    children: {
+      control: false,
+    },
+    description: {
+      control: "text",
+    },
+  },
   parameters: {
     layout: "centered",
   },

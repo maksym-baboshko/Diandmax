@@ -5,6 +5,20 @@ import { RsvpFieldGroup } from "./RsvpFieldGroup";
 const meta = {
   title: "Features/RSVP/RsvpFieldGroup",
   component: RsvpFieldGroup,
+  argTypes: {
+    children: {
+      control: false,
+    },
+    title: {
+      control: "text",
+    },
+    hint: {
+      control: "text",
+    },
+    error: {
+      control: "text",
+    },
+  },
   parameters: {
     layout: "centered",
   },

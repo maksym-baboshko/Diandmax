@@ -1,3 +1,4 @@
+import { StorybookCenteredCanvas } from "@/testing/storybook/canvas";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { expect, userEvent, within } from "storybook/test";
@@ -6,6 +7,16 @@ import { Button } from "./Button";
 const meta = {
   title: "Shared UI/Button",
   component: Button,
+  args: {
+    children: "Primary",
+    size: "md",
+    variant: "primary",
+  },
+  argTypes: {
+    children: {
+      control: "text",
+    },
+  },
   parameters: {
     layout: "centered",
   },
@@ -15,24 +26,56 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Showcase: Story = {
+function renderButtonStory(args: React.ComponentProps<typeof Button>) {
+  return (
+    <StorybookCenteredCanvas widthClassName="w-auto" paddingClassName="p-8">
+      <Button {...args} />
+    </StorybookCenteredCanvas>
+  );
+}
+
+export const Primary: Story = {
+  render: renderButtonStory,
+};
+
+export const Secondary: Story = {
   args: {
-    children: "Primary",
+    children: "Secondary",
+    variant: "secondary",
+  },
+  render: renderButtonStory,
+};
+
+export const Outline: Story = {
+  args: {
+    children: "Outline",
+    variant: "outline",
+  },
+  render: renderButtonStory,
+};
+
+export const Ghost: Story = {
+  args: {
+    children: "Ghost",
+    variant: "ghost",
+  },
+  render: renderButtonStory,
+};
+
+export const Sizes: Story = {
+  parameters: {
+    controls: {
+      disable: true,
+    },
   },
   render: () => (
-    <div className="flex flex-col gap-6 bg-bg-primary p-8">
-      <div className="flex flex-wrap gap-4">
-        <Button>Primary</Button>
-        <Button variant="secondary">Secondary</Button>
-        <Button variant="outline">Outline</Button>
-        <Button variant="ghost">Ghost</Button>
-      </div>
+    <StorybookCenteredCanvas widthClassName="w-auto" paddingClassName="p-8">
       <div className="flex flex-wrap items-center gap-4">
         <Button size="sm">Small</Button>
         <Button size="md">Medium</Button>
         <Button size="lg">Large</Button>
       </div>
-    </div>
+    </StorybookCenteredCanvas>
   ),
 };
 
@@ -48,8 +91,10 @@ function InteractiveButtonDemo() {
 }
 
 export const Interactive: Story = {
-  args: {
-    children: "Натиснути",
+  parameters: {
+    controls: {
+      disable: true,
+    },
   },
   render: () => <InteractiveButtonDemo />,
   play: async ({ canvasElement }) => {

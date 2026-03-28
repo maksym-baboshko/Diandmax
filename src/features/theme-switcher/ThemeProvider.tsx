@@ -4,6 +4,7 @@ import { type ReactNode, createContext, useCallback, useContext, useEffect, useS
 import { THEME_STORAGE_KEY, type Theme } from "./constants";
 
 interface ThemeContextValue {
+  mounted: boolean;
   theme: Theme;
   toggleTheme: () => void;
 }
@@ -48,8 +49,16 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   }, [theme, mounted]);
 
   const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  }, []);
+    if (!mounted) {
+      return;
+    }
 
-  return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>;
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  }, [mounted]);
+
+  return (
+    <ThemeContext.Provider value={{ mounted, theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 }

@@ -1,10 +1,22 @@
+import { StorybookCenteredCanvas } from "@/testing/storybook/canvas";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { GlassPanel } from "./GlassPanel";
 
 const meta = {
   title: "Shared UI/GlassPanel",
   component: GlassPanel,
+  args: {
+    children: null,
+  },
+  argTypes: {
+    children: {
+      control: false,
+    },
+  },
   parameters: {
+    controls: {
+      disable: true,
+    },
     layout: "centered",
   },
 } satisfies Meta<typeof GlassPanel>;
@@ -14,11 +26,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: {
-    children: null,
-  },
   render: () => (
-    <div className="w-[min(40rem,92vw)] bg-bg-primary p-8">
+    <StorybookCenteredCanvas widthClassName="w-[min(40rem,92vw)]" paddingClassName="p-8">
       <GlassPanel contentClassName="p-8">
         <p className="text-xs uppercase tracking-[0.24em] text-accent">Preview shell</p>
         <h3 className="heading-serif mt-4 text-3xl text-text-primary">Glass surface</h3>
@@ -27,6 +36,6 @@ export const Default: Story = {
           existing visual language.
         </p>
       </GlassPanel>
-    </div>
+    </StorybookCenteredCanvas>
   ),
 };

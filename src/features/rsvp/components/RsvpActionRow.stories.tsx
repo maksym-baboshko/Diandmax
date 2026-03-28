@@ -4,6 +4,11 @@ import { RsvpActionRow } from "./RsvpActionRow";
 const meta = {
   title: "Features/RSVP/RsvpActionRow",
   component: RsvpActionRow,
+  argTypes: {
+    errorMessage: {
+      control: "text",
+    },
+  },
   parameters: {
     layout: "centered",
   },

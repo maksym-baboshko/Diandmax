@@ -4,6 +4,11 @@ import { FeedStatePanel } from "./FeedStatePanel";
 const meta = {
   title: "Widgets/Activity Feed/FeedStatePanel",
   component: FeedStatePanel,
+  argTypes: {
+    children: {
+      control: false,
+    },
+  },
   parameters: {
     layout: "centered",
   },

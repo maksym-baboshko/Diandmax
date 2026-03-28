@@ -311,12 +311,54 @@ pnpm build-storybook
 ### Storybook / Chromatic
 
 - Storybook config lives in `configs/storybook/`
+- reusable story preview helpers live in `src/testing/storybook/`
 - CI builds Storybook in `.github/workflows/ci.yml`
 - CI runs Storybook browser tests in `.github/workflows/ci.yml`
 - Chromatic publishing lives in `.github/workflows/chromatic.yml`
 - required repo secret: `CHROMATIC_PROJECT_TOKEN`
 - local first-publish command: `CHROMATIC_PROJECT_TOKEN=your-token pnpm chromatic`
 - Storybook static output lives in `artifacts/storybook/static`
+
+#### Storybook catalog contract
+
+Storybook is a UI catalog for canonical reusable surfaces, not a page gallery.
+
+Use two story types deliberately:
+
+- API stories
+  - for public reusable primitives and canonical composites
+  - must be args-driven for the props exposed in Docs
+  - should keep controls enabled only for safe, serializable props
+- composition stories
+  - for larger visual demos or section-level compositions
+  - may be render-only
+  - should disable misleading controls instead of pretending to be a prop playground
+
+#### Controls rules
+
+- Never expose editable controls for non-serializable props such as:
+  - `children`
+  - `ReactNode`
+  - JSX labels, titles, icons, separators
+  - arbitrary domain objects
+- If Storybook inference would generate a broken or misleading control, override it explicitly or disable it.
+- Nullable text-like props that should stay editable in Docs must use an explicit text control.
+
+#### Story wrappers and determinism
+
+- Prefer shared preview helpers from `src/testing/storybook/canvas.tsx` over ad-hoc wrapper `div`s inside stories.
+- Keep preview shells visually consistent: centered surface, fullscreen dark canvas, or section demo shell.
+- Time-based and stateful stories should be deterministic whenever feasible.
+- Prefer fixed story-only setup over `chromatic.disableSnapshot`; use snapshot opt-outs only when instability is intentional and documented.
+- Interaction tests belong only to genuinely interactive components and should not leak global state into following stories.
+
+#### Story authoring checklist
+
+- Decide first whether the story is API or composition.
+- Ensure every visible Docs control maps to a prop the story really uses.
+- Disable controls for anything non-serializable, misleading, or render-only.
+- Reuse canonical canvas helpers where possible.
+- Keep the sidebar compact and catalog-first; do not add page-scale showcase stories unless the surface is truly canonical.
 
 ### Playwright
 

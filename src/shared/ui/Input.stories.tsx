@@ -1,3 +1,4 @@
+import { StorybookCenteredCanvas } from "@/testing/storybook/canvas";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, userEvent, within } from "storybook/test";
 import { Input } from "./Input";
@@ -5,6 +6,9 @@ import { Input } from "./Input";
 const meta = {
   title: "Shared UI/Input",
   component: Input,
+  args: {
+    placeholder: "Ім'я гостя",
+  },
   parameters: {
     layout: "centered",
   },
@@ -14,21 +18,44 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const States: Story = {
-  render: () => (
-    <div className="w-[min(32rem,90vw)] space-y-4 bg-bg-primary p-8">
-      <Input placeholder="Ім'я гостя" />
-      <Input error defaultValue="Поле з помилкою" />
-      <Input disabled defaultValue="Недоступне поле" />
-    </div>
-  ),
+function renderInputStory(args: React.ComponentProps<typeof Input>) {
+  return (
+    <StorybookCenteredCanvas widthClassName="w-[min(32rem,90vw)]" paddingClassName="p-8">
+      <Input {...args} />
+    </StorybookCenteredCanvas>
+  );
+}
+
+export const Default: Story = {
+  render: renderInputStory,
+};
+
+export const ErrorState: Story = {
+  args: {
+    defaultValue: "Поле з помилкою",
+    error: true,
+  },
+  render: renderInputStory,
+};
+
+export const Disabled: Story = {
+  args: {
+    defaultValue: "Недоступне поле",
+    disabled: true,
+  },
+  render: renderInputStory,
 };
 
 export const Interactive: Story = {
+  parameters: {
+    controls: {
+      disable: true,
+    },
+  },
   render: () => (
-    <div className="w-[min(24rem,90vw)] bg-bg-primary p-8">
+    <StorybookCenteredCanvas widthClassName="w-[min(24rem,90vw)]" paddingClassName="p-8">
       <Input placeholder="Ім'я гостя" />
-    </div>
+    </StorybookCenteredCanvas>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

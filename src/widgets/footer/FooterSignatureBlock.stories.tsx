@@ -4,6 +4,11 @@ import { FooterSignatureBlock } from "./FooterSignatureBlock";
 const meta = {
   title: "Widgets/Footer/FooterSignatureBlock",
   component: FooterSignatureBlock,
+  argTypes: {
+    separator: {
+      control: false,
+    },
+  },
   parameters: {
     layout: "centered",
   },

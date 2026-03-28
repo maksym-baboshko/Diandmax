@@ -6,6 +6,11 @@ import { LeaderboardRow } from "./LeaderboardRow";
 const meta = {
   title: "Widgets/Activity Feed/LeaderboardPanel",
   component: LeaderboardPanel,
+  argTypes: {
+    children: {
+      control: false,
+    },
+  },
   parameters: {
     layout: "centered",
   },

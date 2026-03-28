@@ -4,6 +4,11 @@ import { RsvpPanel } from "./RsvpPanel";
 const meta = {
   title: "Features/RSVP/RsvpPanel",
   component: RsvpPanel,
+  argTypes: {
+    children: {
+      control: false,
+    },
+  },
   parameters: {
     layout: "centered",
   },

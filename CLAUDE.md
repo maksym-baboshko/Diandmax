@@ -179,6 +179,28 @@ Phase 2 is a controlled unification redesign:
 
 Storybook is for these reusable blocks and their variants, not for full pages.
 
+Storybook policy:
+
+- treat Storybook as a UI catalog, not a page gallery
+- use two explicit story types:
+  - API stories for public reusable components and canonical composites; these must be args-driven
+  - composition stories for larger visual demos; these may be render-only and should disable misleading controls
+- expose only safe, serializable controls
+- never expose editable controls for `children`, `ReactNode`, JSX labels/titles, icons, separators, or arbitrary domain objects
+- if a prop is not meaningfully editable in Docs, disable its control instead of letting Storybook infer one
+- prefer shared preview wrappers from `src/testing/storybook/canvas.tsx` over ad-hoc wrapper `div`s in individual stories
+- keep time-based and stateful stories deterministic; prefer fixed story setup over `chromatic.disableSnapshot`
+- add interaction tests only where a component has real behavior
+- stories that mutate `document`, cookies, storage, theme, or locale state must reset cleanly between renders
+
+Storybook checklist for new stories:
+
+- decide first whether the story is API or composition
+- make API stories respond to the props shown in Docs
+- disable controls for non-serializable or render-only props
+- reuse canonical canvas helpers when possible
+- keep the sidebar compact; do not add page-scale showcase stories unless the surface is truly canonical
+
 ---
 
 ## Critical Imports

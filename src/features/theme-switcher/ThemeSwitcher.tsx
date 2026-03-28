@@ -2,7 +2,6 @@
 
 import { cn } from "@/shared/lib";
 import { useTranslations } from "next-intl";
-import { useSyncExternalStore } from "react";
 
 import { useTheme } from "./ThemeProvider";
 
@@ -11,13 +10,8 @@ interface ThemeSwitcherProps {
 }
 
 export function ThemeSwitcher({ className }: ThemeSwitcherProps) {
-  const { theme, toggleTheme } = useTheme();
+  const { mounted, theme, toggleTheme } = useTheme();
   const t = useTranslations("Accessibility");
-  const mounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
-  );
 
   if (!mounted) {
     return (
