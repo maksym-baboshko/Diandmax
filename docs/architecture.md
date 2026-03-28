@@ -318,6 +318,9 @@ pnpm build-storybook
 - required repo secret: `CHROMATIC_PROJECT_TOKEN`
 - local first-publish command: `CHROMATIC_PROJECT_TOKEN=your-token pnpm chromatic`
 - Storybook static output lives in `artifacts/storybook/static`
+- local Chromatic publishes run against the current local worktree, not an intentionally reused old Storybook build
+- multiple local publishes can share the same commit SHA when changes are uncommitted, so SHA alone is not sufficient to identify which local publish you are inspecting
+- when debugging a local Chromatic failure, rely on the exact build URL/build number from CLI output and compare the failure trace to the current story code
 
 #### Storybook catalog contract
 

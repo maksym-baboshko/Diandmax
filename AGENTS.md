@@ -308,6 +308,9 @@ pnpm build-storybook
 
 - workflow file: `.github/workflows/chromatic.yml`
 - required secret: `CHROMATIC_PROJECT_TOKEN`
+- local Chromatic publishes run against the current local worktree, not an intentionally reused old Storybook build
+- do not identify a local Chromatic publish by commit SHA alone; multiple local publishes can share the same SHA when changes are uncommitted
+- when debugging Chromatic locally, use the exact build URL/build number from the CLI output and compare the failure trace to the current story code
 
 ---
 

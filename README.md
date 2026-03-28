@@ -82,6 +82,12 @@ First-time local baseline publish:
 CHROMATIC_PROJECT_TOKEN=your-token pnpm chromatic
 ```
 
+Local Chromatic notes:
+
+- `pnpm chromatic` always publishes from the current local worktree; it does not intentionally reuse an old cached Storybook build
+- multiple local publishes can still appear under the same commit SHA when changes are uncommitted, so commit hash alone is not enough to identify which local publish you are looking at
+- when debugging a failing local publish, use the exact build URL and build number from the CLI output, and compare the failure trace to the current story code before concluding that Chromatic is showing stale results
+
 Then add the same token as a repo secret:
 
 ```text
