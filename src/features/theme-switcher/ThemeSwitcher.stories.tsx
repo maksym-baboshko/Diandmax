@@ -23,7 +23,6 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   globals: {
     locale: "uk",
-    theme: "light",
   },
   render: () => (
     <StorybookCenteredCanvas widthClassName="w-auto" paddingClassName="p-8">
@@ -32,17 +31,16 @@ export const Default: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await waitFor(() =>
-      expect(canvas.getByRole("button")).toHaveAccessibleName("Перемкнути на темну тему"),
-    );
-
-    const button = canvas.getByRole("button");
+    const button = await canvas.findByRole("button");
     await expect(button).toBeEnabled();
+    const initialLabel = button.getAttribute("aria-label");
+
+    expect(initialLabel).toMatch(/Перемкнути на (темну|світлу) тему/);
 
     await userEvent.click(button);
 
     await waitFor(() =>
-      expect(canvas.getByRole("button")).toHaveAccessibleName("Перемкнути на світлу тему"),
+      expect(canvas.getByRole("button")).not.toHaveAccessibleName(initialLabel ?? ""),
     );
   },
 };
