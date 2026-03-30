@@ -35,6 +35,9 @@ const publicApiAliases = {
 export default defineConfig({
   cacheDir: resolve(projectRoot, ".cache/vitest/root"),
   root: projectRoot,
+  server: {
+    host: "127.0.0.1",
+  },
   resolve: {
     alias: {
       "@": resolve(projectRoot, "src"),
@@ -63,6 +66,7 @@ export default defineConfig({
           dir: projectRoot,
           environment: "node",
           include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+          setupFiles: [resolve(projectRoot, "configs/vitest/unit.setup.ts")],
           exclude: testExclude,
         },
       },

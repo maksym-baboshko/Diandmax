@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 
 import type { GuestProfile } from "@/entities/guest";
 import { COUPLE } from "@/shared/config";
-import { PageEnterReveal, SectionShell, SurfacePanel } from "@/shared/ui";
+import { AnimatedReveal, SectionShell, SurfacePanel } from "@/shared/ui";
 import { InvitationSummaryCard } from "./InvitationSummaryCard";
 
 interface PersonalInvitationSectionProps {
@@ -28,14 +28,12 @@ export function PersonalInvitationSection({ guest }: PersonalInvitationSectionPr
       className="relative overflow-visible"
     >
       <div className="mx-auto w-full max-w-6xl px-5 pb-12 pt-24 md:px-8 md:pb-24 md:pt-32">
-        <PageEnterReveal direction="up" delay={0.08} className="relative">
+        <AnimatedReveal direction="up" delay={0.08} threshold={0.12} className="relative">
           <SurfacePanel
-            className="relative bg-text-primary/96 text-bg-primary shadow-2xl shadow-accent/10 dark:bg-bg-secondary dark:text-text-primary"
+            className="relative bg-text-primary/96 text-bg-primary !shadow-none dark:bg-bg-secondary dark:text-text-primary"
             contentClassName="relative grid gap-8 px-6 py-8 md:px-10 md:py-12 lg:grid-cols-[minmax(0,1.3fr)_minmax(300px,0.7fr)] lg:gap-10 lg:px-14 lg:py-16"
           >
             <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-accent/12 via-transparent to-accent/10 dark:from-accent/10 dark:to-accent/6" />
-            <div className="pointer-events-none absolute -left-20 top-12 h-40 w-40 rounded-full bg-accent/12 blur-3xl" />
-            <div className="pointer-events-none absolute -right-16 bottom-8 h-48 w-48 rounded-full bg-accent/10 blur-3xl" />
             <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-linear-to-r from-transparent via-accent/70 to-transparent" />
             <div className="pointer-events-none absolute inset-x-10 bottom-0 h-px bg-linear-to-r from-transparent via-accent/35 to-transparent" />
 
@@ -67,26 +65,28 @@ export function PersonalInvitationSection({ guest }: PersonalInvitationSectionPr
             </div>
 
             <div className="relative z-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-              <InvitationSummaryCard
-                label={t("seats_label")}
-                title={
-                  <div className="flex items-end gap-3">
-                    <span className="font-cinzel text-6xl leading-none text-bg-primary dark:text-text-primary">
-                      {guest.seats}
-                    </span>
-                    <span className="pb-2 text-sm uppercase tracking-[0.22em] text-bg-primary/55 dark:text-text-secondary">
-                      {t("seat_word", { seats: guest.seats })}
-                    </span>
-                  </div>
-                }
-                description={t("seats_note")}
-              />
+              <AnimatedReveal direction="up" delay={0.12} threshold={0.16} className="h-full">
+                <InvitationSummaryCard
+                  label={t("seats_label")}
+                  className="!shadow-none"
+                  title={
+                    <div className="flex items-end gap-3">
+                      <span className="font-cinzel text-6xl leading-none text-bg-primary dark:text-text-primary">
+                        {guest.seats}
+                      </span>
+                      <span className="pb-2 text-sm uppercase tracking-[0.22em] text-bg-primary/55 dark:text-text-secondary">
+                        {t("seat_word", { seats: guest.seats })}
+                      </span>
+                    </div>
+                  }
+                  description={t("seats_note")}
+                />
+              </AnimatedReveal>
 
-              <InvitationSummaryCard
-                label={t("details_label")}
-                tone="highlighted"
-                title={
-                  <dl className="space-y-4">
+              <AnimatedReveal direction="up" delay={0.18} threshold={0.16} className="h-full">
+                <div className="h-full rounded-[var(--surface-radius-card)] border border-accent/22 px-6 py-6">
+                  <p className="surface-panel-label">{t("details_label")}</p>
+                  <dl className="mt-5 space-y-4">
                     <div>
                       <dt className="text-[11px] uppercase tracking-[0.2em] text-bg-primary/45 dark:text-text-secondary/80">
                         {t("date_label")}
@@ -104,12 +104,14 @@ export function PersonalInvitationSection({ guest }: PersonalInvitationSectionPr
                       </dd>
                     </div>
                   </dl>
-                }
-                description={t("details_note")}
-              />
+                  <p className="mt-5 text-sm leading-relaxed text-bg-primary/66 dark:text-text-secondary">
+                    {t("details_note")}
+                  </p>
+                </div>
+              </AnimatedReveal>
             </div>
           </SurfacePanel>
-        </PageEnterReveal>
+        </AnimatedReveal>
       </div>
     </SectionShell>
   );

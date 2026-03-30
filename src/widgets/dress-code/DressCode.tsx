@@ -144,7 +144,7 @@ export function DressCode() {
   );
 
   return (
-    <SectionWrapper id="dress-code" className="relative overflow-hidden py-24">
+    <SectionWrapper id="dress-code" className="relative overflow-hidden py-16 md:py-24">
       {!liteMotion && (
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-150 w-200 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/4 blur-[150px]" />
       )}

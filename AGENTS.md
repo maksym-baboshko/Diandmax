@@ -61,11 +61,11 @@ concrete owned feature lands in the same change.
 
 - canonical config content lives in `configs/<tool>/`
 - root keeps only machine entrypoints and top-level human entrypoints
-- `docs/architecture.md` is the deeper architecture reference
+- keep long-lived repo guidance in `README.md` and this file instead of a broad `docs/` directory
+- keep automation close to its owning config/test area; avoid reintroducing a generic root `scripts/` folder unless there is a strong reason
 - `.cache/` is for private local state and build caches
 - `artifacts/` is for readable generated outputs and reports
 - `.next/` stays as a deliberate Next.js runtime exception
-- `components.json` remains the root exception for shadcn CLI
 - `tsconfig.json` stays in root as a thin shell because TS Server/editor discovery and relative config resolution are root-sensitive
 - `biome.json` stays in root as a thin shell because Biome CLI/editor discovery is most predictable from the repository root
 - Vitest and Playwright are script-driven from `package.json` via `--config`, so they do not keep root config files
@@ -307,6 +307,18 @@ pnpm build-storybook
 - `storybook-tests`
 - `e2e`
 - separate `chromatic` workflow
+
+### Storybook accessibility policy
+
+- canonical reusable stories default to `a11y.test = "error"`
+- temporary exceptions must use `a11y.test = "todo"` with a short code comment and PR mention
+- do not use `a11y.test = "off"` for normal reusable surfaces
+
+### Security hardening notes
+
+- keep lightweight runtime headers in place: `nosniff`, `strict-origin-when-cross-origin`,
+  `X-Frame-Options: DENY`, and conservative `Permissions-Policy`
+- defer CSP until the remaining inline JSON-LD script policy is formalized
 
 ### Visual regression
 

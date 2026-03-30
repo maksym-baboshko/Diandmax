@@ -147,7 +147,7 @@ export function Gifts() {
   const reduceMotion = useReducedMotion();
 
   return (
-    <SectionWrapper id="gifts" className="relative overflow-hidden py-24">
+    <SectionWrapper id="gifts" className="relative overflow-hidden py-16 md:py-24">
       {!liteMotion && (
         <>
           <div className="pointer-events-none absolute left-1/2 top-1/2 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/5 blur-[140px]" />

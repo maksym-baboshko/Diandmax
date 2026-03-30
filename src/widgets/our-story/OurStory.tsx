@@ -133,7 +133,7 @@ export function OurStory() {
   const liteMotion = useLiteMotion();
 
   return (
-    <SectionWrapper id="our-story" className="relative overflow-hidden py-24">
+    <SectionWrapper id="our-story" className="relative overflow-hidden py-16 md:py-24">
       <SectionHeading subtitle={t("how_we_met_title")}>{t("title")}</SectionHeading>
 
       <div className="mx-auto mt-16 max-w-5xl px-4 md:mt-24">
@@ -263,58 +263,60 @@ export function OurStory() {
           </div>
 
           <AnimatedReveal direction="up" delay={liteMotion ? 0 : 0.1} threshold={0.15}>
-            <div className="relative mt-14 md:mt-20">
-              <div className="mb-8 flex items-center gap-4 md:mb-10">
-                <div className="h-px flex-1 bg-accent/20" />
-                <div className="flex shrink-0 gap-1.5">
-                  <div className="h-1 w-1 rounded-full bg-accent/35" />
-                  <div className="h-1.5 w-1.5 rounded-full bg-accent/55" />
-                  <div className="h-1 w-1 rounded-full bg-accent/35" />
+            <div className="relative mt-14 md:mt-18">
+              <div className="pointer-events-none absolute left-1/2 top-[48%] h-26 w-[84%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/6 blur-[44px] md:h-36 md:w-[62%] md:blur-[68px]" />
+
+              <div className="relative mx-auto flex max-w-5xl items-center gap-3 px-4 text-accent/50 sm:gap-4 sm:px-6">
+                <div className="h-px flex-1 bg-linear-to-r from-accent/18 via-accent/22 to-transparent" />
+                <div className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent/55" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent/38" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent/55" />
                 </div>
-                <div className="h-px flex-1 bg-accent/20" />
+                <div className="h-px flex-1 bg-linear-to-l from-accent/18 via-accent/22 to-transparent" />
               </div>
 
-              <div className="relative px-4 text-center md:px-8">
-                <span
-                  aria-hidden="true"
-                  className="heading-serif pointer-events-none absolute left-0 -top-2 select-none text-[4rem] leading-none text-accent/15 md:left-2 md:text-[5rem]"
-                  style={{ lineHeight: 1 }}
-                >
-                  &ldquo;
-                </span>
-
-                <p className="heading-serif-italic text-[1.1rem] leading-[1.4] text-text-primary sm:text-xl md:text-2xl md:leading-relaxed lg:text-[1.65rem]">
-                  {t("story_closing")}
+              <div className="relative mx-auto mt-10 max-w-5xl px-4 sm:mt-12 sm:px-6 md:mt-14">
+                <div className="mx-auto grid max-w-4xl grid-cols-[26px_minmax(0,1fr)_26px] items-center gap-3 text-center sm:grid-cols-[44px_minmax(0,1fr)_44px] sm:gap-5 md:grid-cols-[56px_minmax(0,1fr)_56px]">
                   <span
-                    className="inline-block whitespace-nowrap align-middle text-[1.2em] leading-none sm:text-[1.4em]"
                     aria-hidden="true"
+                    className="heading-serif select-none self-start pt-1 text-[2.2rem] leading-none text-accent/24 sm:pt-2 sm:text-[3rem] md:text-[4rem]"
                   >
-                    {"\u00A0"}💛
+                    &ldquo;
                   </span>
-                </p>
 
-                <span
-                  aria-hidden="true"
-                  className="heading-serif pointer-events-none absolute bottom-[-2rem] right-0 select-none text-[4rem] leading-none text-accent/15 md:right-2 md:text-[5rem]"
-                  style={{ lineHeight: 1 }}
-                >
-                  &rdquo;
-                </span>
+                  <p className="heading-serif-italic mx-auto max-w-[17ch] text-balance text-[1.45rem] leading-[1.26] text-text-primary sm:max-w-[22ch] sm:text-[2rem] md:max-w-[24ch] md:text-[2.65rem] md:leading-[1.22]">
+                    {t("story_closing")}
+                    <span
+                      className="inline-block whitespace-nowrap align-middle text-[0.96em] leading-none"
+                      aria-hidden="true"
+                    >
+                      {"\u00A0"}💛
+                    </span>
+                  </p>
+
+                  <span
+                    aria-hidden="true"
+                    className="heading-serif select-none self-end pb-1 text-[2.2rem] leading-none text-accent/24 sm:pb-2 sm:text-[3rem] md:text-[4rem]"
+                  >
+                    &rdquo;
+                  </span>
+                </div>
               </div>
 
-              <div className="mt-12 flex items-center justify-center gap-3 md:mt-14">
-                <div className="h-px w-20 bg-accent/20 md:w-28" />
+              <div className="relative mx-auto mt-10 flex max-w-xs items-center justify-center gap-3 px-4 text-accent/46 sm:mt-12 sm:max-w-sm sm:gap-4 md:mt-14">
+                <div className="h-px w-20 bg-linear-to-r from-transparent via-accent/26 to-accent/10 sm:w-28" />
                 <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  className="shrink-0 text-accent/40"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  className="shrink-0"
                   fill="currentColor"
                   aria-hidden="true"
                 >
-                  <path d="M8 0L9.6 6.4L16 8L9.6 9.6L8 16L6.4 9.6L0 8L6.4 6.4L8 0Z" />
+                  <path d="M6 0L7.2 4.8L12 6L7.2 7.2L6 12L4.8 7.2L0 6L4.8 4.8L6 0Z" />
                 </svg>
-                <div className="h-px w-20 bg-accent/20 md:w-28" />
+                <div className="h-px w-20 bg-linear-to-l from-transparent via-accent/26 to-accent/10 sm:w-28" />
               </div>
             </div>
           </AnimatedReveal>

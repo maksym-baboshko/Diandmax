@@ -146,6 +146,9 @@ const preview: Preview = {
     theme: "light",
   },
   parameters: {
+    a11y: {
+      test: "error",
+    },
     layout: "fullscreen",
     nextjs: {
       appDirectory: true,

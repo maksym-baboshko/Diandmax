@@ -18,6 +18,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+// TODO(a11y): footer signature metadata lines need a contrast pass on the secondary background.
 export const Default: Story = {
   args: {
     venueLabel: "Bergen · Norway",
@@ -25,6 +26,11 @@ export const Default: Story = {
     brideName: "Діана",
     romanDate: "XXVIII · VI · MMXXVI",
     venueName: "Grand Hotel Terminus",
+  },
+  parameters: {
+    a11y: {
+      test: "todo",
+    },
   },
   render: (args) => (
     <div className="flex min-h-[26rem] flex-col items-center justify-center gap-10 bg-bg-secondary px-6 py-12">

@@ -65,7 +65,7 @@ export function Location() {
   const liteMotion = useLiteMotion();
 
   return (
-    <SectionWrapper id="location" className="relative overflow-hidden py-24">
+    <SectionWrapper id="location" className="relative overflow-hidden py-16 md:py-24">
       {!liteMotion && (
         <div
           aria-hidden="true"
