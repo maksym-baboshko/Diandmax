@@ -101,11 +101,11 @@ body {
 }
 
 @utility section-eyebrow {
-  font-size: 0.65rem;
-  font-weight: 500;
-  letter-spacing: 0.32em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--accent) 88%, transparent);
+  color: var(--accent-hover);
 }
 
 @utility section-title {
