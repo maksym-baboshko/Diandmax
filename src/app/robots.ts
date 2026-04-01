@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+
 import { getSiteUrl } from "@/shared/config";
 
 export default function robots(): MetadataRoute.Robots {

@@ -1,5 +1,6 @@
 import type { Locale } from "@/shared/i18n/routing";
-import { COUPLE, VENUE, WEDDING_DATE } from "./wedding";
+import enMessages from "../i18n/translations/en.json";
+import ukMessages from "../i18n/translations/uk.json";
 import {
   PREVIEW_IMAGE,
   SITE_ALTERNATE_NAME,
@@ -7,15 +8,18 @@ import {
   getLocalePath,
   getMetadataBase,
 } from "./site";
+import { COUPLE, VENUE, WEDDING_DATE } from "./wedding";
 
-export function getStructuredDataJson(locale: Locale) {
+export function getStructuredDataJson(locale: Locale): string {
   const metadataBase = getMetadataBase();
   const localePath = getLocalePath(locale);
-  const weddingDisplayName = `${COUPLE.groom.name[locale]} & ${COUPLE.bride.name[locale]}`;
-  const siteDescription =
-    locale === "uk"
-      ? "Персональний весільний сайт Максима і Діани з деталями церемонії, RSVP та інформацією для гостей."
-      : "A personal wedding website for Maksym and Diana with ceremony details, RSVP, and guest information.";
+  const messages = locale === "uk" ? ukMessages : enMessages;
+  const groomName = COUPLE.groom.name[locale];
+  const brideName = COUPLE.bride.name[locale];
+  const weddingDisplayName = `${groomName} & ${brideName}`;
+
+  const { siteDescription, eventDescriptionPrefix, venueLocationFormatted } = messages.Metadata;
+  const eventDescription = `${eventDescriptionPrefix} ${weddingDisplayName} — ${VENUE.name}, ${venueLocationFormatted}.`;
 
   return JSON.stringify({
     "@context": "https://schema.org",
@@ -32,39 +36,30 @@ export function getStructuredDataJson(locale: Locale) {
         "@type": "Event",
         "@id": new URL(`${localePath}#event`, metadataBase).toString(),
         name: weddingDisplayName,
-        description:
-          locale === "uk"
-            ? "Весільна церемонія та святкування Максима і Діани у Grand Hotel Terminus."
-            : "Wedding ceremony and celebration of Maksym and Diana at Grand Hotel Terminus.",
+        description: eventDescription,
         startDate: WEDDING_DATE.toISOString(),
         eventStatus: "https://schema.org/EventScheduled",
         eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-        inLanguage: locale,
-        image: [new URL(PREVIEW_IMAGE, metadataBase).toString()],
-        url: new URL(localePath, metadataBase).toString(),
         location: {
           "@type": "Place",
           name: VENUE.name,
-          address: VENUE.address,
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: VENUE.address,
+            addressLocality: VENUE.city,
+            addressCountry: VENUE.countryCode,
+          },
           geo: {
             "@type": "GeoCoordinates",
             latitude: VENUE.coordinates.lat,
             longitude: VENUE.coordinates.lng,
           },
         },
-        organizer: [
-          {
-            "@type": "Person",
-            name: COUPLE.groom.name[locale],
-          },
-          {
-            "@type": "Person",
-            name: COUPLE.bride.name[locale],
-          },
-        ],
-        isPartOf: {
-          "@id": new URL("/#website", metadataBase).toString(),
+        organizer: {
+          "@type": "Person",
+          name: weddingDisplayName,
         },
+        image: new URL(PREVIEW_IMAGE, metadataBase).toString(),
       },
     ],
   });

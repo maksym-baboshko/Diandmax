@@ -1,27 +1,21 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { useTheme } from "./ThemeProvider";
-import { useSyncExternalStore } from "react";
 import { cn } from "@/shared/lib";
+import { useTranslations } from "next-intl";
+
+import { useTheme } from "./ThemeProvider";
 
 interface ThemeSwitcherProps {
   className?: string;
 }
 
 export function ThemeSwitcher({ className }: ThemeSwitcherProps) {
-  const { theme, toggleTheme } = useTheme();
+  const { mounted, theme, toggleTheme } = useTheme();
   const t = useTranslations("Accessibility");
-  
-  const mounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false
-  );
 
   if (!mounted) {
     return (
-      <div className="w-10 h-10 rounded-full border border-accent/20 opacity-0" />
+      <div className={cn("h-10 w-10 rounded-full border border-accent/20 opacity-0", className)} />
     );
   }
 
@@ -30,10 +24,10 @@ export function ThemeSwitcher({ className }: ThemeSwitcherProps) {
       type="button"
       onClick={toggleTheme}
       className={cn(
-        "flex items-center justify-center w-10 h-10 rounded-full border border-accent text-accent transition-all duration-300 cursor-pointer select-none",
+        "flex h-10 w-10 cursor-pointer select-none items-center justify-center rounded-full border border-accent text-accent transition-all duration-300",
         "bg-bg-primary hover:bg-accent hover:text-white",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary",
-        className
+        className,
       )}
       aria-label={theme === "light" ? t("switch_to_dark_theme") : t("switch_to_light_theme")}
     >
@@ -45,7 +39,7 @@ export function ThemeSwitcher({ className }: ThemeSwitcherProps) {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="w-5 h-5"
+          className="h-5 w-5"
           aria-hidden="true"
         >
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
@@ -58,7 +52,7 @@ export function ThemeSwitcher({ className }: ThemeSwitcherProps) {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="w-5 h-5"
+          className="h-5 w-5"
           aria-hidden="true"
         >
           <circle cx="12" cy="12" r="5" />

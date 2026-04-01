@@ -1,12 +1,6 @@
-import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import baseConfig from "./configs/next/config";
 
 const withNextIntl = createNextIntlPlugin("./src/shared/i18n/request.ts");
 
-const nextConfig: NextConfig = {
-  experimental: {
-    globalNotFound: true,
-  },
-};
-
-export default withNextIntl(nextConfig);
+export default withNextIntl(baseConfig);

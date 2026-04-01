@@ -2,6 +2,10 @@
 
 import { useSyncExternalStore } from "react";
 
+/**
+ * Returns true when the user prefers reduced motion, is on a touch-only device,
+ * or is on a small screen. Use this to tone down heavy animations.
+ */
 const MEDIA_QUERIES = [
   "(prefers-reduced-motion: reduce)",
   "(hover: none) and (pointer: coarse)",
@@ -13,36 +17,25 @@ function getServerSnapshot() {
 }
 
 function getSnapshot() {
-  if (typeof window === "undefined") {
-    return false;
-  }
-
-  return MEDIA_QUERIES.some((query) => window.matchMedia(query).matches);
+  if (typeof window === "undefined") return false;
+  return MEDIA_QUERIES.some((q) => window.matchMedia(q).matches);
 }
 
 function subscribe(callback: () => void) {
-  if (typeof window === "undefined") {
-    return () => {};
-  }
+  if (typeof window === "undefined") return () => {};
 
-  const cleanups = MEDIA_QUERIES.map((query) => {
-    const mediaQuery = window.matchMedia(query);
+  const cleanups = MEDIA_QUERIES.map((q) => {
+    const mq = window.matchMedia(q);
     const handler = () => callback();
-
-    if (typeof mediaQuery.addEventListener === "function") {
-      mediaQuery.addEventListener("change", handler);
-      return () => mediaQuery.removeEventListener("change", handler);
-    }
-
-    mediaQuery.addListener(handler);
-    return () => mediaQuery.removeListener(handler);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
   });
 
   return () => {
-    cleanups.forEach((cleanup) => cleanup());
+    for (const cleanup of cleanups) cleanup();
   };
 }
 
-export function useLiteMotion() {
+export function useLiteMotion(): boolean {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

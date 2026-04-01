@@ -1,10 +1,11 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
+import { type Variants, motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { SectionWrapper, SectionHeading, AnimatedReveal, Ornament } from "@/shared/ui";
+
 import { MOTION_EASE, useLiteMotion } from "@/shared/lib";
+import { AnimatedReveal, SectionHeading, SectionWrapper } from "@/shared/ui";
 
 const ease = MOTION_EASE;
 
@@ -35,12 +36,19 @@ const mobileImageVariants: Variants = {
 
 function StarDivider() {
   return (
-    <div className="flex items-center justify-center gap-3 my-10 md:my-12">
-      <div className="w-10 md:w-14 h-px bg-accent/25" />
-      <svg width="12" height="12" viewBox="0 0 12 12" className="text-accent/45 shrink-0" fill="currentColor">
+    <div className="my-10 flex items-center justify-center gap-3 md:my-12">
+      <div className="h-px w-10 bg-accent/25 md:w-14" />
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 12 12"
+        className="shrink-0 text-accent/45"
+        fill="currentColor"
+        aria-hidden="true"
+      >
         <path d="M6 0L7.2 4.8L12 6L7.2 7.2L6 12L4.8 7.2L0 6L4.8 4.8L6 0Z" />
       </svg>
-      <div className="w-10 md:w-14 h-px bg-accent/25" />
+      <div className="h-px w-10 bg-accent/25 md:w-14" />
     </div>
   );
 }
@@ -61,11 +69,11 @@ function Portrait({
   liteMotion: boolean;
 }) {
   const content = (
-    <div className={`w-full flex flex-col items-center ${direction === "right" ? "md:pt-16" : ""}`}>
-      <div className="relative w-[80%] sm:w-full max-w-70 aspect-3/4 mb-4 md:mb-8 group">
-        <div className="absolute inset-0 border border-accent/70 rounded-t-[100px] rounded-b-sm transition-all duration-500 group-hover:border-accent shadow-[0_0_0_0_transparent] group-hover:shadow-[0_0_30px_4px_color-mix(in_srgb,var(--accent)_15%,transparent)] z-10 pointer-events-none" />
-        <div className="absolute inset-2 border border-accent/60 rounded-t-[92px] rounded-b-sm z-20 pointer-events-none" />
-        <div className="absolute inset-0 rounded-t-[100px] rounded-b-sm overflow-hidden">
+    <div className={`flex w-full flex-col items-center ${direction === "right" ? "md:pt-16" : ""}`}>
+      <div className="group relative mb-4 aspect-3/4 w-[80%] max-w-70 sm:w-full md:mb-8">
+        <div className="pointer-events-none absolute inset-0 z-10 rounded-t-[100px] rounded-b-sm border border-accent/70 shadow-[0_0_0_0_transparent] transition-all duration-500 group-hover:border-accent group-hover:shadow-[0_0_30px_4px_color-mix(in_srgb,var(--accent)_15%,transparent)]" />
+        <div className="pointer-events-none absolute inset-2 z-20 rounded-t-[92px] rounded-b-sm border border-accent/60" />
+        <div className="absolute inset-0 overflow-hidden rounded-t-[100px] rounded-b-sm">
           {liteMotion ? (
             <motion.div
               initial="hidden"
@@ -88,8 +96,12 @@ function Portrait({
           )}
         </div>
       </div>
-      <h3 className="heading-serif text-3xl md:text-4xl text-text-primary mb-2 text-center">{name}</h3>
-      <span className="text-xs tracking-widest uppercase text-accent font-medium text-center">{role}</span>
+      <h3 className="heading-serif mb-2 text-center text-3xl text-text-primary md:text-4xl">
+        {name}
+      </h3>
+      <span className="text-center text-xs font-medium uppercase tracking-widest text-accent">
+        {role}
+      </span>
     </div>
   );
 
@@ -121,47 +133,59 @@ export function OurStory() {
   const liteMotion = useLiteMotion();
 
   return (
-    <SectionWrapper id="our-story" className="relative overflow-hidden py-24">
-      <Ornament position="top-left" size="sm" />
-      <Ornament position="top-right" size="sm" />
-      <Ornament position="bottom-left" size="sm" />
-      <Ornament position="bottom-right" size="sm" />
-
+    <SectionWrapper id="our-story" className="relative overflow-hidden py-16 md:py-24">
       <SectionHeading subtitle={t("how_we_met_title")}>{t("title")}</SectionHeading>
 
-      <div className="max-w-5xl mx-auto px-4 mt-16 md:mt-24">
-        {/* Portraits */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 lg:gap-24 mb-12 md:mb-24 relative">
+      <div className="mx-auto mt-16 max-w-5xl px-4 md:mt-24">
+        <div className="relative mb-12 grid grid-cols-1 gap-8 md:mb-24 md:grid-cols-2 md:gap-16 lg:gap-24">
           {!liteMotion && (
             <>
-              <div className="absolute top-1/3 left-1/4 w-72 h-72 bg-accent/8 rounded-full blur-[80px] pointer-events-none -translate-x-1/2" />
-              <div className="absolute top-1/2 right-1/4 w-72 h-72 bg-accent/8 rounded-full blur-[80px] pointer-events-none translate-x-1/2" />
+              <div className="pointer-events-none absolute left-1/4 top-1/3 h-72 w-72 -translate-x-1/2 rounded-full bg-accent/8 blur-[80px]" />
+              <div className="pointer-events-none absolute right-1/4 top-1/2 h-72 w-72 translate-x-1/2 rounded-full bg-accent/8 blur-[80px]" />
             </>
           )}
-          <Portrait src="/images/story/groom.jpg" name={t("groom_name")} role={t("groom_bio")} direction="left" delay={0.1} liteMotion={liteMotion} />
-          <Portrait src="/images/story/bride.jpg" name={t("bride_name")} role={t("bride_bio")} direction="right" delay={0.2} liteMotion={liteMotion} />
+          <Portrait
+            src="/images/story/groom.jpg"
+            name={t("groom_name")}
+            role={t("groom_bio")}
+            direction="left"
+            delay={0.1}
+            liteMotion={liteMotion}
+          />
+          <Portrait
+            src="/images/story/bride.jpg"
+            name={t("bride_name")}
+            role={t("bride_bio")}
+            direction="right"
+            delay={0.2}
+            liteMotion={liteMotion}
+          />
         </div>
 
-        {/* ── Story narrative ── */}
-        <div className="max-w-2xl mx-auto">
-
-          {/* Top heart divider */}
+        <div className="mx-auto max-w-2xl">
           <AnimatedReveal direction="up" delay={liteMotion ? 0 : 0.05} threshold={0.1}>
-            <div className="flex items-center justify-center gap-5 mb-12 md:mb-16">
-              <div className="flex-1 h-px bg-accent/30" />
-              <div className="text-accent/70 shrink-0 drop-shadow-[0_0_6px_color-mix(in_srgb,var(--accent)_50%,transparent)]">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="0.5">
+            <div className="mb-12 flex items-center justify-center gap-5 md:mb-16">
+              <div className="h-px flex-1 bg-accent/30" />
+              <div className="shrink-0 text-accent/70 drop-shadow-[0_0_6px_color-mix(in_srgb,var(--accent)_50%,transparent)]">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="currentColor"
+                  strokeWidth="0.5"
+                  aria-hidden="true"
+                >
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                 </svg>
               </div>
-              <div className="flex-1 h-px bg-accent/30" />
+              <div className="h-px flex-1 bg-accent/30" />
             </div>
           </AnimatedReveal>
 
-          {/* ── P1 — Drop cap ── */}
           <AnimatedReveal direction="up" delay={liteMotion ? 0 : 0.1} threshold={0.12}>
-            <p className="text-base md:text-lg text-text-secondary leading-relaxed md:leading-loose">
-              <span className="float-left heading-serif text-[3.8rem] md:text-[5rem] leading-[0.72] mr-3 md:mr-4 mt-[0.1em] text-accent drop-shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_35%,transparent)]">
+            <p className="text-base leading-relaxed text-text-secondary md:text-lg md:leading-loose">
+              <span className="heading-serif float-left mr-3 mt-[0.1em] text-[3.8rem] leading-[0.72] text-accent drop-shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_35%,transparent)] md:mr-4 md:text-[5rem]">
                 {t("story_p1").charAt(0)}
               </span>
               {t("story_p1").slice(1)}
@@ -172,16 +196,14 @@ export function OurStory() {
             <StarDivider />
           </AnimatedReveal>
 
-          {/* ── P2 — Bergen meeting ── */}
           <AnimatedReveal direction="up" delay={liteMotion ? 0 : 0.08} threshold={0.12}>
-            <p className="text-base md:text-lg text-text-secondary leading-relaxed md:leading-loose">
+            <p className="text-base leading-relaxed text-text-secondary md:text-lg md:leading-loose">
               {t("story_p2")}
             </p>
           </AnimatedReveal>
 
-          {/* ── First photo together — cinematic strip ── */}
           <AnimatedReveal direction="up" delay={liteMotion ? 0 : 0.06} threshold={0.08}>
-            <div className="relative w-full aspect-square md:aspect-4/3 rounded-2xl overflow-hidden mt-10 md:mt-12 group">
+            <div className="group relative mt-10 aspect-square w-full overflow-hidden rounded-2xl md:mt-12 md:aspect-4/3">
               <Image
                 src="/images/story/our_first_photo.jpg"
                 alt=""
@@ -190,17 +212,14 @@ export function OurStory() {
                 className="object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105"
                 style={{ objectPosition: "center 20%" }}
               />
-              {/* dark vignette + bottom gradient for caption */}
               <div className="absolute inset-0 bg-linear-to-t from-black/65 via-black/5 to-transparent" />
               <div className="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.25)]" />
-              {/* Caption */}
+              <div className="absolute inset-0 rounded-2xl border border-accent/20" />
               <div className="absolute bottom-0 left-0 right-0 px-5 py-4 md:py-5">
-                <p className="text-center text-[0.65rem] md:text-xs tracking-[0.22em] uppercase text-white/75 font-medium">
+                <p className="text-center text-[0.65rem] font-medium uppercase tracking-[0.22em] text-white/75 md:text-xs">
                   {t("photo_caption_first")}
                 </p>
               </div>
-              {/* Subtle gold border */}
-              <div className="absolute inset-0 rounded-2xl border border-accent/20 pointer-events-none" />
             </div>
           </AnimatedReveal>
 
@@ -208,9 +227,8 @@ export function OurStory() {
             <StarDivider />
           </AnimatedReveal>
 
-          {/* ── P3 — relationship grows ── */}
           <AnimatedReveal direction="up" delay={liteMotion ? 0 : 0.08} threshold={0.12}>
-            <p className="text-base md:text-lg text-text-secondary leading-relaxed md:leading-loose">
+            <p className="text-base leading-relaxed text-text-secondary md:text-lg md:leading-loose">
               {t("story_p3")}
             </p>
           </AnimatedReveal>
@@ -219,16 +237,19 @@ export function OurStory() {
             <StarDivider />
           </AnimatedReveal>
 
-          {/* ── P4 + heart photo side by side ── */}
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_160px] gap-6 md:gap-10 items-center">
+          <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-[1fr_160px] md:gap-10">
             <AnimatedReveal direction="up" delay={liteMotion ? 0 : 0.05} threshold={0.12}>
-              <p className="text-base md:text-lg text-text-secondary leading-relaxed md:leading-loose">
+              <p className="text-base leading-relaxed text-text-secondary md:text-lg md:leading-loose">
                 {t("story_p4")}
               </p>
             </AnimatedReveal>
 
-            <AnimatedReveal direction={liteMotion ? "up" : "left"} delay={liteMotion ? 0 : 0.15} threshold={0.12}>
-              <div className="relative w-full aspect-3/4 md:w-full rounded-2xl overflow-hidden group">
+            <AnimatedReveal
+              direction={liteMotion ? "up" : "left"}
+              delay={liteMotion ? 0 : 0.15}
+              threshold={0.12}
+            >
+              <div className="group relative aspect-3/4 w-full overflow-hidden rounded-2xl md:w-full">
                 <Image
                   src="/images/story/heart.jpg"
                   alt=""
@@ -236,67 +257,69 @@ export function OurStory() {
                   sizes="(max-width: 768px) 100vw, 160px"
                   className="object-cover object-center transition-transform duration-[1.2s] ease-out group-hover:scale-105"
                 />
-                <div className="absolute inset-0 rounded-2xl border border-accent/25 pointer-events-none" />
+                <div className="absolute inset-0 rounded-2xl border border-accent/25" />
               </div>
             </AnimatedReveal>
           </div>
 
-          {/* ── Closing quote ── */}
           <AnimatedReveal direction="up" delay={liteMotion ? 0 : 0.1} threshold={0.15}>
-            <div className="mt-14 md:mt-20 relative">
-              {/* Decorative top rule */}
-              <div className="flex items-center gap-4 mb-8 md:mb-10">
-                <div className="flex-1 h-px bg-accent/20" />
-                <div className="flex gap-1.5 shrink-0">
-                  <div className="w-1 h-1 rounded-full bg-accent/35" />
-                  <div className="w-1.5 h-1.5 rounded-full bg-accent/55" />
-                  <div className="w-1 h-1 rounded-full bg-accent/35" />
+            <div className="relative mt-14 md:mt-18">
+              <div className="pointer-events-none absolute left-1/2 top-[48%] h-26 w-[84%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/6 blur-[44px] md:h-36 md:w-[62%] md:blur-[68px]" />
+
+              <div className="relative mx-auto flex max-w-5xl items-center gap-3 px-4 text-accent/50 sm:gap-4 sm:px-6">
+                <div className="h-px flex-1 bg-linear-to-r from-accent/18 via-accent/22 to-transparent" />
+                <div className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent/55" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent/38" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent/55" />
                 </div>
-                <div className="flex-1 h-px bg-accent/20" />
+                <div className="h-px flex-1 bg-linear-to-l from-accent/18 via-accent/22 to-transparent" />
               </div>
 
-              {/* Quote block */}
-              <div className="relative text-center px-4 md:px-8">
-                {/* Opening quote mark */}
-                <span
-                  aria-hidden="true"
-                  className="absolute -top-2 left-0 md:left-2 heading-serif text-[4rem] md:text-[5rem] leading-none text-accent/15 select-none"
-                  style={{ lineHeight: 1 }}
-                >
-                  &ldquo;
-                </span>
-
-                <p className="heading-serif-italic text-[1.1rem] sm:text-xl md:text-2xl lg:text-[1.65rem] text-text-primary leading-[1.4] md:leading-relaxed">
-                  {t("story_closing")}
+              <div className="relative mx-auto mt-10 max-w-5xl px-4 sm:mt-12 sm:px-6 md:mt-14">
+                <div className="mx-auto grid max-w-4xl grid-cols-[26px_minmax(0,1fr)_26px] items-center gap-3 text-center sm:grid-cols-[44px_minmax(0,1fr)_44px] sm:gap-5 md:grid-cols-[56px_minmax(0,1fr)_56px]">
                   <span
-                    className="inline-block whitespace-nowrap text-[1.2em] align-middle leading-none sm:text-[1.4em]"
                     aria-hidden="true"
+                    className="heading-serif select-none self-start pt-1 text-[2.2rem] leading-none text-accent/24 sm:pt-2 sm:text-[3rem] md:text-[4rem]"
                   >
-                    {"\u00A0"}💛
+                    &ldquo;
                   </span>
-                </p>
 
-                {/* Closing quote mark */}
-                <span
-                  aria-hidden="true"
-                  className="absolute -bottom-8 right-0 md:right-2 heading-serif text-[4rem] md:text-[5rem] leading-none text-accent/15 select-none"
-                  style={{ lineHeight: 1 }}
-                >
-                  &rdquo;
-                </span>
+                  <p className="heading-serif-italic mx-auto max-w-[17ch] text-balance text-[1.45rem] leading-[1.26] text-text-primary sm:max-w-[22ch] sm:text-[2rem] md:max-w-[24ch] md:text-[2.65rem] md:leading-[1.22]">
+                    {t("story_closing")}
+                    <span
+                      className="inline-block whitespace-nowrap align-middle text-[0.96em] leading-none"
+                      aria-hidden="true"
+                    >
+                      {"\u00A0"}💛
+                    </span>
+                  </p>
+
+                  <span
+                    aria-hidden="true"
+                    className="heading-serif select-none self-end pb-1 text-[2.2rem] leading-none text-accent/24 sm:pb-2 sm:text-[3rem] md:text-[4rem]"
+                  >
+                    &rdquo;
+                  </span>
+                </div>
               </div>
 
-              {/* Decorative bottom rule */}
-              <div className="flex items-center justify-center gap-3 mt-12 md:mt-14">
-                <div className="w-20 md:w-28 h-px bg-accent/20" />
-                <svg width="16" height="16" viewBox="0 0 16 16" className="text-accent/40 shrink-0" fill="currentColor">
-                  <path d="M8 0L9.6 6.4L16 8L9.6 9.6L8 16L6.4 9.6L0 8L6.4 6.4L8 0Z" />
+              <div className="relative mx-auto mt-10 flex max-w-xs items-center justify-center gap-3 px-4 text-accent/46 sm:mt-12 sm:max-w-sm sm:gap-4 md:mt-14">
+                <div className="h-px w-20 bg-linear-to-r from-transparent via-accent/26 to-accent/10 sm:w-28" />
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  className="shrink-0"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M6 0L7.2 4.8L12 6L7.2 7.2L6 12L4.8 7.2L0 6L4.8 4.8L6 0Z" />
                 </svg>
-                <div className="w-20 md:w-28 h-px bg-accent/20" />
+                <div className="h-px w-20 bg-linear-to-l from-transparent via-accent/26 to-accent/10 sm:w-28" />
               </div>
             </div>
           </AnimatedReveal>
-
         </div>
       </div>
     </SectionWrapper>

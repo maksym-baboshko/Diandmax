@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+
 import { SITE_ALTERNATE_NAME, SITE_NAME } from "@/shared/config";
 
 export default function manifest(): MetadataRoute.Manifest {
@@ -9,8 +10,8 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     scope: "/",
     display: "browser",
-    background_color: "#FAF6F0",
-    theme_color: "#FAF6F0",
+    background_color: "#1a1614",
+    theme_color: "#1a1614",
     icons: [
       {
         src: "/icon-192.png",

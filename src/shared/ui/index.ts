@@ -1,7 +1,12 @@
 export { AnimatedReveal } from "./AnimatedReveal";
-export { SectionWrapper } from "./SectionWrapper";
-export { SectionHeading } from "./SectionHeading";
 export { Button } from "./Button";
-export { Ornament } from "./Ornament";
+export { GlassPanel } from "./GlassPanel";
+export { InViewReveal } from "./InViewReveal";
 export { Input } from "./Input";
+export { Ornament } from "./Ornament";
+export { PageEnterReveal } from "./PageEnterReveal";
+export { SectionShell } from "./SectionShell";
+export { SectionHeading } from "./SectionHeading";
+export { SurfacePanel } from "./SurfacePanel";
+export { SectionWrapper } from "./SectionWrapper";
 export { Textarea } from "./Textarea";

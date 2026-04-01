@@ -1,1 +1,1 @@
-export * from "./Gifts";
+export { Gifts } from "./Gifts";

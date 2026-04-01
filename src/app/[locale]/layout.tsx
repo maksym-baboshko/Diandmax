@@ -1,11 +1,5 @@
-import type { Metadata } from "next";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { NextIntlClientProvider } from "next-intl";
-import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
-import { notFound } from "next/navigation";
+import { ThemeProvider } from "@/features/theme-switcher";
 import {
-  getStructuredDataJson,
   PREVIEW_IMAGE,
   PREVIEW_IMAGE_HEIGHT,
   PREVIEW_IMAGE_WIDTH,
@@ -14,10 +8,12 @@ import {
   getMetadataBase,
   getOpenGraphLocale,
 } from "@/shared/config";
-import { playfair, inter, cinzel, vibes, THEME_INIT_SCRIPT } from "@/shared/lib";
-import { ThemeProvider } from "@/features/theme-switcher";
-import { routing, resolveLocale, type Locale } from "@/shared/i18n/routing";
-import "../globals.css";
+import { isLocale, resolveLocale, routing } from "@/shared/i18n/routing";
+import { NotFoundPage, getNotFoundPageContent } from "@/widgets/not-found";
+import type { Metadata } from "next";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages, getTranslations } from "next-intl/server";
+import { cookies } from "next/headers";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -33,10 +29,7 @@ export async function generateMetadata({
   const metadataBase = getMetadataBase();
   const localePath = getLocalePath(typedLocale);
   const alternateLocale = typedLocale === "uk" ? "en_US" : "uk_UA";
-  const t = await getTranslations({
-    locale: typedLocale,
-    namespace: "Metadata",
-  });
+  const t = await getTranslations({ locale: typedLocale, namespace: "Metadata" });
   const title = t("title");
   const description = t("description");
 
@@ -47,16 +40,9 @@ export async function generateMetadata({
     applicationName: SITE_NAME,
     alternates: {
       canonical: localePath,
-      languages: {
-        uk: "/",
-        en: "/en",
-        "x-default": "/",
-      },
+      languages: { uk: "/", en: "/en", "x-default": "/" },
     },
-    robots: {
-      index: true,
-      follow: true,
-    },
+    robots: { index: true, follow: true },
     openGraph: {
       url: localePath,
       siteName: SITE_NAME,
@@ -83,47 +69,32 @@ export async function generateMetadata({
   };
 }
 
-export default async function RootLayout({
-  children,
-  params,
-}: Readonly<{
+interface LocaleLayoutProps {
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
-}>) {
+}
+
+export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {
   const { locale } = await params;
-  if (!routing.locales.includes(locale as Locale)) {
-    notFound();
+
+  if (!isLocale(locale)) {
+    const cookieStore = await cookies();
+    const resolvedLocale = resolveLocale(cookieStore.get("NEXT_LOCALE")?.value ?? "");
+    const content = getNotFoundPageContent(resolvedLocale);
+
+    return (
+      <ThemeProvider>
+        <NotFoundPage locale={resolvedLocale} content={content} />
+      </ThemeProvider>
+    );
   }
 
-  const typedLocale = locale as Locale;
-  setRequestLocale(typedLocale);
-  const messages = await getMessages();
-  const structuredDataJson = getStructuredDataJson(typedLocale);
+  const typedLocale = resolveLocale(locale);
+  const messages = await getMessages({ locale: typedLocale });
 
   return (
-    <html lang={typedLocale} suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: THEME_INIT_SCRIPT,
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: structuredDataJson,
-          }}
-        />
-      </head>
-      <body
-        className={`${playfair.variable} ${inter.variable} ${cinzel.variable} ${vibes.variable} font-inter antialiased`}
-      >
-        <NextIntlClientProvider messages={messages}>
-          <ThemeProvider>{children}</ThemeProvider>
-        </NextIntlClientProvider>
-        <Analytics />
-        <SpeedInsights />
-      </body>
-    </html>
+    <NextIntlClientProvider locale={typedLocale} messages={messages}>
+      <ThemeProvider>{children}</ThemeProvider>
+    </NextIntlClientProvider>
   );
 }

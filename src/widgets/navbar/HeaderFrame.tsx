@@ -1,18 +1,31 @@
 "use client";
 
 import type { MouseEvent, ReactNode, Ref } from "react";
-import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+
 import { LanguageSwitcher } from "@/features/language-switcher";
 import { ThemeSwitcher } from "@/features/theme-switcher";
 import { Link } from "@/shared/i18n/navigation";
-import { cn, MOTION_EASE, useLiteMotion } from "@/shared/lib";
+import { MOTION_EASE, cn, useLiteMotion } from "@/shared/lib";
 import { Ornament } from "@/shared/ui";
+import { AnimatePresence, motion } from "motion/react";
 
-const ease = MOTION_EASE;
-const desktopMediaQuery = "(min-width: 1024px)";
-const focusRingClass =
+const DESKTOP_MEDIA_QUERY = "(min-width: 1024px)";
+const FOCUS_RING_CLASS =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary";
+
+function subscribeScroll(onStoreChange: () => void) {
+  window.addEventListener("scroll", onStoreChange, { passive: true });
+  return () => window.removeEventListener("scroll", onStoreChange);
+}
+
+function getScrollSnapshot() {
+  return window.scrollY > 20;
+}
+
+function getServerScrollSnapshot() {
+  return false;
+}
 
 export interface HeaderNavItem {
   href: string;
@@ -50,13 +63,7 @@ interface HeaderLinkOptions {
   ref?: Ref<HTMLAnchorElement>;
 }
 
-function renderHeaderLink({
-  item,
-  className,
-  children,
-  onAfterSelect,
-  ref,
-}: HeaderLinkOptions) {
+function renderHeaderLink({ item, className, children, onAfterSelect, ref }: HeaderLinkOptions) {
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     item.onSelect?.(event);
     onAfterSelect?.();
@@ -101,7 +108,12 @@ export function HeaderFrame({
   footerId = "site-footer",
 }: HeaderFrameProps) {
   const liteMotion = useLiteMotion();
-  const [isScrolled, setIsScrolled] = useState(false);
+  const isScrolled = useSyncExternalStore(
+    subscribeScroll,
+    getScrollSnapshot,
+    getServerScrollSnapshot,
+  );
+  const [isTransitionReady, setIsTransitionReady] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDesktopViewport, setIsDesktopViewport] = useState(false);
   const [isKeyboardNavigation, setIsKeyboardNavigation] = useState(false);
@@ -111,13 +123,13 @@ export function HeaderFrame({
   const resolvedMobileItems = mobileItems ?? items;
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const id = requestAnimationFrame(() => setIsTransitionReady(true));
+    return () => cancelAnimationFrame(id);
   }, []);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia(desktopMediaQuery);
+    const mediaQuery = window.matchMedia(DESKTOP_MEDIA_QUERY);
+
     const syncViewport = (matches: boolean) => {
       setIsDesktopViewport(matches);
 
@@ -133,7 +145,6 @@ export function HeaderFrame({
     };
 
     mediaQuery.addEventListener("change", handleChange);
-
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
@@ -216,35 +227,32 @@ export function HeaderFrame({
       data-keyboard-nav={isKeyboardNavigation ? "true" : "false"}
     >
       {showSkipLink && skipLinkLabel ? (
-        <a
-          href={`#${skipTargetId}`}
-          onClick={handleSkipToContent}
-          className="skip-link"
-        >
+        <a href={`#${skipTargetId}`} onClick={handleSkipToContent} className="skip-link">
           {skipLinkLabel}
         </a>
       ) : null}
 
       <div
         className={cn(
-          "relative z-60 border-b py-4 transition-all duration-500",
+          "relative z-[60] border-b py-4",
+          isTransitionReady && "transition-all duration-500",
           isMobileOverlayActive
             ? "border-transparent bg-bg-primary py-4 shadow-none backdrop-blur-none"
             : isScrolled
               ? liteMotion
-                ? "border-accent/18 bg-bg-primary py-3 shadow-lg lg:bg-bg-primary/96"
-                : "border-accent/18 bg-bg-primary py-3 shadow-lg lg:bg-bg-primary/80 lg:backdrop-blur-2xl"
-            : liteMotion
-              ? "border-transparent bg-bg-primary lg:bg-bg-primary/92"
-              : "border-transparent bg-bg-primary lg:bg-bg-primary/20 lg:backdrop-blur-md"
+                ? "border-accent/18 bg-bg-primary shadow-lg lg:bg-bg-primary/96"
+                : "border-accent/18 bg-bg-primary shadow-lg lg:bg-bg-primary/80 lg:backdrop-blur-2xl"
+              : liteMotion
+                ? "border-transparent bg-bg-primary lg:bg-bg-primary/92"
+                : "border-transparent bg-bg-primary lg:bg-bg-primary/20 lg:backdrop-blur-md",
         )}
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
+        <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-6">
           {renderHeaderLink({
             item: logo,
             className: cn(
-              "heading-serif shrink-0 rounded-sm text-xl text-text-primary transition-colors hover:text-accent md:text-2xl",
-              focusRingClass
+              "heading-serif justify-self-start shrink-0 rounded-sm text-xl text-text-primary transition-colors hover:text-accent md:text-2xl",
+              FOCUS_RING_CLASS,
             ),
             children: (
               <>
@@ -255,7 +263,7 @@ export function HeaderFrame({
 
           <nav
             aria-label={desktopNavLabel}
-            className="hidden items-center gap-8 lg:flex"
+            className="hidden items-center justify-self-center gap-8 lg:flex"
           >
             {items.map((item) => (
               <div key={`${item.kind}-${item.href}`} className="contents">
@@ -263,10 +271,8 @@ export function HeaderFrame({
                   item,
                   className: cn(
                     "group relative rounded-sm px-1 py-2 text-xs font-medium uppercase tracking-widest transition-colors",
-                    item.active
-                      ? "text-text-primary"
-                      : "text-text-secondary hover:text-accent",
-                    focusRingClass
+                    item.active ? "text-text-primary" : "text-text-secondary hover:text-accent",
+                    FOCUS_RING_CLASS,
                   ),
                   children: (
                     <>
@@ -276,7 +282,7 @@ export function HeaderFrame({
                           "pointer-events-none absolute bottom-0 left-1 right-1 h-px origin-left bg-accent transition-transform duration-300",
                           item.active
                             ? "scale-x-100"
-                            : "scale-x-0 group-hover:scale-x-100 group-focus-visible:scale-x-100"
+                            : "scale-x-0 group-hover:scale-x-100 group-focus-visible:scale-x-100",
                         )}
                       />
                     </>
@@ -284,15 +290,14 @@ export function HeaderFrame({
                 })}
               </div>
             ))}
-
-            <div aria-hidden="true" className="mx-2 h-4 w-px bg-accent/30" />
-            <div className="flex items-center gap-3">
-              <ThemeSwitcher />
-              <LanguageSwitcher />
-            </div>
           </nav>
 
-          <div className="flex items-center gap-3 lg:hidden">
+          <div className="hidden justify-self-end lg:flex lg:items-center lg:gap-3">
+            <ThemeSwitcher />
+            <LanguageSwitcher />
+          </div>
+
+          <div className="col-start-3 flex items-center justify-self-end gap-3 lg:hidden">
             <ThemeSwitcher />
             <LanguageSwitcher />
             <div className="mx-1 h-4 w-px bg-accent/30" />
@@ -302,16 +307,14 @@ export function HeaderFrame({
               onClick={() => setIsMobileMenuOpen((open) => !open)}
               className={cn(
                 "flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-full",
-                focusRingClass
+                FOCUS_RING_CLASS,
               )}
               aria-label={isMobileMenuOpen ? closeMenuLabel : openMenuLabel}
               aria-controls="mobile-navigation"
               aria-expanded={isMobileMenuOpen}
             >
               <motion.span
-                animate={
-                  isMobileMenuOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }
-                }
+                animate={isMobileMenuOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
                 className="h-0.5 w-6 rounded-full bg-accent"
               />
               <motion.span
@@ -319,9 +322,7 @@ export function HeaderFrame({
                 className="h-0.5 w-6 rounded-full bg-accent"
               />
               <motion.span
-                animate={
-                  isMobileMenuOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }
-                }
+                animate={isMobileMenuOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
                 className="h-0.5 w-6 rounded-full bg-accent"
               />
             </button>
@@ -338,7 +339,7 @@ export function HeaderFrame({
             transition={{ duration: 0.3 }}
             className={cn(
               "fixed inset-0 z-50 overflow-hidden bg-bg-primary lg:hidden",
-              !liteMotion && "backdrop-blur-2xl"
+              !liteMotion && "backdrop-blur-2xl",
             )}
           >
             <div
@@ -364,14 +365,18 @@ export function HeaderFrame({
                   initial={{ opacity: 0, x: -28 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -28 }}
-                  transition={{ delay: 0.05 + index * 0.07, duration: 0.45, ease }}
+                  transition={{
+                    delay: 0.05 + index * 0.07,
+                    duration: 0.45,
+                    ease: MOTION_EASE,
+                  }}
                   className="group border-b border-accent/18 last:border-0"
                 >
                   {renderHeaderLink({
                     item,
                     className: cn(
                       "flex items-center gap-4 rounded-sm py-[0.9rem]",
-                      focusRingClass
+                      FOCUS_RING_CLASS,
                     ),
                     onAfterSelect: () => setIsMobileMenuOpen(false),
                     ref: index === 0 ? firstMobileLinkRef : undefined,
@@ -385,7 +390,7 @@ export function HeaderFrame({
                             "heading-serif text-[1.7rem] leading-none transition-colors duration-300",
                             item.active
                               ? "text-accent"
-                              : "text-text-primary group-hover:text-accent group-focus-visible:text-accent"
+                              : "text-text-primary group-hover:text-accent group-focus-visible:text-accent",
                           )}
                         >
                           {item.label}

@@ -1,26 +1,35 @@
-import { Playfair_Display, Inter, Cinzel, Great_Vibes } from "next/font/google";
+import localFont from "next/font/local";
 
-export const playfair = Playfair_Display({
-  subsets: ["latin", "cyrillic"],
-  variable: "--font-playfair",
-  display: "swap",
-});
-
-export const inter = Inter({
-  subsets: ["latin", "cyrillic"],
+export const inter = localFont({
+  src: "./font-files/Inter-Variable.woff2",
   variable: "--font-inter",
   display: "swap",
 });
 
-export const cinzel = Cinzel({
-  subsets: ["latin"],
+export const playfair = localFont({
+  src: [
+    {
+      path: "./font-files/PlayfairDisplay-Variable.woff2",
+      style: "normal",
+    },
+    {
+      path: "./font-files/PlayfairDisplay-Italic-Variable.woff2",
+      style: "italic",
+    },
+  ],
+  variable: "--font-playfair",
+  display: "swap",
+});
+
+export const cinzel = localFont({
+  src: "./font-files/Cinzel-Variable.woff2",
   variable: "--font-cinzel",
   display: "swap",
 });
 
-export const vibes = Great_Vibes({
-  weight: "400",
-  subsets: ["latin", "cyrillic"],
+export const vibes = localFont({
+  src: "./font-files/GreatVibes-Regular.woff2",
   variable: "--font-vibes",
   display: "swap",
+  weight: "400",
 });

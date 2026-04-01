@@ -1,9 +1,10 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { useSyncExternalStore } from "react";
-import { motion } from "framer-motion";
 import { WEDDING_DATE } from "@/shared/config";
+import { cn } from "@/shared/lib";
+import { motion, useReducedMotion } from "motion/react";
+import { useTranslations } from "next-intl";
+import { useMemo, useSyncExternalStore } from "react";
 
 interface TimeLeft {
   days: number;
@@ -12,11 +13,25 @@ interface TimeLeft {
   seconds: number;
 }
 
-const TARGET_MS = WEDDING_DATE.getTime();
+interface CountdownProps {
+  className?: string;
+  nowMs?: number;
+}
 
-function calculateTimeLeft(): TimeLeft {
-  const diff = TARGET_MS - Date.now();
-  if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+const TARGET_MS = WEDDING_DATE.getTime();
+const SERVER_SNAPSHOT: TimeLeft = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+
+let globalStore = calculateTimeLeft(Date.now());
+const listeners = new Set<() => void>();
+let countdownIntervalStarted = false;
+
+function calculateTimeLeft(nowMs: number): TimeLeft {
+  const diff = TARGET_MS - nowMs;
+
+  if (diff <= 0) {
+    return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+  }
+
   return {
     days: Math.floor(diff / (1000 * 60 * 60 * 24)),
     hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
@@ -25,55 +40,68 @@ function calculateTimeLeft(): TimeLeft {
   };
 }
 
-let globalStore = calculateTimeLeft();
-const listeners = new Set<() => void>();
-let countdownIntervalStarted = false;
+function subscribeStatic(): () => void {
+  return () => undefined;
+}
 
-function ensureCountdownInterval() {
+function ensureCountdownInterval(): void {
   if (typeof window === "undefined" || countdownIntervalStarted) {
     return;
   }
 
   countdownIntervalStarted = true;
   window.setInterval(() => {
-    globalStore = calculateTimeLeft();
-    listeners.forEach((callback) => callback());
+    globalStore = calculateTimeLeft(Date.now());
+    for (const callback of listeners) {
+      callback();
+    }
   }, 1000);
 }
 
-function subscribe(callback: () => void) {
+function subscribe(callback: () => void): () => void {
   ensureCountdownInterval();
   listeners.add(callback);
+
   return () => listeners.delete(callback);
 }
 
-function getSnapshot() {
+function getSnapshot(): TimeLeft {
   return globalStore;
 }
-
-const SERVER_SNAPSHOT: TimeLeft = { days: 0, hours: 0, minutes: 0, seconds: 0 };
 
 function getServerSnapshot(): TimeLeft {
   return SERVER_SNAPSHOT;
 }
 
-export function Countdown() {
+export function Countdown({ className, nowMs }: CountdownProps) {
   const t = useTranslations("Countdown");
-  const mounted = useSyncExternalStore(
+  const reduceMotion = useReducedMotion();
+  const mountedStore = useSyncExternalStore(
     () => () => {},
     () => true,
-    () => false
+    () => false,
   );
-
-  const timeLeft = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const fixedTimeLeft = useMemo(
+    () => (typeof nowMs === "number" ? calculateTimeLeft(nowMs) : null),
+    [nowMs],
+  );
+  const mounted = typeof nowMs === "number" ? true : mountedStore;
+  const timeLeft = useSyncExternalStore(
+    typeof nowMs === "number" ? subscribeStatic : subscribe,
+    typeof nowMs === "number" ? () => fixedTimeLeft ?? SERVER_SNAPSHOT : getSnapshot,
+    typeof nowMs === "number" ? () => fixedTimeLeft ?? SERVER_SNAPSHOT : getServerSnapshot,
+  );
 
   if (!mounted) {
     return (
-      <div className="flex gap-4 md:gap-8 justify-center opacity-0">
+      <div
+        data-testid="countdown"
+        className={cn("flex justify-center gap-4 opacity-0 md:gap-8", className)}
+      >
         {["days", "hours", "minutes", "seconds"].map((unit) => (
-          <div key={unit} className="flex flex-col items-center min-w-16">
-            <span className="text-3xl md:text-5xl font-serif text-text-primary mb-1">00</span>
-            <span className="text-xs md:text-sm tracking-widest uppercase text-text-secondary">
+          <div key={unit} className="flex min-w-16 flex-col items-center">
+            <span className="mb-1 font-serif text-3xl text-text-primary md:text-5xl">00</span>
+            <span className="text-xs uppercase tracking-widest text-text-secondary md:text-sm">
               {t(unit)}
             </span>
           </div>
@@ -90,32 +118,36 @@ export function Countdown() {
   ];
 
   return (
-    <div className="flex items-start justify-center">
+    <div data-testid="countdown" className={cn("flex items-start justify-center", className)}>
       {entries.map((item, index) => (
         <div key={item.label} className="flex items-start">
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 + index * 0.1, ease: "easeOut" }}
-            className="flex flex-col items-center min-w-16 md:min-w-20 px-2 md:px-4"
+            initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+            animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            transition={
+              reduceMotion
+                ? undefined
+                : { duration: 0.8, delay: 0.2 + index * 0.1, ease: "easeOut" }
+            }
+            className="flex min-w-16 flex-col items-center px-2 md:min-w-20 md:px-4"
           >
-            <span className="text-4xl md:text-5xl font-cinzel font-medium text-text-primary mb-3 tabular-nums tracking-widest leading-none">
+            <span className="mb-3 font-cinzel text-[2.625rem] leading-none font-medium tabular-nums tracking-widest text-text-primary md:text-5xl">
               {item.value.toString().padStart(2, "0")}
             </span>
-            <span className="text-[11px] md:text-sm tracking-[0.2em] uppercase text-accent font-medium">
+            <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-accent md:text-sm">
               {item.label}
             </span>
           </motion.div>
-          {index < entries.length - 1 && (
+          {index < entries.length - 1 ? (
             <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.3 + index * 0.1 }}
-              className="font-cinzel text-2xl md:text-3xl text-accent/30 mt-1 select-none"
+              initial={reduceMotion ? false : { opacity: 0 }}
+              animate={reduceMotion ? undefined : { opacity: 1 }}
+              transition={reduceMotion ? undefined : { duration: 0.8, delay: 0.3 + index * 0.1 }}
+              className="mt-1 select-none font-cinzel text-[1.75rem] text-accent/45 md:text-[2.1rem]"
             >
               ·
             </motion.span>
-          )}
+          ) : null}
         </div>
       ))}
     </div>

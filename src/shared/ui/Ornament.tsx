@@ -6,11 +6,7 @@ interface OrnamentProps {
   size?: "sm" | "md" | "lg";
 }
 
-export function Ornament({
-  className,
-  position = "top-left",
-  size = "md",
-}: OrnamentProps) {
+export function Ornament({ className, position = "top-left", size = "md" }: OrnamentProps) {
   const sizeClasses = {
     sm: "w-16 h-16 md:w-20 md:h-20",
     md: "w-24 h-24 md:w-32 md:h-32",
@@ -27,10 +23,10 @@ export function Ornament({
   return (
     <div
       className={cn(
-        "absolute pointer-events-none opacity-60",
+        "pointer-events-none absolute opacity-60",
         positionClasses[position],
         sizeClasses[size],
-        className
+        className,
       )}
       aria-hidden="true"
     >
@@ -38,7 +34,8 @@ export function Ornament({
         viewBox="0 0 120 120"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full"
+        className="h-full w-full"
+        role="presentation"
       >
         <path
           d="M5 115 Q 20 80, 40 60 Q 55 45, 70 35 Q 85 25, 105 15"

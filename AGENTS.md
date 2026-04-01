@@ -1,20 +1,35 @@
-# Big Day — Wedding Invitation + Games Site
+# diandmax — Frontend Contract
 
-Wedding website for Maksym & Diana.
-Date: June 28, 2026.
+Wedding website for Maksym & Diana.  
+Date: June 28, 2026.  
 Venue: Grand Hotel Terminus, Bergen, Norway.
 
 > Keep `AGENTS.md` and `CLAUDE.md` aligned.
 > If a local `GEMINI.md` exists, keep that one aligned too.
 
-This repository contains:
+This repository is the current rewrite of `diandmax` in a **frontend-only, mock-first** phase.
+The old backend runtime is intentionally removed. The future server layer will be reintroduced later
+behind explicit contracts instead of evolving the deleted implementation.
 
-- the invitation site at `/` and `/en`
-- personalized invite pages at `/invite/[slug]`
-- the games hub at `/games`
-- the live wheel game at `/games/wheel-of-fortune`
-- the projector/live feed page at `/live`
-- server APIs for RSVP, games, and live snapshots
+---
+
+## Current Scope
+
+- `/` and `/en` render the invitation homepage
+- `/invite/[slug]` renders typed personalized invites from mock guest fixtures
+- `/live` renders the live projector from typed mock feed data
+- `/live?state=populated|empty|error` is the canonical local/demo state switch
+- RSVP submits into a local mock service backed by `localStorage`
+- Storybook covers reusable UI and design-system phase 2 canonical surfaces
+- Chromatic is wired through GitHub Actions and requires `CHROMATIC_PROJECT_TOKEN`
+
+### Explicitly out of scope in the current phase
+
+- API routes
+- database access
+- Supabase Auth / Realtime
+- email sending
+- production backend mutations
 
 ---
 
@@ -22,342 +37,355 @@ This repository contains:
 
 | Layer | Tool |
 |---|---|
-| Framework | Next.js 16 (App Router) |
-| Language | TypeScript 5 (strict mode) |
+| Framework | Next.js App Router |
+| Language | TypeScript strict |
 | Styling | Tailwind CSS v4 + CSS variables |
-| Animation | Framer Motion 12 |
-| i18n | next-intl 4 |
-| Forms | react-hook-form + zod + @hookform/resolvers |
-| Testing | Vitest + React Testing Library |
-| Backend services | Supabase + Resend |
-| Utilities | clsx + tailwind-merge via `cn()` |
+| Motion | `motion/react` |
+| i18n | `next-intl` |
+| Forms | `react-hook-form` + `zod` |
+| UI system | custom reusable primitives + Lucide-ready DS direction |
+| Testing | Vitest (unit + Storybook browser lanes) + Playwright + page-level screenshots |
+| Component docs | Storybook 10 |
+| Visual review | Chromatic |
+| Lint/format | Biome |
+| CI | GitHub Actions |
+| Analytics | `@vercel/analytics` + `@vercel/speed-insights` |
+
+### Future-phase policy
+
+Do not keep dormant runtime dependencies installed just because they might be useful later.
+Query-state libraries, Supabase, Drizzle, and related backend tooling should return only when a
+concrete owned feature lands in the same change.
+
+## Repository Organization
+
+- canonical config content lives in `configs/<tool>/`
+- root keeps only machine entrypoints and top-level human entrypoints
+- keep long-lived repo guidance in `README.md` and this file instead of a broad `docs/` directory
+- keep automation close to its owning config/test area; avoid reintroducing a generic root `scripts/` folder unless there is a strong reason
+- `.cache/` is for private local state and build caches
+- `artifacts/` is for readable generated outputs and reports
+- `.next/` stays as a deliberate Next.js runtime exception
+- `tsconfig.json` stays in root as a thin shell because TS Server/editor discovery and relative config resolution are root-sensitive
+- `biome.json` stays in root as a thin shell because Biome CLI/editor discovery is most predictable from the repository root
+- Vitest and Playwright are script-driven from `package.json` via `--config`, so they do not keep root config files
 
 ---
 
-## Project Structure
+## Architecture
 
-FSD-inspired, with route composition in `app/`, interactive flows in `features/`, shared primitives in `shared/`, and page/section composition in `widgets/`.
+Feature-Sliced Design (FSD) hybrid.
+
+Dependency direction:
 
 ```text
-src/
-├── app/
-│   ├── [locale]/                 # invitation, invite, games, live pages
-│   └── api/                      # rsvp, live, games APIs
-├── features/
-│   ├── countdown/
-│   ├── game-session/             # auth, local cache, shared contracts, server repositories
-│   │   └── server/
-│   │       ├── wheel-round-repository.ts   # barrel for wheel round lifecycle modules
-│   │       ├── wheel-round-shared.ts       # shared wheel lifecycle helpers + errors
-│   │       ├── wheel-round-read-repository.ts
-│   │       ├── wheel-round-start-repository.ts
-│   │       ├── wheel-round-timer-repository.ts
-│   │       ├── wheel-round-resolve-repository.ts
-│   │       ├── player-repository.ts        # profile bootstrap & save
-│   │       ├── leaderboard-repository.ts   # leaderboard + live snapshot
-│   │       ├── broadcast-repository.ts     # Supabase Broadcast signals
-│   │       ├── activity-repository.ts      # live feed activity log
-│   │       ├── wheel-session-repository.ts # session + cycle management
-│   │       ├── wheel-content-repository.ts # categories, tasks, history
-│   │       ├── repository-helpers.ts       # pure helpers, server-side timer
-│   │       ├── auth.ts                     # requireAuthenticatedGameUser
-│   │       ├── errors.ts                   # domain error classes
-│   │       ├── queries.ts                  # shared select strings
-│   │       └── index.ts                    # barrel
-│   ├── language-switcher/
-│   ├── theme-switcher/
-│   └── wheel-of-fortune/         # WheelOfFortuneGame + hook + extracted subcomponents
-│       ├── WheelOfFortuneGame.tsx  # animation + JSX only
-│       ├── useWheelGame.ts         # reducer-backed state, API calls, timer, restore logic
-│       ├── wheel-game-reducer.ts   # wheel reducer + command transitions
-│       ├── WheelChallengeOverlay.tsx
-│       ├── WheelLeaderboardCard.tsx
-│       ├── ConfettiPop.tsx
-│       └── wheel-helpers.ts      # shared constants, types, pure helpers
-├── shared/
-│   ├── config/                   # wedding data, guests, game catalog, wheel content, metadata helpers
-│   ├── i18n/
-│   ├── lib/
-│   │   ├── motion.ts             # MOTION_EASE — canonical default animation curve
-│   │   └── server/               # server-only utilities
-│   │       ├── deferred.ts       # after() + runDeferredTasks for Vercel serverless
-│   │       ├── game-api-error-handler.ts  # centralized error → HTTP response mapping
-│   │       ├── csp.ts
-│   │       └── rate-limit.ts
-│   └── ui/
-└── widgets/
-    ├── invitation-page/
-    ├── personal-invitation/
-    ├── games-hub/
-    ├── games-hero/
-    ├── games-shell/
-    ├── games-wheel-page/
-    ├── live-projector/            # decomposed projector page
-    │   ├── LiveProjectorPage.tsx  # composition root
-    │   ├── LiveClock.tsx
-    │   ├── FeedEventCard.tsx
-    │   ├── LeaderboardRow.tsx
-    │   ├── HeroEventOverlay.tsx
-    │   ├── live-projector-helpers.ts
-    │   └── useLiveProjectorSnapshot.ts
-    ├── navbar/
-    ├── not-found-page/
-    └── invitation sections
+app → widgets → features → entities → shared
 ```
 
-There is still no dedicated `entities/` layer. Keep the current structure unless a change clearly needs a reusable domain module rather than a feature- or shared-level abstraction.
+### Layer responsibilities
 
-Barrel exports are already used across the repo. Prefer importing from the barrel when one exists.
+| Layer | Purpose |
+|---|---|
+| `app/` | routes, metadata, top-level layouts |
+| `widgets/` | page sections and composite UI |
+| `features/` | focused interactive behavior |
+| `entities/` | domain contracts, typed fixtures, repositories/adapters |
+| `shared/` | global config, i18n, utilities, UI primitives |
+
+### Testing topology
+
+- unit tests stay colocated with source files as `*.test.ts(x)`
+- Storybook stories stay colocated with reusable UI and drive the browser component-test lane
+- shared test mocks/helpers live in `src/testing/`
+- route-level and visual regression specs stay in `e2e/`
+
+### Current domain ownership
+
+- `entities/guest`
+  - `GuestProfile`
+  - `InvitationContent`
+  - `GuestRepository`
+  - typed mock guest repository and slug lookups
+- `entities/event`
+  - `FeedEvent`
+  - `LeaderboardEntry`
+  - `ActivityFeedSnapshot`
+  - `LiveFeedState`
+  - `ActivityFeedSource`
+  - typed mock feed source and state resolver
+- `features/rsvp`
+  - `RsvpSubmissionInput`
+  - `RsvpSubmissionResult`
+  - `RsvpSubmissionService`
+  - mock submission service using `localStorage`
+
+### Current runtime rules
+
+- `shared/config` contains only real global site constants and metadata helpers
+- guest fixtures must not live in `shared/config`
+- UI must not `fetch` live data in the current phase
+- no DB queries, no email sending, no server-only utilities in UI flows
+- `/live` must use typed mock source, not `/api/*`
+- personalized invites must resolve through `entities/guest`
+- locale priority is `URL > NEXT_LOCALE cookie > first-visit Accept-Language`
+- first-visit locale detection resolves `uk` and `ru` to `uk`; every other locale resolves to `en`
+
+### React component logic policy
+
+- keep simple local state and straightforward derived values inside the component
+- do not extract custom hooks just to make a component file shorter
+- extract a custom hook only when it clearly reduces cognitive complexity, creates a clean test seam, or isolates a real responsibility such as submission orchestration, focus management, or heavy watcher/effect logic
+- if the logic is local, short, and easier to understand next to the JSX, leave it in the component
+- prefer a few meaningful hooks over many tiny `useSomething` wrappers with no strong ownership
 
 ---
 
-## Product Notes
+## Public UI APIs
 
-### Invitation and RSVP
+Stable reusable exports in the current phase:
 
-- `/` and `/en` render the full invitation page
-- `/invite/[slug]` renders guest-specific copy and seat count
-- personalized invite pages prefill RSVP defaults from the guest entry
-- `src/app/api/rsvp/route.ts` is implemented and uses `rsvpSchema`
-- the RSVP API rate-limits submissions, uses a honeypot `website` field that short-circuits bot-like submissions, and sends via Resend or `mock` mode
-
-Current RSVP payload shape:
-
-- `guestNames: string[]`
-- `attending: "yes" | "no"`
-- `guests: number`
-- `dietary?: string`
-- `message?: string`
-- `website?: string`
-
-### Games platform
-
-- `/games` is the public hub
-- only `wheel-of-fortune` is currently playable
-- other games remain catalog entries with `comingSoon` status in `src/shared/config/games.ts`
-- browser auth/session bootstrap lives in `src/features/game-session/auth-client.ts`
-- backend state remains authoritative; game logic and persistence live in `src/features/game-session/server` (split across domain-scoped repository files)
-- timer remaining seconds are computed server-side in `repository-helpers.ts` — clients cannot influence resolution outcome
-- post-response work (broadcast, logging, realtime signals) uses deferred tasks via Next.js `after()` to guarantee execution on Vercel serverless
-- all game API routes use a centralized error handler (`handleGameApiError`) for consistent error → HTTP response mapping
-- all game API endpoints (GET and POST) are rate-limited per authenticated user via `enforceRateLimit()`
-
-### Live projector
-
-- `/live` reads from `/api/live`
-- the client receives live updates via Supabase Broadcast (WebSocket) with 30s polling as fallback in `widgets/live-projector/useLiveProjectorSnapshot.ts`
-- hero event deduplication uses a sliding window (200 IDs) to prevent unbounded memory growth during long sessions
-- the page is intended for projector/live usage and is marked `noindex`
-
----
-
-## Shared Config, UI, and Styling
-
-`@/shared/config` is the source of truth for wedding data, guest data, game catalog, wheel content, and metadata helpers.
-
-- always import `WEDDING_DATE` from `@/shared/config`
-- do not duplicate `VENUE`, `COUPLE`, `DRESS_CODE`, guests, or metadata data in route files or widgets
-
-Current reusable UI primitives in `src/shared/ui`:
-
-- `SectionWrapper`
-- `SectionHeading`
-- `AnimatedReveal`
-- `Ornament`
 - `Button`
 - `Input`
 - `Textarea`
+- `GlassPanel`
+- `SurfacePanel`
+- `SectionShell`
+- `SectionHeading`
+- `PageEnterReveal`
+- `InViewReveal`
+- `Navbar`
+- `Countdown`
+- `LanguageSwitcher`
+- `ThemeSwitcher`
+- `TimelineRail`
+- `LeaderboardList`
+- `LeaderboardState`
+- `Footer`
+- `InvitationHeroIntro`
+- `RsvpPanel`
+- `RsvpFieldGroup`
+- `RsvpActionRow`
+- `InvitationSummaryCard`
+- `TimelineItemCard`
+- `FooterNavCluster`
+- `FooterSignatureBlock`
+- `BackToTopControl`
+- `FeedEventCard`
+- `FeedStatePanel`
+- `LeaderboardPanel`
+- `LeaderboardStatePanel`
 
-Styling rules:
+Phase 2 is a controlled unification redesign:
 
-- colors should go through CSS variables defined in `src/app/globals.css`
-- prefer Tailwind classes backed by those variables such as `bg-bg-primary`, `text-text-primary`, `text-accent`
-- avoid hardcoded colors in components except intentional config/email/SVG cases
-- headings use `heading-serif` or `heading-serif-italic`
-- numerals and formal labels use `font-cinzel`
-- default motion curve is `[0.22, 1, 0.36, 1]`; import `MOTION_EASE` from `@/shared/lib` — do not hardcode the array inline
+- RSVP panel language is the canonical surface reference
+- invitation-first surfaces lead the system direction
+- `/live` follows the same surface language where it is genuinely reusable
+- page-specific markup should stay local unless it becomes a canonical system pattern
+- `SurfacePanel` stays narrow; RSVP-specific visual treatment belongs in `RsvpPanel`
+- `SectionWrapper` is a compatibility wrapper; new section work should prefer `SectionShell`
+- `VisitedRouteScript` is the single source of truth for writing the last visited route
+
+Storybook is for these reusable blocks and their variants, not for full pages.
+
+Storybook policy:
+
+- treat Storybook as a UI catalog, not a page gallery
+- use two explicit story types:
+  - API stories for public reusable components and canonical composites; these must be args-driven
+  - composition stories for larger visual demos; these may be render-only and should disable misleading controls
+- expose only safe, serializable controls
+- never expose editable controls for `children`, `ReactNode`, JSX labels/titles, icons, separators, or arbitrary domain objects
+- if a prop is not meaningfully editable in Docs, disable its control instead of letting Storybook infer one
+- prefer shared preview wrappers from `src/testing/storybook/canvas.tsx` over ad-hoc wrapper `div`s in individual stories
+- keep time-based and stateful stories deterministic; prefer fixed story setup over `chromatic.disableSnapshot`
+- motion-heavy composition stories must set a stable Storybook/Chromatic baseline, usually via `globals: { motion: "reduce" }`, unless motion itself is the thing being reviewed
+- add interaction tests only where a component has real behavior
+- stories that mutate `document`, cookies, storage, theme, or locale state must reset cleanly between renders
+
+Storybook checklist for new stories:
+
+- decide first whether the story is API or composition
+- make API stories respond to the props shown in Docs
+- disable controls for non-serializable or render-only props
+- reuse canonical canvas helpers when possible
+- decide whether the visual baseline should run with reduced motion before leaving a composition story on the default motion global
+- keep the sidebar compact; do not add page-scale showcase stories unless the surface is truly canonical
 
 ---
 
-## Internationalization
+## Critical Imports
 
-- default locale is `uk`
-- English uses `/en`
-- messages live in `src/shared/i18n/messages/uk.json` and `en.json`
-- client navigation must use `@/shared/i18n/navigation`
-- new message keys must be added to both locale files with identical structure
+```ts
+import { WEDDING_DATE, WEDDING_DATE_ROMAN } from "@/shared/config";
+import { VENUE } from "@/shared/config";
+import { MOTION_EASE, cn } from "@/shared/lib";
 
----
+import { getAllGuestSlugs, getGuestBySlug, getInvitationContent } from "@/entities/guest";
+import { mockActivityFeedSource, resolveLiveFeedState } from "@/entities/event";
+import { mockRsvpSubmissionService } from "@/features/rsvp";
 
-## Hydration-Sensitive Code
-
-Do not casually refactor these pieces:
-
-- `features/countdown/Countdown.tsx`
-- `widgets/splash/Splash.tsx`
-- `features/language-switcher/LanguageSwitcher.tsx`
-- `features/theme-switcher/ThemeProvider.tsx`
-- `widgets/live-projector/useLiveProjectorSnapshot.ts`
-- `features/wheel-of-fortune/useWheelGame.ts`
-
-These pieces intentionally use hydration-safe patterns such as `useSyncExternalStore`, staged mount logic, mixed polling/realtime invalidation, and `useEffectEvent` for stable auto-timeout callbacks.
-
----
-
-## Supabase and Migrations
-
-Required runtime env vars:
-
-```bash
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
-SUPABASE_SECRET_KEY=
+import { usePathname, Link } from "@/shared/i18n/navigation";
 ```
 
-Supported fallbacks still exist in code for older setups:
-
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `SUPABASE_URL`
-
-For repo-local games work and `pnpm smoke:games`, anonymous sign-ins stay enabled in `supabase/config.toml`.
-
-Supabase CLI workflow on this machine:
-
-```bash
-SUPABASE_DB_PASSWORD=
-```
-
-`SUPABASE_DB_PASSWORD` is local-only. Do not commit it.
-
-Useful Supabase files:
-
-- `supabase/games_platform_schema.sql`
-- `supabase/migrations/*.sql`
-- `supabase/config.toml`
-- `supabase/seed_wheel_content.sql`
-- `supabase/reset_runtime_data.sql`
-- `supabase/verify_games_platform_setup.sql`
-- `src/features/game-session/server/supabase-types.generated.ts`
-- `src/features/game-session/server/supabase-types.generated.meta.json`
-- `supabase/games_hub_schema.sql` is legacy and should not be applied to the current setup
-
-Migration rules:
-
-- `supabase/games_platform_schema.sql` is the baseline schema snapshot
-- incremental database changes go into `supabase/migrations/*.sql`
-- when schema changes, update both the baseline snapshot and add a new migration in the same change
-- refresh generated DB types with `pnpm supabase:types:generate -- --local` or `--linked`
-- applied migrations stay committed in the repo; do not delete them after pushing
-- prefer the repo-local CLI via `pnpm exec supabase` or the `pnpm supabase:*` scripts
-- if Supabase CLI is authenticated and local `SUPABASE_DB_PASSWORD` is set, the agent may link the project and run remote migration commands without extra product-level setup
-- if CLI auth expires or the database password changes, re-auth/link may be needed
-
 ---
 
-## Server Patterns
+## Forbidden Patterns
 
-### Deferred tasks
-
-On Vercel serverless, the runtime may shut down immediately after the response is sent. Fire-and-forget (`void asyncFn()`) is unreliable. All post-response work must go through the deferred tasks pattern:
-
-1. Repository methods return `{ data, deferredTasks: DeferredTask[] }`
-2. Route handlers call `after(() => runDeferredTasks(tasks))` after sending the response
-3. `runDeferredTasks` uses `Promise.allSettled` so one failure does not block others
-
-This applies to: broadcast signals, activity logging, leaderboard notifications, and live snapshot pushes.
-Each deferred task is labeled as `{ label, run }`, so failures remain attributable in structured logs.
-
-### Centralized error handling
-
-Game API routes use `handleGameApiError()` from `@/shared/lib/server` instead of per-route `instanceof` chains. When adding a new error class, register it in `game-api-error-handler.ts` once.
-
-### Unified error envelopes and request IDs
-
-All `/api/games/*`, `/api/live`, and `/api/rsvp` error responses share the same shape:
-
-- `error: string`
-- `code: string`
-- `requestId: string`
-- `retryAfterSeconds?: number`
-
-Request IDs come from `x-request-id`, then `x-vercel-id`, then `crypto.randomUUID()`.
-
-### Structured server logging
-
-Prefer `logServerInfo()` and `logServerError()` from `@/shared/lib/server` over direct `console.error` / `console.log` in server code.
-Structured log payloads include `scope`, `event`, `requestId`, optional `context`, and serialized error details.
-
-### Server-side timer computation
-
-`computeServerRemainingSeconds()` in `repository-helpers.ts` calculates the remaining time from `timer_last_started_at` and `timer_remaining_seconds`. Clients never submit remaining seconds for round resolution.
-
-### Live projector resilience
-
-`useLiveProjectorSnapshot.ts` keeps polling active at all times.
-Supabase Broadcast invalidates the snapshot immediately, `SUBSCRIBED` forces a refresh, and retryable realtime statuses (`CHANNEL_ERROR`, `TIMED_OUT`, `CLOSED`) degrade to polling with bounded retry backoff.
-Hero-event dedupe uses a sliding 200-ID window to prevent duplicate overlays and unbounded memory growth during long projector sessions.
+- `any` in TypeScript
+- hardcoded colors instead of CSS variables
+- hardcoded motion curve instead of `MOTION_EASE`
+- hardcoded wedding metadata instead of `@/shared/config`
+- domain fixtures in `shared/config`
+- API routes or server code for current invitation/live flows
+- DB queries in UI components
+- cross-feature internal imports
+- circular dependencies
 
 ---
 
 ## Quality Gates
 
-Minimum local verification before considering the repo ready:
-
 ```bash
+pnpm typecheck
 pnpm lint
 pnpm test
+pnpm test:storybook
 pnpm test:e2e
-pnpm supabase:types:check
 pnpm build
-pnpm smoke:games
+pnpm build-storybook
 ```
 
-`pnpm smoke:games` is self-contained by default: it starts a temporary local Next.js server when `SMOKE_BASE_URL` is not set, then runs the games smoke flow against that server.
-`pnpm test:e2e` and `pnpm test:e2e:ci` both rebuild the app before Playwright starts its dedicated production server, so local browser tests cannot accidentally use a stale `.next` build.
-Run `pnpm verify:env` before smoke-related work to validate the required Supabase runtime env and local anonymous-auth config.
-`pnpm smoke:games` reports named steps and, on failure, includes the failing step, the last successful step, relevant HTTP status/payload context, and recent managed-server logs when available.
-CI additionally runs `pnpm test:coverage` to enforce coverage thresholds on the current safety-net surface.
-CI also runs `pnpm exec playwright test` after a separate build step for browser-level RSVP, games, wheel, and live-feed verification.
-CI also runs `pnpm supabase:types:check` after resetting local Supabase to catch DB type drift.
+### Test taxonomy
+
+- `pnpm test` → unit Vitest project
+- `pnpm test:storybook` → Storybook-driven browser tests through `@storybook/addon-vitest`
+- `pnpm test:e2e` → Playwright route flows and screenshot baselines
+- `pnpm test:coverage` → enforced unit coverage thresholds + coverage report output
+
+### Browser verification policy
+
+- Minor local visual tweaks can stop at quick safety checks during iteration:
+  - `pnpm lint`
+  - `pnpm typecheck`
+- Run `pnpm setup:browsers` once locally before Playwright-backed browser lanes.
+- Substantial UI/UX changes, or any UI/UX batch before commit, must end with a verification pass.
+- Minimum required full lane for substantial UI/UX work:
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm test`
+  - `pnpm build`
+  - `pnpm test:e2e`
+- If the change touches reusable UI surfaces, stories, or visual baselines, also run the relevant visual lane:
+  - `pnpm test:storybook`
+  - `pnpm build-storybook`
+- Do not leave a substantial UI/UX change or a UI/UX commit batch with failing visual, storybook, or e2e checks.
+  Fix the regression or update the approved baseline in the same change, then rerun the affected lane.
+- Prefer canonical script-driven lanes over raw tool invocations:
+  - `pnpm test:e2e`
+  - `pnpm test:storybook`
+  - `pnpm smoke:history-restore:dev`
+- Do not treat raw `pnpm exec playwright test ...` as the canonical verification path in this repo.
+  Playwright is configured via `package.json` scripts and explicit `--config` wiring.
+- In the Codex desktop sandbox on macOS, ad-hoc browser launches can fail with MachPort / permission errors.
+  Treat that as an environment limitation first, not as automatic evidence of a product bug.
+- If a build or e2e run fails with `Another next build process is already running`, check for a stale
+  `.next/lock` left by an interrupted build, clear it, and rerun the canonical script.
+- When reporting browser-test results, prefer the script-driven lane first and mention sandbox instability
+  only when the failure is genuinely environment-related.
+
+### Git hooks
+
+- `pre-commit` runs `lint-staged` only
+- `pre-push` runs `pnpm typecheck` and `pnpm test`
+
+### CI lanes
+
+- `quality`
+- `unit`
+- `build`
+- `storybook-build`
+- `storybook-tests`
+- `e2e`
+- separate `chromatic` workflow
+
+### Storybook accessibility policy
+
+- canonical reusable stories default to `a11y.test = "error"`
+- temporary exceptions must use `a11y.test = "todo"` with a short code comment and PR mention
+- do not use `a11y.test = "off"` for normal reusable surfaces
+
+### Security hardening notes
+
+- keep lightweight runtime headers in place: `nosniff`, `strict-origin-when-cross-origin`,
+  `X-Frame-Options: DENY`, and conservative `Permissions-Policy`
+- defer CSP until the remaining inline JSON-LD script policy is formalized
+
+### Visual regression
+
+- `e2e/visual.spec.ts` owns current page-level screenshot baselines
+- homepage and personalized invite use stabilized above-the-fold screenshots
+- `/live` uses full-screen baselines for empty and error states
+- Playwright screenshot baselines are committed without OS suffixes
+- the canonical screenshot lane runs on pinned `macos-15` CI to avoid cross-version rendering drift
+- global tolerance (`threshold: 0.3`, `maxDiffPixelRatio: 0.002`) is set in `configs/playwright/config.ts`; individual tests should not override unless they have a documented reason
+
+### Visual baseline maintenance
+
+- after any UI change that alters page-level appearance, regenerate baselines:
+  `pnpm test:e2e -- --update-snapshots`
+- regeneration must happen on the same OS as CI (currently macOS 15); if local OS differs,
+  let CI fail, download actual screenshots from the `playwright-report` artifact, and commit those
+- never raise tolerance thresholds to paper over a real regression; investigate first
+- when upgrading the CI macOS pin (e.g., `macos-15` → `macos-16`), regenerate all baselines
+  and commit them alongside the runner change
+
+### Chromatic
+
+- workflow file: `.github/workflows/chromatic.yml`
+- required secret: `CHROMATIC_PROJECT_TOKEN`
+- local Chromatic publishes run against the current local worktree, not an intentionally reused old Storybook build
+- do not identify a local Chromatic publish by commit SHA alone; multiple local publishes can share the same SHA when changes are uncommitted
+- when debugging Chromatic locally, use the exact build URL/build number from the CLI output and compare the failure trace to the current story code
 
 ---
 
-## Key Rules
+## Hydration-Sensitive
 
-- Never hardcode the wedding date; import `WEDDING_DATE`
-- Never hardcode the default motion curve `[0.22, 1, 0.36, 1]` inline; import `MOTION_EASE` from `@/shared/lib`
-- Keep locale message files in sync
-- Prefer server components by default
-- Keep invite and games route metadata localized
-- Use existing barrel exports when they exist
-- Treat `/invite/[slug]` and `/live` as intentionally non-indexed surfaces
-- Do not remove the current hydration-safe patterns in countdown, splash, language switcher, theme provider, or live snapshot refresh
-- Do not replace the server-authoritative wheel flow with client-side randomness or client-side score authority
-- Use the deferred tasks pattern for any post-response async work in API routes — never `void asyncFn()`
-- Register new game error types in `game-api-error-handler.ts` rather than adding `instanceof` checks in route files
+Do not casually refactor these:
+
+- `features/countdown/Countdown.tsx`
+- `widgets/splash/Splash.tsx`
+- `shared/ui/PageEnterReveal.tsx`
+- `shared/ui/InViewReveal.tsx`
+- `features/language-switcher/LanguageSwitcher.tsx`
+- `features/theme-switcher/ThemeProvider.tsx`
 
 ---
 
-## Useful Commands
+## Future Backend Re-entry
 
-```bash
-pnpm dev
-pnpm test
-pnpm test:coverage
-pnpm test:e2e
-pnpm test:e2e:ci
-pnpm verify:env
-pnpm lint
-pnpm build
-pnpm smoke:games
-pnpm generate:wheel-content-seed
-pnpm supabase:types:check
-pnpm supabase:types:generate -- --local
-pnpm supabase:login
-pnpm supabase:link
-pnpm supabase:db:push
-pnpm supabase:migration:new
-pnpm exec supabase db push --linked --dry-run
-```
+The next backend phase must plug into the existing frontend contracts instead of replacing them.
+
+Expected re-entry points:
+
+- `GuestRepository`
+  - mock today
+  - DB-backed later
+- `RsvpSubmissionService`
+  - localStorage mock today
+  - API-backed mutation later
+- `ActivityFeedSource`
+  - mock snapshots today
+  - polling + realtime adapter later
+
+Expected future server contracts:
+
+- `POST /api/rsvp` ← accepts `RsvpSubmissionInput`, returns `RsvpSubmissionResult`
+- `GET /api/activity-feed` ← returns `ActivityFeedSnapshot`
+- realtime payloads must serialize to `FeedEvent`
+
+Backend artifacts stay out of the repository until that phase starts for real. When it does, the
+same change must restore `drizzle.config.ts`, add schema/migrations, define the server env
+contract, and wire new backend-only dependencies through the existing repository/service seams.
+
+Do not reintroduce backend code without preserving these frontend-facing shapes.

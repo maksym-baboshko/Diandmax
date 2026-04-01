@@ -1,22 +1,28 @@
 import { cn } from "@/shared/lib/cn";
-import React from "react";
+import { forwardRef } from "react";
+import type React from "react";
 
 interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   error?: boolean;
 }
 
-export function Textarea({ error, className, ...props }: TextareaProps) {
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea(
+  { error, className, ...props },
+  ref,
+) {
   return (
     <textarea
+      ref={ref}
       className={cn(
-        "w-full px-4 py-3 rounded-xl border bg-bg-primary transition-all duration-300 outline-none min-h-[120px] resize-y",
-        "placeholder:text-text-secondary/90 text-text-primary",
-        !error && "border-accent/28 focus:border-accent focus:ring-2 focus:ring-accent/16 focus:bg-white dark:focus:bg-bg-primary",
-        error && "border-red-500 focus:ring-2 focus:ring-red-500/10",
-        "disabled:cursor-not-allowed disabled:border-accent/18 disabled:bg-bg-secondary/35 disabled:text-text-secondary/90",
-        className
+        "min-h-30 w-full resize-y rounded-xl border bg-bg-primary px-4 py-3 text-text-primary outline-none transition-all duration-300",
+        "placeholder:text-text-secondary/90",
+        !error &&
+          "border-accent/20 focus:border-accent focus:ring-2 focus:ring-accent/20 dark:focus:bg-bg-primary",
+        error && "border-error focus:ring-2 focus:ring-error/10",
+        "disabled:cursor-not-allowed disabled:border-accent/10 disabled:bg-bg-secondary/30 disabled:text-text-secondary/80",
+        className,
       )}
       {...props}
     />
   );
-}
+});

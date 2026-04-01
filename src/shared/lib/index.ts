@@ -1,5 +1,5 @@
 export { cn } from "./cn";
-export { playfair, inter, cinzel, vibes } from "./fonts";
+export { LAST_VISITED_ROUTE_STORAGE_KEY } from "./visited-route";
 export { MOTION_EASE } from "./motion";
-export { THEME_INIT_SCRIPT } from "./theme-script";
+export { inter, playfair, cinzel, vibes } from "./fonts";
 export { useLiteMotion } from "./useLiteMotion";

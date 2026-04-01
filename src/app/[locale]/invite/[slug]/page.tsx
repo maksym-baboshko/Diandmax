@@ -1,74 +1,56 @@
 import type { Metadata } from "next";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { PREVIEW_IMAGE, getAllGuestSlugs, getGuestBySlug } from "@/shared/config";
+
+import { getAllGuestSlugs, getGuestBySlug } from "@/entities/guest";
+import { PREVIEW_IMAGE, getOpenGraphLocale } from "@/shared/config";
 import { resolveLocale } from "@/shared/i18n/routing";
-import { InvitationPage } from "@/widgets/invitation-page";
+import { VisitedRouteScript } from "@/shared/lib/VisitedRouteScript";
+import { PersonalInvitationPage } from "@/widgets/personal-invitation";
 
 interface InvitePageProps {
-  params: Promise<{
-    locale: string;
-    slug: string;
-  }>;
+  params: Promise<{ slug: string; locale: string }>;
 }
 
-export const dynamicParams = false;
-
-export function generateStaticParams() {
+export async function generateStaticParams() {
   return getAllGuestSlugs().map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: InvitePageProps): Promise<Metadata> {
-  const { locale, slug } = await params;
-  const typedLocale = resolveLocale(locale);
+export async function generateMetadata({ params }: InvitePageProps): Promise<Metadata> {
+  const { slug, locale } = await params;
   const guest = getGuestBySlug(slug);
-
   if (!guest) {
-    return {};
+    return { robots: { index: false, follow: false } };
   }
 
-  const t = await getTranslations({
-    locale: typedLocale,
-    namespace: "InvitePage",
-  });
-
+  const t = await getTranslations("InvitePage");
+  const typedLocale = resolveLocale(locale);
   const name = guest.name[typedLocale];
   const title = t("title", { name });
   const description = t("description", { name });
-  const pagePath =
-    typedLocale === "uk" ? `/invite/${slug}` : `/en/invite/${slug}`;
+  const invitePath = typedLocale === "uk" ? `/invite/${slug}` : `/en/invite/${slug}`;
   const alternateLocale = typedLocale === "uk" ? "en_US" : "uk_UA";
 
   return {
     title,
     description,
     alternates: {
-      canonical: pagePath,
+      canonical: invitePath,
       languages: {
         uk: `/invite/${slug}`,
         en: `/en/invite/${slug}`,
         "x-default": `/invite/${slug}`,
       },
     },
-    robots: {
-      index: false,
-      follow: false,
-    },
+    robots: { index: false, follow: false },
     openGraph: {
-      url: pagePath,
+      url: invitePath,
       title,
       description,
       type: "website",
-      locale: typedLocale === "uk" ? "uk_UA" : "en_US",
+      locale: getOpenGraphLocale(typedLocale),
       alternateLocale: [alternateLocale],
-      images: [
-        {
-          url: PREVIEW_IMAGE,
-          alt: title,
-        },
-      ],
+      images: [{ url: PREVIEW_IMAGE, alt: title }],
     },
     twitter: {
       card: "summary_large_image",
@@ -80,15 +62,17 @@ export async function generateMetadata({
 }
 
 export default async function InvitePage({ params }: InvitePageProps) {
-  const { locale, slug } = await params;
-  const typedLocale = resolveLocale(locale);
+  const { slug } = await params;
   const guest = getGuestBySlug(slug);
 
   if (!guest) {
     notFound();
   }
 
-  setRequestLocale(typedLocale);
-
-  return <InvitationPage guest={guest} />;
+  return (
+    <>
+      <VisitedRouteScript />
+      <PersonalInvitationPage guest={guest} />
+    </>
+  );
 }

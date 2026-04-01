@@ -1,3 +1,1 @@
-export * from "./GamesNavbar";
-export * from "./HeaderFrame";
-export * from "./Navbar";
+export { Navbar } from "./Navbar";

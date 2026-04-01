@@ -1,5 +1,5 @@
 import { cn } from "@/shared/lib/cn";
-import React from "react";
+import type React from "react";
 
 type ButtonVariant = "primary" | "secondary" | "outline" | "ghost";
 type ButtonSize = "sm" | "md" | "lg";
@@ -22,10 +22,11 @@ export function Button<T extends React.ElementType = "button">({
   children,
   ...props
 }: ButtonProps<T>) {
-  const Component = as || "button";
+  const Component = (as ?? "button") as React.ElementType;
 
   const variantStyles: Record<ButtonVariant, string> = {
-    primary: "bg-accent text-bg-primary hover:bg-accent-hover hover:text-bg-primary shadow-sm hover:shadow-md",
+    primary:
+      "bg-accent text-bg-primary hover:bg-accent-hover hover:text-bg-primary shadow-sm hover:shadow-md",
     secondary: "bg-bg-secondary text-text-primary hover:bg-accent-soft border border-accent/20",
     outline: "border border-accent text-accent hover:bg-accent hover:text-bg-primary",
     ghost: "text-text-secondary hover:text-accent hover:bg-accent-soft/20",
@@ -40,12 +41,12 @@ export function Button<T extends React.ElementType = "button">({
   return (
     <Component
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-all duration-300 ease-out cursor-pointer",
+        "inline-flex cursor-pointer items-center justify-center gap-2 rounded-full font-medium transition-all duration-300 ease-out",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary",
         "disabled:pointer-events-none disabled:opacity-50",
         variantStyles[variant],
         sizeStyles[size],
-        className
+        className,
       )}
       {...props}
     >
